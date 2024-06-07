@@ -8,7 +8,7 @@ class PerkuliahanMahasiswaModel extends Model
     protected $primaryKey = 'id';    
 	protected $useAutoIncrement = false;
     protected $returnType       = 'object';
-    protected $useSoftDeletes   = false;
+    protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields = [
         'id_registrasi_mahasiswa',
@@ -22,6 +22,12 @@ class PerkuliahanMahasiswaModel extends Model
 		'created_at',
 		'updated_at',
 		'deleted_at',
-		'sync_at'
+		'sync_at',
+		'status_sync'
     ];
+	protected $useTimestamps = true;
+    protected $dateFormat    = 'datetime';
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
 }

@@ -15,13 +15,4 @@ class AgamaModel extends Model
     protected $allowedFields    = [
         'nama_agama'
     ];
-
-    protected bool $allowEmptyInserts = false;
-
-    // Dates
-    protected $useTimestamps = true;
-    protected $dateFormat    = 'datetime';
-    protected $createdField  = 'created_at';
-    protected $updatedField  = 'updated_at';
-    protected $deletedField  = 'deleted_at';
 }

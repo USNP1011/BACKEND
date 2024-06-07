@@ -8,14 +8,25 @@ class BimbingMahasiswaModel extends Model
     protected $primaryKey = 'id';    
     protected $useAutoIncrement = false;
     protected $returnType       = 'object';
-    protected $useSoftDeletes   = false;
+    protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields = [
         'id_bimbing_mahasiswa',
 		'bimbing_mahasiswacol',
-		'aktivitas_id',
+		'id_aktivitas',
 		'id_kategori_kegiatan',
-		'dosen_id_dosen',
+		'nama_kategori_kegiatan',
+		'id_dosen',
+		'nidn',
+		'nama_dosen',
+		'pembimbing_ke',
+		'judul',
 		'status_sync'
     ];
+    protected bool $allowEmptyInserts = false;
+    protected $useTimestamps = true;
+    protected $dateFormat    = 'datetime';
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
 }

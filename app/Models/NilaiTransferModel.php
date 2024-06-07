@@ -8,18 +8,32 @@ class NilaiTransferModel extends Model
     protected $primaryKey = 'id';    
 	protected $useAutoIncrement = false;
     protected $returnType       = 'object';
-    protected $useSoftDeletes   = false;
+    protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields = [
         'id_transfer',
 		'id_registrasi_mahasiswa',
 		'id_matkul',
+		'id_prodi',
 		'kode_mata_kuliah_asal',
 		'nama_mata_kuliah_asal',
 		'sks_mata_kuliah_asal',
 		'sks_mata_kuliah_diakui',
 		'nilai_huruf_asal',
 		'nilai_huruf_diakui',
-		'nilai_angka_diakui'
+		'nilai_angka_diakui',
+		'nim',
+		'nama_mahasiswa',
+		'nama_program_studi',
+		'id_periode_masuk',
+		'kode_matkul_diakui',
+		'nama_mata_kuliah_diakui',
+		'status_sync'
     ];
+	protected bool $allowEmptyInserts = false;
+    protected $useTimestamps = true;
+    protected $dateFormat    = 'datetime';
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
 }
