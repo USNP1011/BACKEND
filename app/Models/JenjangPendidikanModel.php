@@ -1,0 +1,16 @@
+<?php namespace App\Models;
+
+use CodeIgniter\Model;
+
+class JenjangPendidikanModel extends Model
+{
+    protected $table = 'jenjang_pendidikan';
+    protected $primaryKey = 'id_jenjang_didik';    
+    protected $useAutoIncrement = false;
+    protected $returnType       = 'object';
+    protected $useSoftDeletes   = false;
+    protected $protectFields    = true;
+    protected $allowedFields = [
+        'nama_jenjang_didik'
+    ];
+}
