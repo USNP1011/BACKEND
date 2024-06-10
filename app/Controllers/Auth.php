@@ -34,6 +34,7 @@ class Auth extends BaseController
     private function getJWTForUser(string $emailAddress, int $responseCode = ResponseInterface::HTTP_OK) 
     {
         try {
+            $item = $this->request->getJSON();
             $model = new UserModel();
             $user = ['nama'=>'Deni Malik', 'email'=>'deni@mail.com'];
 

@@ -17,7 +17,7 @@ function getJWTFromRequest($authenticationHeader): string
 function validateJWTFromRequest(string $encodedToken)
 {
     $decodedToken = JWT::decode($encodedToken, new Key(Services::getPublicKey(), 'RS256'));
-    throw new Exception('Missing or invalid JWT in request');
+    // throw new Exception('Missing or invalid JWT in request');
     // $userModel = new UserModel();
     // $userModel->findUserByEmailAddress($decodedToken->data->email);
 }

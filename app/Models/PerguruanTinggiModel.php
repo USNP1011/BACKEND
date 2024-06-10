@@ -9,7 +9,7 @@ class PerguruanTinggiModel extends Model
     protected $table            = 'profil_pt';
     protected $primaryKey       = 'id_perguruan_tinggi';
     protected $useAutoIncrement = false;
-    protected $returnType       = 'object';
+    protected $returnType       = 'App\Entities\PerguruanTinggi';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields    = [

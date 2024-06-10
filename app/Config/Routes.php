@@ -6,6 +6,8 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 $routes->get('/', 'Home::index', ['filter' => 'auth']);
+
+service('auth')->routes($routes);
 $routes->group('pt', static function($routes){
     $routes->get('read', 'PerguruanTinggi::index');
 });
@@ -13,6 +15,7 @@ $routes->group('pt', static function($routes){
 $routes->group('auth', static function($routes){
     $routes->post('login', 'Auth::login');
 });
+
 $routes->group('get_data', static function($routes){
     $routes->get('/', 'GetData::index');
     $routes->get('profile_pt', 'GetData::profile_pt');
@@ -57,3 +60,12 @@ $routes->group('get_data', static function($routes){
     $routes->get('anggota_aktivitas_mahasiswa', 'GetData::anggota_aktivitas_mahasiswa');
     $routes->get('bimbing_mahasiswa', 'GetData::bimbing_mahasiswa');
 });
+
+$routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($routes){
+    $routes->post('register', 'AuthController::register');
+    $routes->post('login', 'AuthController::login');
+    $routes->get('perguruanTinggi', 'Referensi\PerguruanTinggi::store', ['filter' => 'auth']);
+    
+});
+
+
