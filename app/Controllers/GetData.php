@@ -703,4 +703,36 @@ class GetData extends BaseController
         }
         return response()->setJSON($data);
     }
+
+    public function peserta_kelas()
+    {
+        $pesertaKelas = new \App\Models\PesertaKelasModel();
+
+        $data = $this->api->getData('GetPesertaKelasKuliah', $this->token, "");
+        if ($data->error_code == 100) {
+            $this->token = $this->api->getToken()->data->token;
+            $data = $this->api->getData('GetPesertaKelasKuliah', $this->token);
+        }
+        foreach ($data->data as $key => $value) {
+            $value->id = Uuid::uuid4()->toString();
+            $pesertaKelas->insert($value);
+        }
+        return response()->setJSON($data);
+    }
+
+    public function nilai_kelas()
+    {
+        $pesertaKelas = new \App\Models\PesertaKelasModel();
+
+        $data = $this->api->getData('GetDetailNilaiPerkuliahanKelas', $this->token, "");
+        if ($data->error_code == 100) {
+            $this->token = $this->api->getToken()->data->token;
+            $data = $this->api->getData('GetDetailNilaiPerkuliahanKelas', $this->token);
+        }
+        foreach ($data->data as $key => $value) {
+            $value->id = Uuid::uuid4()->toString();
+            $pesertaKelas->insert($value);
+        }
+        return response()->setJSON($data);
+    }
 }

@@ -11,16 +11,25 @@ class PesertaKelasModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields = [
-        'riwayat_pendidikan_mahasiswa_id',
-		'kelas_kuliah_id',
-		'id_registrasi_mahasiswa',
 		'id_kelas_kuliah',
+		'nama_kelas_kuliah',
+		'id_registrasi_mahasiswa',
+		'id_mahasiswa',
+		'nim',
+		'nama_mahasiswa',
+		'id_matkul',
+		'kode_mata_kuliah',
+		'nama_mata_kuliah',
+		'id_prodi',
+		'nama_program_studi',
+		'angkatan',
 		'nilai_angka',
 		'nilai_huruf',
 		'nilai_indeks',
 		'created_at',
 		'updated_at',
 		'deleted_at',
-		'sync_at'
+		'sync_at',
+		'status_sync',
     ];
 }

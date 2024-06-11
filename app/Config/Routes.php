@@ -59,6 +59,8 @@ $routes->group('get_data', static function($routes){
     $routes->get('aktivitas_mahasiswa', 'GetData::aktivitas_mahasiswa');
     $routes->get('anggota_aktivitas_mahasiswa', 'GetData::anggota_aktivitas_mahasiswa');
     $routes->get('bimbing_mahasiswa', 'GetData::bimbing_mahasiswa');
+    $routes->get('peserta_kelas', 'GetData::peserta_kelas');
+    $routes->get('nilai_kelas', 'GetData::nilai_kelas');
 });
 
 $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($routes){
