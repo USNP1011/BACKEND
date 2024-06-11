@@ -2,31 +2,22 @@
 
 namespace App\Controllers\Api;
 
+use App\Entities\Mahasiswa as EntitiesMahasiswa;
+use App\Models\MahasiswaModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
+use Ramsey\Uuid\Uuid;
 
-class PerguruanTinggiController extends ResourceController
+class Mahasiswa extends ResourceController
 {
-    /**
-     * Return an array of resource objects, themselves in array format.
-     *
-     * @return ResponseInterface
-     */
-    public function index()
-    {
-        //
-    }
 
-    /**
-     * Return the properties of a resource object.
-     *
-     * @param int|string|null $id
-     *
-     * @return ResponseInterface
-     */
     public function show($id = null)
     {
-        //
+        $mahasiswa = new MahasiswaModel();
+        return $this->respond([
+            'status' => true,
+            'data' => $id == null ? $mahasiswa->findAll() : $mahasiswa->where('id', $id)->first()
+        ]);
     }
 
     /**
@@ -46,7 +37,22 @@ class PerguruanTinggiController extends ResourceController
      */
     public function create()
     {
-        //
+        try {
+            $item = $this->request->getJSON();
+            $item->id = Uuid::uuid4()->toString();
+            $object = new MahasiswaModel();
+            $object->save($item);
+            return $this->respond([
+                'status' => true,
+                'data' => $item
+            ]); 
+        } catch (\Throwable $th) {
+            return $this->fail([
+                'status' => false,
+                'message' => $th->getMessage(),
+                'data' => $item
+            ]);
+        }
     }
 
     /**

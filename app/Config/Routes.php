@@ -66,8 +66,39 @@ $routes->group('get_data', static function($routes){
 $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($routes){
     $routes->post('register', 'AuthController::register');
     $routes->post('login', 'AuthController::login');
+
+
     $routes->get('perguruanTinggi', 'Referensi\PerguruanTinggi::store', ['filter' => 'auth']);
+    $routes->get('prodi', 'Referensi\Prodi::store', ['filter' => 'auth']);
+    $routes->get('semester', 'Referensi\Semester::store', ['filter' => 'auth']);
+    $routes->get('agama', 'Referensi\Agama::store', ['filter' => 'auth']);
+    $routes->get('penghasilan', 'Referensi\Penghasilan::store', ['filter' => 'auth']);
+    $routes->get('jenis_evaluasi', 'Referensi\JenisEvaluasi::store', ['filter' => 'auth']);
+    $routes->get('jenis_tinggal', 'Referensi\JenisTinggal::store', ['filter' => 'auth']);
+    $routes->get('jenis_keluar', 'Referensi\jenisKeluar::store', ['filter' => 'auth']);
+    $routes->get('jenis_sertifikasi', 'Referensi\JenisSertifikasi::store', ['filter' => 'auth']);
+    $routes->get('jenis_pendaftaran', 'Referensi\JenisPendaftaran::store', ['filter' => 'auth']);
+    $routes->get('jenis_sms', 'Referensi\JenisSMS::store', ['filter' => 'auth']);
+    $routes->get('bentuk_pendidikan', 'Referensi\BentukPendidikan::store', ['filter' => 'auth']);
+    $routes->get('jalur_masuk', 'Referensi\JalurMasuk::store', ['filter' => 'auth']);
+    $routes->get('transportasi', 'Referensi\Transportasi::store', ['filter' => 'auth']);
+    $routes->get('jenis_substansi', 'Referensi\JenisSubstansi::store', ['filter' => 'auth']);
+    $routes->get('jenjang_pendidikan', 'Referensi\JenjangPendidikan::store', ['filter' => 'auth']);
+    $routes->get('kebutuhan_khusus', 'Referensi\KebutuhanKhusus::store', ['filter' => 'auth']);
+    $routes->get('lembaga_pangkat', 'Referensi\LembagaPangkat::store', ['filter' => 'auth']);
+    $routes->get('level_wilayah', 'Referensi\LevelWilayah::store', ['filter' => 'auth']);
+    $routes->get('nagara', 'Referensi\Negara::store', ['filter' => 'auth']);
+    $routes->get('pekerjaan', 'Referensi\Pekerjaan::store', ['filter' => 'auth']);
+    $routes->get('status_mahasiswa', 'Referensi\StatusMahasiswa::store', ['filter' => 'auth']);
+    $routes->get('wilayah', 'Referensi\Wilayah::store', ['filter' => 'auth']);
+    $routes->get('skala_nilai', 'Referensi\SkalaNilai::store', ['filter' => 'auth']);
+    $routes->get('jenis_aktivitas', 'Referensi\JenisAktivitas::store', ['filter' => 'auth']);
+    $routes->get('pengajar_kelas', 'Referensi\PengajarKelas::store', ['filter' => 'auth']);
     
+
+    $routes->get('mahasiswa', 'Mahasiswa::show', ['filter' => 'auth']);
+    $routes->get('mahasiswa/(:any)', 'Mahasiswa::show/$1', ['filter' => 'auth']);
+    $routes->post('mahasiswa', 'Mahasiswa::create', ['filter' => 'auth']);
 });
 
 

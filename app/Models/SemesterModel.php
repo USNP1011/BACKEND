@@ -7,7 +7,7 @@ class SemesterModel extends Model
     protected $table = 'semester';
     protected $primaryKey = 'id_semester';  
 	protected $useAutoIncrement = false;
-    protected $returnType       = 'object';
+    protected $returnType       = 'App\Entities\Semester';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;  
     protected $allowedFields = [
