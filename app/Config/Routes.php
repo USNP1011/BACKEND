@@ -99,6 +99,14 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->get('mahasiswa', 'Mahasiswa::show', ['filter' => 'auth']);
     $routes->get('mahasiswa/(:any)', 'Mahasiswa::show/$1', ['filter' => 'auth']);
     $routes->post('mahasiswa', 'Mahasiswa::create', ['filter' => 'auth']);
+    $routes->put('mahasiswa', 'Mahasiswa::update', ['filter' => 'auth']);
+    $routes->delete('mahasiswa/(:any)', 'Mahasiswa::delete/$1', ['filter' => 'auth']);
+
+    $routes->get('riwayat_pendidikan_mahasiswa', 'RiwayatPendidikanMahasiswa::show', ['filter' => 'auth']);
+    $routes->get('riwayat_pendidikan_mahasiswa/(:any)', 'RiwayatPendidikanMahasiswa::show/$1', ['filter' => 'auth']);
+    $routes->post('riwayat_pendidikan_mahasiswa', 'RiwayatPendidikanMahasiswa::create', ['filter' => 'auth']);
+    $routes->put('riwayat_pendidikan_mahasiswa', 'RiwayatPendidikanMahasiswa::update', ['filter' => 'auth']);
+    $routes->delete('riwayat_pendidikan_mahasiswa/(:any)', 'RiwayatPendidikanMahasiswa::delete/$1', ['filter' => 'auth']);
 });
 
 

@@ -4,19 +4,20 @@ namespace App\Controllers\Api;
 
 use App\Entities\Mahasiswa as EntitiesMahasiswa;
 use App\Models\MahasiswaModel;
+use App\Models\RiwayatPendidikanMahasiswaModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use Ramsey\Uuid\Uuid;
 
-class Mahasiswa extends ResourceController
+class RiwayatPendidikanMahasiswa extends ResourceController
 {
 
     public function show($id = null)
     {
-        $mahasiswa = new MahasiswaModel();
+        $riwayat = new RiwayatPendidikanMahasiswaModel();
         return $this->respond([
             'status' => true,
-            'data' => $id == null ? $mahasiswa->findAll() : $mahasiswa->where('id', $id)->first()
+            'data' => $id == null ? $riwayat->findAll() : $riwayat->where('id', $id)->first()
         ]);
     }
 
