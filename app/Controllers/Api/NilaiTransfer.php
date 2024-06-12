@@ -4,20 +4,30 @@ namespace App\Controllers\Api;
 
 use App\Entities\Mahasiswa as EntitiesMahasiswa;
 use App\Models\MahasiswaModel;
+use App\Models\NilaiTransferModel;
 use App\Models\RiwayatPendidikanMahasiswaModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use Ramsey\Uuid\Uuid;
 
-class RiwayatPendidikanMahasiswa extends ResourceController
+class NilaiTransfer extends ResourceController
 {
 
     public function show($id = null)
     {
-        $riwayat = new RiwayatPendidikanMahasiswaModel();
+        $object = new NilaiTransferModel();
         return $this->respond([
             'status' => true,
-            'data' => $id == null ? $riwayat->findAll() : $riwayat->where('id', $id)->first()
+            'data' => $id == null ? $object->findAll() : $object->where('id', $id)->first()
+        ]);
+    }
+
+    public function showByMhs($id = null)
+    {
+        $object = new NilaiTransferModel();
+        return $this->respond([
+            'status' => true,
+            'data' => $object->where('id_riwayat_pendidikan', $id)->findAll()
         ]);
     }
 
@@ -41,8 +51,8 @@ class RiwayatPendidikanMahasiswa extends ResourceController
         try {
             $item = $this->request->getJSON();
             $item->id = null;
-            $object = new \App\Models\RiwayatPendidikanMahasiswaModel();
-            $model = new \App\Entities\RiwayatPendidikanMahasiswa();
+            $object = new \App\Models\NilaiTransferModel();
+            $model = new \App\Entities\NilaiTransferEntity();
             $model->fill((array)$item);
             $object->save($model);
             return $this->respond([
@@ -79,8 +89,8 @@ class RiwayatPendidikanMahasiswa extends ResourceController
     public function update($id = null)
     {
         try {
-            $object = new \App\Models\RiwayatPendidikanMahasiswaModel();
-            $model = new \App\Entities\RiwayatPendidikanMahasiswa();
+            $object = new \App\Models\NilaiTransferModel();
+            $model = new \App\Entities\NilaiTransferEntity();
             $model->fill((array)$this->request->getJSON());
             $object->save($model);
             return $this->respond([
@@ -105,7 +115,7 @@ class RiwayatPendidikanMahasiswa extends ResourceController
     public function delete($id = null)
     {
         try {
-            $object = new \App\Models\RiwayatPendidikanMahasiswaModel();
+            $object = new \App\Models\NilaiTransferModel();
             $object->delete($id);
             return $this->respondDeleted([
                 'status' => true,

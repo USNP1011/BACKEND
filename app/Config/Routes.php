@@ -107,6 +107,13 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->post('riwayat_pendidikan_mahasiswa', 'RiwayatPendidikanMahasiswa::create', ['filter' => 'auth']);
     $routes->put('riwayat_pendidikan_mahasiswa', 'RiwayatPendidikanMahasiswa::update', ['filter' => 'auth']);
     $routes->delete('riwayat_pendidikan_mahasiswa/(:any)', 'RiwayatPendidikanMahasiswa::delete/$1', ['filter' => 'auth']);
+
+    $routes->get('nilai_transfer', 'NilaiTransfer::show', ['filter' => 'auth']);
+    $routes->get('nilai_transfer/(:any)', 'NilaiTransfer::show/$1', ['filter' => 'auth']);
+    $routes->get('nilai_transfer_by_mahasiswa/(:any)', 'NilaiTransfer::showByMhs/$1', ['filter' => 'auth']);
+    $routes->post('nilai_transfer', 'NilaiTransfer::create', ['filter' => 'auth']);
+    $routes->put('nilai_transfer', 'NilaiTransfer::update', ['filter' => 'auth']);
+    $routes->delete('nilai_transfer/(:any)', 'NilaiTransfer::delete/$1', ['filter' => 'auth']);
 });
 
 

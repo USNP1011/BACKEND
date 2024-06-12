@@ -7,11 +7,12 @@ class NilaiTransferModel extends Model
     protected $table = 'nilai_transfer';
     protected $primaryKey = 'id';    
 	protected $useAutoIncrement = false;
-    protected $returnType       = 'object';
+    protected $returnType       = 'App\Entities\NilaiTransferEntity';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields = [
         'id_transfer',
+		'id_riwayat_pendidikan',
 		'id_registrasi_mahasiswa',
 		'id_matkul',
 		'id_prodi',
@@ -28,7 +29,8 @@ class NilaiTransferModel extends Model
 		'id_periode_masuk',
 		'kode_matkul_diakui',
 		'nama_mata_kuliah_diakui',
-		'status_sync'
+		'status_sync',
+		'sync_at'
     ];
 	protected bool $allowEmptyInserts = false;
     protected $useTimestamps = true;

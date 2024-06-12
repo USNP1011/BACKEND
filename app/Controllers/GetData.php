@@ -222,6 +222,7 @@ class GetData extends BaseController
     public function nilai_transfer()
     {
         $nilaiTransfer = new \App\Models\NilaiTransferModel();
+        $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
 
         $data = $this->api->getData('GetNilaiTransferPendidikanMahasiswa', $this->token);
         if ($data->error_code == 100) {
@@ -229,7 +230,9 @@ class GetData extends BaseController
             $data = $this->api->getData('GetNilaiTransferPendidikanMahasiswa', $this->token);
         }
         foreach ($data->data as $key => $value) {
+            $dataRiwayat = $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
             $value->id = Uuid::uuid4()->toString();
+            $value->id_riwayat_pendidikan = $dataRiwayat->id;
             $nilaiTransfer->insert($value);
         }
         return response()->setJSON($data);

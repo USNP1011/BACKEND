@@ -5,10 +5,10 @@ namespace App\Entities;
 use CodeIgniter\Entity\Entity;
 use Ramsey\Uuid\Uuid;
 
-class RiwayatPendidikanMahasiswa extends Entity
+class NilaiTransferEntity extends Entity
 {
     protected $datamap = [];
-    protected $dates   = ['tanggal_daftar','tanggal_keluar', 'sync_at', 'created_at', 'updated_at', 'deleted_at'];
+    protected $dates   = ['sync_at', 'created_at', 'updated_at', 'deleted_at'];
     protected $casts   = [];
 
     public function setId($id) {
@@ -22,6 +22,15 @@ class RiwayatPendidikanMahasiswa extends Entity
     }
     public function setNamaMahasiswa($nama_mahasiswa) {
         $this->attributes['nama_mahasiswa'] = strtoupper($nama_mahasiswa);
+        return $this;
+    }
+    public function setNamaMataKuliahAsal($nama_mata_kuliah_asal) {
+        $this->attributes['nama_mata_kuliah_asal'] = strtoupper($nama_mata_kuliah_asal);
+        return $this;
+    }
+
+    public function setNamaMataKuliahDiakui($nama_mata_kuliah_diakui) {
+        $this->attributes['nama_mata_kuliah_diakui'] = strtoupper($nama_mata_kuliah_diakui);
         return $this;
     }
 }

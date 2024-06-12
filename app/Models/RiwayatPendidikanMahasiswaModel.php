@@ -42,7 +42,6 @@ class RiwayatPendidikanMahasiswaModel extends Model
 		'created_at',
 		'updated_at',
 		'deleted_at',
-		'sync_at',
 		'status_sync',
 		'last_update',
 		'tgl_create',
@@ -50,4 +49,12 @@ class RiwayatPendidikanMahasiswaModel extends Model
 		'id_bidang_minat',
 		'id_periode_keluar'
     ];
+	protected bool $allowEmptyInserts = false;
+
+    // Dates
+    protected $useTimestamps = true;
+    protected $dateFormat    = 'datetime';
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
 }
