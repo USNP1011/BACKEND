@@ -28,7 +28,7 @@ class Database extends Config
         'DSN'          => '',
         'hostname'     => 'localhost',
         'username'     => 'root',
-        'password'     => 'Sonyalpha@77',
+        'password'     => '',
         'database'     => 'simak_usn',
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',
