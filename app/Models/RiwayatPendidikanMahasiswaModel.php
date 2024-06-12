@@ -7,7 +7,7 @@ class RiwayatPendidikanMahasiswaModel extends Model
     protected $table = 'riwayat_pendidikan_mahasiswa';
     protected $primaryKey = 'id';  
 	protected $useAutoIncrement = false;
-    protected $returnType       = 'object';
+    protected $returnType       = 'App\Entities\RiwayatPendidikanMahasiswa';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;  
     protected $allowedFields = [
