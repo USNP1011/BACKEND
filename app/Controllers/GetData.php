@@ -537,6 +537,10 @@ class GetData extends BaseController
     public function riwayat_pendidikan()
     {
         $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
+        
+        $mahasiswa = new \App\Models\MahasiswaModel();
+        // $dataMahasiswa = $mahasiswa->findAll();
+        // $a = array_search('001a955e-2dc9-4264-8b60-00f4edad0246', $dataMahasiswa);
 
         $data = $this->api->getData('GetListRiwayatPendidikanMahasiswa', $this->token);
         if ($data->error_code == 100) {
@@ -544,9 +548,12 @@ class GetData extends BaseController
             $data = $this->api->getData('GetListRiwayatPendidikanMahasiswa', $this->token);
         }
         foreach ($data->data as $key => $value) {
+            $model = new \App\Entities\RiwayatPendidikanMahasiswa();
             $value->id = Uuid::uuid4()->toString();
             $value->angkatan = $value->nim;
-            $riwayat->insert($value);
+            $value->id_mahasiswa = $mahasiswa->where('id_mahasiswa', $value->id_mahasiswa)->first()->id;
+            $model->fill((array)$value);
+            $riwayat->insert($model);
         }
         return response()->setJSON($data);
     }

@@ -39,19 +39,19 @@ class RiwayatPendidikanMahasiswa extends ResourceController
     public function create()
     {
         try {
-            $item = $this->request->getJSON();
-            $item->id = Uuid::uuid4()->toString();
-            $object = new MahasiswaModel();
-            $object->save($item);
+            $object = new \App\Models\RiwayatPendidikanMahasiswaModel();
+            $model = new \App\Entities\RiwayatPendidikanMahasiswa();
+            $model->fill((array)$this->request->getJSON());
+            $id = $model->id;
+            $object->insert($model);
             return $this->respond([
                 'status' => true,
-                'data' => $item
+                'data' => $model
             ]); 
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,
-                'message' => $th->getMessage(),
-                'data' => $item
+                'message' => $th->getMessage()
             ]);
         }
     }
