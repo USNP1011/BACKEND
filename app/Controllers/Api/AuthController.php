@@ -12,31 +12,36 @@ class AuthController extends ResourceController
 {
     public function register()
     {
-        $rules = [
-            "username" => "required",
-            "email" => "required|valid_email|is_unique[auth_identities.secret]",
-            "password" => "required"
-        ];
-        if (!$this->validate($rules)) {
-            $result = [
-                "status" => false,
-                "message" => $this->validator->getErrors(),
-                "data" => []
+        try {
+            $rules = [
+                "username" => "required",
+                "email" => "required|valid_email|is_unique[auth_identities.secret]",
+                "password" => "required"
             ];
-            return $this->failValidationErrors($result);
-        } else {
-            $userObject = auth()->getProvider();
-            $userEntityObject = new User();
-            $userEntityObject->fill((array)$this->request->getJSON());
-            $userObject->save($userEntityObject);
-            $itemData = $userObject->findById($userObject->getInsertID());
-            $userObject->addToDefaultGroup($itemData);
-            $result = [
-                "status" => true,
-                "message" => "User saved successfully",
-                "data" => []
-            ];
-            return $this->respond($result);
+            if (!$this->validate($rules)) {
+                $result = [
+                    "status" => false,
+                    "message" => $this->validator->getErrors(),
+                    "data" => []
+                ];
+                return $this->failValidationErrors($result);
+            } else {
+                $userObject = auth()->getProvider();
+                $userEntityObject = new User();
+                $userEntityObject->fill((array)$this->request->getJSON());
+                $userObject->save($userEntityObject);
+                $itemData = $userObject->findById($userObject->getInsertID());
+                $userObject->addToDefaultGroup($itemData);
+                $result = [
+                    "status" => true,
+                    "message" => "User saved successfully",
+                    "data" => []
+                ];
+                return $this->respond($result);
+            }
+        } catch (\Throwable $th) {
+            //throw $th;
+            $err= $th->getMessage();
         }
     }
 
