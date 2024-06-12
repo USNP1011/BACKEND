@@ -1,12 +1,26 @@
 <?php
 
+
+
+
 namespace App\Controllers;
+
 
 use App\Controllers\BaseController;
 use App\Libraries\Rest;
 use App\Models\PerguruanTinggiModel;
 use Ramsey\Uuid\Uuid;
 use CodeIgniter\HTTP\ResponseInterface;
+
+
+
+use OpenApi\Attributes as OA;
+
+#[OA\Info(title: "My First API", version: "0.1")]
+class OpenApi
+{
+}
+
 
 class GetData extends BaseController
 {
@@ -64,7 +78,10 @@ class GetData extends BaseController
         $this->bimbing_mahasiswa();
     }
 
-    public function profile_pt()
+
+    #[OA\Get(path: '/api/data.json')]
+    #[OA\Response(response: '200', description: 'The data')]
+    public function     profile_pt()
     {
         $data = $this->api->getData('GetProfilPT', $this->token);
         $this->pt->insert($data->data[0]);
