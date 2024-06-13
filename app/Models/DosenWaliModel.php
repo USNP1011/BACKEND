@@ -2,32 +2,23 @@
 
 use CodeIgniter\Model;
 
-class PerkuliahanMahasiswaModel extends Model
+class DosenWaliModel extends Model
 {
-    protected $table = 'perkuliahan_mahasiswa';
+    protected $table = 'dosen_wali';
     protected $primaryKey = 'id';    
 	protected $useAutoIncrement = false;
-    protected $returnType       = 'App\Entities\AktivitasKuliahEntity';
+    protected $returnType       = 'App\Entities\DosenWaliEntity';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields = [
-        'id_registrasi_mahasiswa',
         'id_riwayat_pendidikan',
-        'id_mahasiswa',
-		'id_semester',
-        'nama_semester',
+        'id_dosen',
+		'nama_mahasiswa',
         'nim',
-        'nama_mahasiswa',
-        'angkatan',
         'id_prodi',
         'nama_program_studi',
-		'id_status_mahasiswa',
-		'nama_status_mahasiswa',
-		'ips',
-		'ipk',
-		'sks_semester',
-		'total_sks',
-		'biaya_kuliah_smt',
+		'nama_dosen',
+		'nidn',
 		'created_at',
 		'updated_at',
 		'deleted_at',

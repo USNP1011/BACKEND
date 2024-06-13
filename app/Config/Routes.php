@@ -114,6 +114,20 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->post('nilai_transfer', 'NilaiTransfer::create', ['filter' => 'auth']);
     $routes->put('nilai_transfer', 'NilaiTransfer::update', ['filter' => 'auth']);
     $routes->delete('nilai_transfer/(:any)', 'NilaiTransfer::delete/$1', ['filter' => 'auth']);
+
+    $routes->get('aktivitas_kuliah', 'AktivitasKuliah::show', ['filter' => 'auth']);
+    $routes->get('aktivitas_kuliah/(:any)', 'AktivitasKuliah::show/$1', ['filter' => 'auth']);
+    $routes->get('aktivitas_kuliah_by_mahasiswa/(:any)', 'AktivitasKuliah::showByMhs/$1', ['filter' => 'auth']);
+    $routes->post('aktivitas_kuliah', 'AktivitasKuliah::create', ['filter' => 'auth']);
+    $routes->put('aktivitas_kuliah', 'AktivitasKuliah::update', ['filter' => 'auth']);
+    $routes->delete('aktivitas_kuliah/(:any)', 'AktivitasKuliah::delete/$1', ['filter' => 'auth']);
+
+    $routes->get('dosen_wali', 'DosenWali::show', ['filter' => 'auth']);
+    $routes->get('dosen_wali/(:any)', 'DosenWali::show/$1', ['filter' => 'auth']);
+    $routes->get('dosen_wali_by_dosen/(:any)', 'DosenWali::showByDsn/$1', ['filter' => 'auth']);
+    $routes->post('dosen_wali', 'DosenWali::create', ['filter' => 'auth']);
+    $routes->put('dosen_wali', 'DosenWali::update', ['filter' => 'auth']);
+    $routes->delete('dosen_wali/(:any)', 'DosenWali::delete/$1', ['filter' => 'auth']);
 });
 
 

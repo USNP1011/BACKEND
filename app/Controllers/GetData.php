@@ -13,15 +13,6 @@ use Ramsey\Uuid\Uuid;
 use CodeIgniter\HTTP\ResponseInterface;
 
 
-
-use OpenApi\Attributes as OA;
-
-#[OA\Info(title: "My First API", version: "0.1")]
-class OpenApi
-{
-}
-
-
 class GetData extends BaseController
 {
     protected $api;
@@ -79,8 +70,6 @@ class GetData extends BaseController
     }
 
 
-    #[OA\Get(path: '/api/data.json')]
-    #[OA\Response(response: '200', description: 'The data')]
     public function     profile_pt()
     {
         $data = $this->api->getData('GetProfilPT', $this->token);
@@ -430,6 +419,7 @@ class GetData extends BaseController
     public function aktivitas_kuliah()
     {
         $aktivitasMahasiswa = new \App\Models\PerkuliahanMahasiswaModel();
+        $riwayatPendidikan = new \App\Models\RiwayatPendidikanMahasiswaModel();
 
         $data = $this->api->getData('GetAktivitasKuliahMahasiswa', $this->token);
         if ($data->error_code == 100) {
@@ -438,6 +428,8 @@ class GetData extends BaseController
         }
         foreach ($data->data as $key => $value) {
             $value->id = Uuid::uuid4()->toString();
+            $riwayat = $riwayatPendidikan->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
+            $value->id_riwayat_pendidikan = $riwayat->id;
             $aktivitasMahasiswa->insert($value);
         }
         return response()->setJSON($data);

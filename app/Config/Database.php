@@ -29,6 +29,7 @@ class Database extends Config
         'hostname'     => 'localhost',
         'username'     => 'root',
         'password'     => '',
+        
         'database'     => 'simak_usn',
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',

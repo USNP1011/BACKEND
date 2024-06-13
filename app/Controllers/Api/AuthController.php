@@ -22,7 +22,6 @@ class AuthController extends ResourceController
                 $result = [
                     "status" => false,
                     "message" => $this->validator->getErrors(),
-                    "data" => []
                 ];
                 return $this->failValidationErrors($result);
             } else {
@@ -40,8 +39,7 @@ class AuthController extends ResourceController
                 return $this->respond($result);
             }
         } catch (\Throwable $th) {
-            //throw $th;
-            $err= $th->getMessage();
+            return $this->fail($th->getMessage());
         }
     }
 
@@ -88,38 +86,6 @@ class AuthController extends ResourceController
             'user' => $set,
             'access_token' => getSignedJWTForUser($set)
         ]);
-        // if (!$this->validate($rules)) {
-        //     $result = [
-        //         "status" => false,
-        //         "message" => $this->validator->getErrors(),
-        //         "data" => []
-        //     ];
-        //     return $this->failValidationErrors($result);
-        // } else {
-        //     $credentials = [
-        //         "username" => $this->request->getJsonVar('username'),
-        //         "password" => $this->request->getJsonVar('password'),
-        //     ];
-        //     $loginAttemt = auth()->attempt($credentials);
-        //     if (!$loginAttemt->isOK()) {
-        //         $result = [
-        //             "status" => false,
-        //             "message" => "Invalid login details",
-        //             "data" => []
-        //         ];
-        //     } else {
-        //         $user = new UserModel();
-        //         $userData = $user->findById(auth()->id());
-        //         $token = $userData->generateAccessToken(getenv('JWT_SECRET_KEY'));
-
-        //         $result = [
-        //             "status" => false,
-        //             "message" => $token->raw_token,
-        //             "data" => []
-        //         ];
-        //         return $this->respond($result);
-        //     }
-        // }
     }
 
     protected function getValidationRules(): array
