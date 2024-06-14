@@ -7,7 +7,7 @@ class DosenPengajarKelasModel extends Model
     protected $table = 'dosen_pengajar_kelas';
     protected $primaryKey = 'id';    
 	protected $useAutoIncrement = false;
-    protected $returnType       = 'object';
+    protected $returnType       = 'App\Entities\DosenPengajarKelasEntity';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields = [
@@ -16,7 +16,7 @@ class DosenPengajarKelasModel extends Model
         'id_dosen', 
         'nidn',
         'nama_dosen',
-		'id_kelas_kuliah',
+		'kelas_kuliah_id',
         'nama_kelas_kuliah',
 		'id_substansi',
 		'sks_substansi_total',
@@ -25,6 +25,16 @@ class DosenPengajarKelasModel extends Model
 		'id_jenis_evaluasi',
         'nama_jenis_evaluasi',
         'id_prodi',
-        'id_semester'
+        'id_semester',
+        'status_sync',
+        'sync_at'
     ];
+    protected bool $allowEmptyInserts = false;
+
+    // Dates
+    protected $useTimestamps = true;
+    protected $dateFormat    = 'datetime';
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
 }

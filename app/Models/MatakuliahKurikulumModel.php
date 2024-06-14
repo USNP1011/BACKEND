@@ -7,12 +7,12 @@ class MatakuliahKurikulumModel extends Model
     protected $table = 'matakuliah_kurikulum';
     protected $primaryKey = 'id';   
 	protected $useAutoIncrement = false;
-    protected $returnType       = 'object';
+    protected $returnType       = 'App\Entities\MatakuliahKurikulumEntity';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true; 
     protected $allowedFields = [
-		'id_kurikulum',
-		'id_matkul',
+		'kurikulum_id',
+		'matakuliah_id',
         'id_semester',
 		'sks_mata_kuliah',
 		'sks_praktek',
@@ -27,11 +27,15 @@ class MatakuliahKurikulumModel extends Model
 		'semester',
 		'semester_mulai_berlaku',
 		'sks_tatap_muka',
-		'created_at',
-		'updated_at',
-		'deleted_at',
 		'sync_at',
-		'tgl_create',
 		'status_sync'
     ];
+	protected bool $allowEmptyInserts = false;
+
+    // Dates
+    protected $useTimestamps = true;
+    protected $dateFormat    = 'datetime';
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
 }
