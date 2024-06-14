@@ -24,12 +24,13 @@ class Database extends Config
      *
      * @var array<string, mixed>
      */
+
+    
     public array $default = [
         'DSN'          => '',
         'hostname'     => 'localhost',
         'username'     => 'root',
-        'password'     => '',
-        
+        'password'     => 'Sonyalpha@77', 
         'database'     => 'simak_usn',
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',
