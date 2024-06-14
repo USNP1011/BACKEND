@@ -7,17 +7,17 @@ class PesertaKelasModel extends Model
     protected $table = 'peserta_kelas';
     protected $primaryKey = 'id';    
 	protected $useAutoIncrement = false;
-    protected $returnType       = 'object';
+    protected $returnType       = 'App\Entities\PesertaKelasEntity';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields = [
-		'id_kelas_kuliah',
+		'kelas_kuliah_id',
 		'nama_kelas_kuliah',
-		'id_registrasi_mahasiswa',
-		'id_mahasiswa',
+		'id_riwayat_pendidikan',
+		'mahasiswa_id',
 		'nim',
 		'nama_mahasiswa',
-		'id_matkul',
+		'matakuliah_id',
 		'kode_mata_kuliah',
 		'nama_mata_kuliah',
 		'id_prodi',
@@ -26,10 +26,15 @@ class PesertaKelasModel extends Model
 		'nilai_angka',
 		'nilai_huruf',
 		'nilai_indeks',
-		'created_at',
-		'updated_at',
-		'deleted_at',
 		'sync_at',
 		'status_sync',
     ];
+	protected bool $allowEmptyInserts = false;
+
+    // Dates
+    protected $useTimestamps = true;
+    protected $dateFormat    = 'datetime';
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
 }

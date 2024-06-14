@@ -37,9 +37,15 @@ class MatakuliahModel extends Model
 		'kel_mk',
 		'nama_program_studi',
 		'status_sync',
-		'created_at',
-		'updated_at',
-		'deleted_at',
 		'sync_at'
     ];
+
+	protected bool $allowEmptyInserts = false;
+
+    // Dates
+    protected $useTimestamps = true;
+    protected $dateFormat    = 'datetime';
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
 }

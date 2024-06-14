@@ -128,6 +128,25 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->post('dosen_wali', 'DosenWali::create', ['filter' => 'auth']);
     $routes->put('dosen_wali', 'DosenWali::update', ['filter' => 'auth']);
     $routes->delete('dosen_wali/(:any)', 'DosenWali::delete/$1', ['filter' => 'auth']);
+    
+    $routes->get('kelas_kuliah', 'KelasKuliah::show', ['filter' => 'auth']);
+    $routes->get('kelas_kuliah/(:any)', 'KelasKuliah::show/$1', ['filter' => 'auth']);
+    $routes->post('kelas_kuliah', 'KelasKuliah::create', ['filter' => 'auth']);
+    $routes->put('kelas_kuliah', 'KelasKuliah::update', ['filter' => 'auth']);
+    $routes->delete('kelas_kuliah/(:any)', 'KelasKuliah::delete/$1', ['filter' => 'auth']);
+
+    $routes->get('kurikulum', 'Kurikulum::show', ['filter' => 'auth']);
+    $routes->get('kurikulum/(:any)', 'Kurikulum::show/$1', ['filter' => 'auth']);
+    $routes->post('kurikulum', 'Kurikulum::create', ['filter' => 'auth']);
+    $routes->put('kurikulum', 'Kurikulum::update', ['filter' => 'auth']);
+    $routes->delete('kurikulum/(:any)', 'Kurikulum::delete/$1', ['filter' => 'auth']);
+
+    $routes->get('matakuliah_kurikulum', 'MatakuliahKurikulum::show', ['filter' => 'auth']);
+    $routes->get('matakuliah_kurikulum/(:any)', 'MatakuliahKurikulum::show/$1', ['filter' => 'auth']);
+    $routes->get('matakuliah_kurikulum_kurikulum_id/(:any)', 'MatakuliahKurikulum::by_kurikulum_id/$1', ['filter' => 'auth']);
+    $routes->post('matakuliah_kurikulum', 'MatakuliahKurikulum::create', ['filter' => 'auth']);
+    $routes->put('matakuliah_kurikulum', 'MatakuliahKurikulum::update', ['filter' => 'auth']);
+    $routes->delete('matakuliah_kurikulum/(:any)', 'MatakuliahKurikulum::delete/$1', ['filter' => 'auth']);
 });
 
 
