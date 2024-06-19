@@ -91,6 +91,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->get('pekerjaan', 'Referensi\Pekerjaan::store', ['filter' => 'auth']);
     $routes->get('status_mahasiswa', 'Referensi\StatusMahasiswa::store', ['filter' => 'auth']);
     $routes->get('wilayah', 'Referensi\Wilayah::store', ['filter' => 'auth']);
+    $routes->get('get_wilayah/(:any)/(:any)', 'Referensi\Wilayah::by_id/$1/$2', ['filter' => 'auth']);
     $routes->get('skala_nilai', 'Referensi\SkalaNilai::store', ['filter' => 'auth']);
     $routes->get('jenis_aktivitas', 'Referensi\JenisAktivitas::store', ['filter' => 'auth']);
     $routes->get('pengajar_kelas', 'Referensi\PengajarKelas::store', ['filter' => 'auth']);

@@ -16,4 +16,18 @@ class Wilayah extends ResourceController
             'data' => $object->findAll()
         ]);
     }
+
+    public function by_id($id_wilayah, $id_level_wilayah)
+    {
+        $object = new WilayahModel();
+        if($id_level_wilayah=="1"){
+            $setData = $object->where("SUBSTRING(id_wilayah,1,2)=SUBSTRING('".$id_wilayah."',1,2)")->where('id_level_wilayah', '2')->findAll();
+        }else if($id_level_wilayah=="2"){
+            $setData = $object->where("SUBSTRING(id_wilayah,1,4)=SUBSTRING('".$id_wilayah."',1,4)")->where('id_level_wilayah', '3')->findAll();
+        }
+        return $this->respond([
+            'status' => true,
+            'data' => $setData
+        ]);
+    }
 }
