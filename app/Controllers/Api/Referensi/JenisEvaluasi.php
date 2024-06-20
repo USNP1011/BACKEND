@@ -2,12 +2,10 @@
 
 namespace App\Controllers\Api\Referensi;
 
-use App\Models\AgamaModel;
 use App\Models\JenisEvaluasiModel;
-use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
-class Agama extends ResourceController
+class JenisEvaluasi extends ResourceController
 {
     public function store()
     {

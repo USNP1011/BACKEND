@@ -6,7 +6,7 @@ use App\Models\AgamaModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
-class Agama extends ResourceController
+class JenisPendaftaran extends ResourceController
 {
     public function store()
     {

@@ -2,12 +2,11 @@
 
 namespace App\Controllers\Api;
 
-use App\Models\KelasKuliahModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use Ramsey\Uuid\Uuid;
 
-class KelasKuliah extends ResourceController
+class PesertaKelas extends ResourceController
 {
 
     /**
@@ -17,21 +16,20 @@ class KelasKuliah extends ResourceController
      */
     public function show($id = null):object
     {
-        $object = new KelasKuliahModel();
+        $object = new \App\Models\PesertaKelasModel();
         return $this->respond([
             'status' => true,
             'data' => $id == null ? $object->findAll() : $object->where('id', $id)->first()
         ]);
     }
 
-
     public function create()
     {
         try {
             $item = $this->request->getJSON();
             $item->id = null;
-            $object = new \App\Models\KelasKuliahModel();
-            $model = new \App\Entities\KelasKuliahEntity();
+            $object = new \App\Models\PesertaKelasModel();
+            $model = new \App\Entities\PesertaKelasEntity();
             $model->fill((array)$item);
             $object->save($model);
             return $this->respond([
@@ -49,8 +47,8 @@ class KelasKuliah extends ResourceController
     public function update($id = null)
     {
         try {
-            $object = new \App\Models\KelasKuliahModel();
-            $model = new \App\Entities\KelasKuliahEntity();
+            $object = new \App\Models\PesertaKelasModel();
+            $model = new \App\Entities\PesertaKelasEntity();
             $model->fill((array)$this->request->getJSON());
             $object->save($model);
             return $this->respond([
@@ -69,7 +67,7 @@ class KelasKuliah extends ResourceController
     public function delete($id = null)
     {
         try {
-            $object = new \App\Models\KelasKuliahModel();
+            $object = new \App\Models\PesertaKelasModel();
             $object->delete($id);
             return $this->respondDeleted([
                 'status' => true,

@@ -95,10 +95,12 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->get('skala_nilai', 'Referensi\SkalaNilai::store', ['filter' => 'auth']);
     $routes->get('jenis_aktivitas', 'Referensi\JenisAktivitas::store', ['filter' => 'auth']);
     $routes->get('pengajar_kelas', 'Referensi\PengajarKelas::store', ['filter' => 'auth']);
+    $routes->get('penugasan_dosen', 'Referensi\PenugasanDosen::store', ['filter' => 'auth']);
     
 
     $routes->get('mahasiswa', 'Mahasiswa::show', ['filter' => 'auth']);
     $routes->get('mahasiswa/(:any)', 'Mahasiswa::show/$1', ['filter' => 'auth']);
+    $routes->get('mahasiswa_paginate/(:any)', 'Mahasiswa::paginate/$1', ['filter' => 'auth']);
     $routes->post('mahasiswa', 'Mahasiswa::create', ['filter' => 'auth']);
     $routes->put('mahasiswa', 'Mahasiswa::update', ['filter' => 'auth']);
     $routes->delete('mahasiswa/(:any)', 'Mahasiswa::delete/$1', ['filter' => 'auth']);
@@ -148,6 +150,12 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->post('matakuliah_kurikulum', 'MatakuliahKurikulum::create', ['filter' => 'auth']);
     $routes->put('matakuliah_kurikulum', 'MatakuliahKurikulum::update', ['filter' => 'auth']);
     $routes->delete('matakuliah_kurikulum/(:any)', 'MatakuliahKurikulum::delete/$1', ['filter' => 'auth']);
+
+    $routes->get('dosen_pengajar', 'DosenPengajarKelas::show', ['filter' => 'auth']);
+    $routes->get('dosen_pengajar/(:any)', 'DosenPengajarKelas::show/$1', ['filter' => 'auth']);
+    $routes->post('dosen_pengajar', 'DosenPengajarKelas::create', ['filter' => 'auth']);
+    $routes->put('dosen_pengajar', 'DosenPengajarKelas::update', ['filter' => 'auth']);
+    $routes->delete('dosen_pengajar/(:any)', 'DosenPengajarKelas::delete/$1', ['filter' => 'auth']);
 });
 
 

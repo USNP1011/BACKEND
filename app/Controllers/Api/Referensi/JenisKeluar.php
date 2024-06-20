@@ -3,11 +3,10 @@
 namespace App\Controllers\Api\Referensi;
 
 use App\Models\JenisKeluarModel;
-use App\Models\JenisPendaftaranModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
-class JenisPendaftaran extends ResourceController
+class JenisKeluar extends ResourceController
 {
     public function store()
     {

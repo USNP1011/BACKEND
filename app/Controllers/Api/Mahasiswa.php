@@ -37,20 +37,55 @@ class Mahasiswa extends ResourceController
      */
     public function create()
     {
+        $item = $this->request->getJSON();
         try {
-            $item = $this->request->getJSON();
-            $item->id = Uuid::uuid4()->toString();
-            $object = new MahasiswaModel();
-            $object->save($item);
-            return $this->respond([
-                'status' => true,
-                'data' => $item
-            ]); 
+            $rules = [
+                "nama_mahasiswa" => [
+                    "label"=>"Nama Mahasiswa",
+                    "rules"=> "required",
+                    "errors"=>[
+                        "required" => "Nama Mahasiswa Tidak Boleh Kosong"
+                    ]
+                ],
+                "email" => [
+                    "label"=>"Email",
+                    "rules"=> "required|is_unique[mahasiswa.email]",
+                    "errors"=>[
+                        "required" => "Email Tidak Boleh Kosong",
+                        "is_unique"=>"Email yang sama sudah ada"
+                    ]
+                ],
+                "nik" => [
+                    "label"=>"NIK",
+                    "rules"=> "required|is_unique[mahasiswa.nik]|max_length[16]|min_length[16]",
+                    "errors"=>[
+                        "required" => "NIK Tidak Boleh Kosong",
+                        "is_unique"=>"NIK yang sama sudah ada",
+                        "max_length"=> "NIK tidak boleh lebih dari 16 karakter",
+                        "min_length"=> "NIK tidak boleh kurang dari 16 karakter",
+                    ]
+                ],
+            ];
+            if (!$this->validate($rules)) {
+                $result = [
+                    "status" => false,
+                    "message" => $this->validator->getErrors(),
+                ];
+                return $this->failValidationErrors($result);
+            } else {
+                $item->id = Uuid::uuid4()->toString();
+                $object = new MahasiswaModel();
+                $object->save($item);
+                return $this->respond([
+                    'status' => true,
+                    'data' => $item
+                ]);
+            }
         } catch (\Throwable $th) {
-            return $this->fail([
+            if($th->getCode()==1062){}
+            return $this->failValidationErrors([
                 'status' => false,
-                'message' => $th->getMessage(),
-                'data' => $item
+                'message' => "Mahasiswa dengan nama, tempat, tanggal lahir dan ibu kandung yang sama sudah ada",
             ]);
         }
     }
@@ -83,7 +118,7 @@ class Mahasiswa extends ResourceController
             return $this->respondUpdated([
                 'status' => true,
                 'data' => $item
-            ]); 
+            ]);
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,
@@ -103,17 +138,28 @@ class Mahasiswa extends ResourceController
     {
         try {
             $object = new MahasiswaModel();
-            $a= $object->delete($id);
+            $a = $object->delete($id);
             return $this->respondDeleted([
                 'status' => true,
                 'message' => 'successful deleted',
-                'data'=>[]
-            ]); 
+                'data' => []
+            ]);
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,
                 'message' => $th->getMessage()
             ]);
         }
+    }
+
+    public function paginate($page=1)
+    {
+        $object = model(MahasiswaModel::class);
+        $item = [
+            'status' => true,
+            'data' => $object->paginate(10,'default',$page),
+            'pager' => $object->pager->getDetails()
+        ];
+        return $this->respond($item);
     }
 }

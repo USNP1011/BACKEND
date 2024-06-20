@@ -2,18 +2,18 @@
 
 namespace App\Controllers\Api\Referensi;
 
-use App\Models\SemesterModel;
+use App\Models\PenugasanDosenModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
-class Semester extends ResourceController
+class PenugasanDosen extends ResourceController
 {
     public function store()
     {
-        $semester = new SemesterModel();
+        $object = new PenugasanDosenModel();
         return $this->respond([
             'status' => true,
-            'data' => $semester->where('a_periode_aktif', '1')->first()
+            'data' => $object->join('dosen', 'penugasan_dosen.id_dosen=dosen.id_dosen', 'left')->findAll()
         ]);
     }
 }
