@@ -4,8 +4,73 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "173cf2ee5d1b3d33a4183d6635301dbb",
+    "content-hash": "56db27c7e9f529dbab23998251a86e20",
     "packages": [
+        {
+            "name": "agungsugiarto/codeigniter4-cors",
+            "version": "v3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/agungsugiarto/codeigniter4-cors.git",
+                "reference": "4b7ed2d0f6dfd6f84983b8e7f2afc99a34e54607"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/agungsugiarto/codeigniter4-cors/zipball/4b7ed2d0f6dfd6f84983b8e7f2afc99a34e54607",
+                "reference": "4b7ed2d0f6dfd6f84983b8e7f2afc99a34e54607",
+                "shasum": ""
+            },
+            "require": {
+                "codeigniter4/framework": "^4.3",
+                "php": "^7.4 || ^8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.1"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Fluent\\Cors\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Agung Sugiarto",
+                    "email": "me.agungsugiarto@tgmail.com",
+                    "homepage": "https://agungsugiarto.github.io",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Send CORS Headers in a CodeIgniter 4 application.",
+            "keywords": [
+                "ajax",
+                "api",
+                "codeigniter4",
+                "codeigniter4-cors",
+                "cors",
+                "request"
+            ],
+            "support": {
+                "issues": "https://github.com/agungsugiarto/codeigniter4-cors/issues",
+                "source": "https://github.com/agungsugiarto/codeigniter4-cors/tree/v3.0.0"
+            },
+            "funding": [
+                {
+                    "url": "https://saweria.co/agungsugiarto",
+                    "type": "custom"
+                }
+            ],
+            "time": "2023-02-18T07:33:23+00:00"
+        },
         {
             "name": "brick/math",
             "version": "0.12.1",

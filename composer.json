@@ -11,6 +11,7 @@
     },
     "require": {
         "php": "^8.1",
+        "agungsugiarto/codeigniter4-cors": "^3.0",
         "codeigniter4/framework": "^4.0",
         "codeigniter4/shield": "^1.0",
         "firebase/php-jwt": "^6.10",
