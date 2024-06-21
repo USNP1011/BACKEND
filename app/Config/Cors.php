@@ -2,27 +2,39 @@
 
 namespace Config;
 
-use CodeIgniter\Config\BaseConfig;
 
 /**
+ * --------------------------------------------------------------------------
  * Cross-Origin Resource Sharing (CORS) Configuration
+ * --------------------------------------------------------------------------
+ *
+ * Here you may configure your settings for cross-origin resource sharing
+ * or "CORS". This determines what cross-origin operations may execute
+ * in web browsers. You are free to adjust these settings as needed.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
  */
-class Cors extends BaseConfig
+class Cors extends \Fluent\Cors\Config\Cors
 {
     /**
-     * The default CORS configuration.
+     * --------------------------------------------------------------------------
+     * Allowed HTTP headers
+     * --------------------------------------------------------------------------
      *
-     * @var array{
-     *      allowedOrigins: list<string>,
-     *      allowedOriginsPatterns: list<string>,
-     *      supportsCredentials: bool,
-     *      allowedHeaders: list<string>,
-     *      exposedHeaders: list<string>,
-     *      allowedMethods: list<string>,
-     *      maxAge: int,
-     *  }
+     * Indicates which HTTP headers are allowed.
+     *
+     * @var array
+     */
+    public $allowedHeaders = ['*'];
+
+    /**
+     * --------------------------------------------------------------------------
+     * Allowed HTTP methods
+     * --------------------------------------------------------------------------
+     *
+     * Indicates which HTTP methods are allowed.
+     *
+     * @var array
      */
     public array $default = [
         /**
@@ -34,7 +46,7 @@ class Cors extends BaseConfig
          *   - ['http://localhost:8080']
          *   - ['https://www.example.com']
          */
-        'allowedOrigins' => ['*'],
+        'allowedOrigins' => [],
 
         /**
          * Origin regex patterns for the `Access-Control-Allow-Origin` header.
@@ -68,7 +80,7 @@ class Cors extends BaseConfig
          *
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers
          */
-        'allowedHeaders' => ["Content-Type","Authorization"],
+        'allowedHeaders' => [],
 
         /**
          * Set headers to expose.
@@ -93,7 +105,7 @@ class Cors extends BaseConfig
          *
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods
          */
-        'allowedMethods' => ['GET','OPTIONS', 'POST', 'PUT', 'DELETE'],
+        'allowedMethods' => [],
 
         /**
          * Set how many seconds the results of a preflight request can be cached.
