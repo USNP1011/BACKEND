@@ -19,7 +19,7 @@ class PesertaKelas extends ResourceController
         $object = new \App\Models\PesertaKelasModel();
         return $this->respond([
             'status' => true,
-            'data' => $id == null ? $object->findAll() : $object->where('id', $id)->first()
+            'data' => $id == null ? $object->findAll() : $object->where('kelas_kuliah_id', $id)->first()
         ]);
     }
 
