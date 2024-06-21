@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use CodeIgniter\API\ResponseTrait;
 use CodeIgniter\Controller;
 use CodeIgniter\HTTP\CLIRequest;
 use CodeIgniter\HTTP\IncomingRequest;
@@ -26,6 +27,7 @@ abstract class BaseController extends Controller
      *
      * @var CLIRequest|IncomingRequest
      */
+    use ResponseTrait;
     protected $request;
 
     /**

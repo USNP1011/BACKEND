@@ -2,13 +2,12 @@
 
 namespace App\Controllers\Api\Referensi;
 
+use App\Controllers\BaseController;
 use App\Models\AgamaModel;
-use CodeIgniter\HTTP\ResponseInterface;
-use CodeIgniter\RESTful\ResourceController;
 
-class Agama extends ResourceController
+class Agama extends BaseController
 {
-    public function store():ResponseInterface
+    public function store()
     {
         $object = new AgamaModel();
         return $this->respond([
