@@ -3,7 +3,6 @@
 namespace App\Controllers\Api\Referensi;
 
 use App\Models\AgamaModel;
-use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
 class Agama extends ResourceController
