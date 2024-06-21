@@ -2,6 +2,7 @@
 
 namespace Config;
 
+use App\Filters\CorsFilter;
 use CodeIgniter\Config\Filters as BaseFilters;
 use CodeIgniter\Filters\Cors;
 use CodeIgniter\Filters\CSRF;
@@ -75,6 +76,7 @@ class Filters extends BaseFilters
             // 'honeypot',
             // 'csrf',
             // 'invalidchars',
+           'cors'
         ],
         'after' => [
             // 'honeypot',
