@@ -46,7 +46,7 @@ class Cors extends \Fluent\Cors\Config\Cors
          *   - ['http://localhost:8080']
          *   - ['https://www.example.com']
          */
-        'allowedOrigins' => [],
+        'allowedOrigins' => ['*'],
 
         /**
          * Origin regex patterns for the `Access-Control-Allow-Origin` header.
@@ -59,7 +59,7 @@ class Cors extends \Fluent\Cors\Config\Cors
          * E.g.:
          *   - ['https://\w+\.example\.com']
          */
-        'allowedOriginsPatterns' => [],
+        'allowedOriginsPatterns' => ['*'],
 
         /**
          * Weather to send the `Access-Control-Allow-Credentials` header.
@@ -80,7 +80,7 @@ class Cors extends \Fluent\Cors\Config\Cors
          *
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers
          */
-        'allowedHeaders' => [],
+        'allowedHeaders' => ['*'],
 
         /**
          * Set headers to expose.
@@ -91,7 +91,7 @@ class Cors extends \Fluent\Cors\Config\Cors
          *
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers
          */
-        'exposedHeaders' => [],
+        'exposedHeaders' => ['*'],
 
         /**
          * Set methods to allow.
