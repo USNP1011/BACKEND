@@ -154,6 +154,7 @@ class Mahasiswa extends ResourceController
 
     public function paginate($page=1)
     {
+       
         $object = model(MahasiswaModel::class);
         $item = [
             'status' => true,
