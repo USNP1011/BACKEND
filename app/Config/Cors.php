@@ -105,7 +105,7 @@ class Cors extends \Fluent\Cors\Config\Cors
          *
          * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Methods
          */
-        'allowedMethods' => [],
+        'allowedMethods' => ['*'],
 
         /**
          * Set how many seconds the results of a preflight request can be cached.
