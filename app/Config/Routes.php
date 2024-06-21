@@ -100,7 +100,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
 
     $routes->get('mahasiswa', 'Mahasiswa::show', ['filter' => 'auth']);
     $routes->get('mahasiswa/(:any)', 'Mahasiswa::show/$1', ['filter' => 'auth']);
-    $routes->get('mahasiswa_paginate/(:any)', 'Mahasiswa::paginate/$1', ['filter' => 'auth']);
+    $routes->post('mahasiswa_paginate', 'Mahasiswa::paginate', ['filter' => 'auth']);
     $routes->post('mahasiswa', 'Mahasiswa::create', ['filter' => 'auth']);
     $routes->put('mahasiswa', 'Mahasiswa::update', ['filter' => 'auth']);
     $routes->delete('mahasiswa/(:any)', 'Mahasiswa::delete/$1', ['filter' => 'auth']);
