@@ -20,7 +20,10 @@ class Wilayah extends ResourceController
     public function by_id($id_wilayah, $id_level_wilayah)
     {
         $object = new WilayahModel();
-        if($id_level_wilayah=="1"){
+        if($id_level_wilayah=="0"){
+            $setData = $object->where('id_level_wilayah', '1')->findAll();
+        }
+        else if($id_level_wilayah=="1"){
             $setData = $object->where("SUBSTRING(id_wilayah,1,2)=SUBSTRING('".$id_wilayah."',1,2)")->where('id_level_wilayah', '2')->findAll();
         }else if($id_level_wilayah=="2"){
             $setData = $object->where("SUBSTRING(id_wilayah,1,4)=SUBSTRING('".$id_wilayah."',1,4)")->where('id_level_wilayah', '3')->findAll();

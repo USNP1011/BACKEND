@@ -16,7 +16,13 @@ class Mahasiswa extends ResourceController
         $mahasiswa = new MahasiswaModel();
         return $this->respond([
             'status' => true,
-            'data' => $id == null ? $mahasiswa->findAll() : $mahasiswa->where('id', $id)->first()
+            'data' => $id == null ? $mahasiswa
+                ->select("mahasiswa.*, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.nama_program_studi, riwayat_pendidikan_mahasiswa.angkatan")
+                ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id', 'left')
+                ->findAll() : $mahasiswa
+                ->select("mahasiswa.*, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.nama_program_studi, riwayat_pendidikan_mahasiswa.angkatan")
+                ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id', 'left')
+                ->where('id', $id)->first()
         ]);
     }
 
@@ -41,28 +47,28 @@ class Mahasiswa extends ResourceController
         try {
             $rules = [
                 "nama_mahasiswa" => [
-                    "label"=>"Nama Mahasiswa",
-                    "rules"=> "required",
-                    "errors"=>[
+                    "label" => "Nama Mahasiswa",
+                    "rules" => "required",
+                    "errors" => [
                         "required" => "Nama Mahasiswa Tidak Boleh Kosong"
                     ]
                 ],
                 "email" => [
-                    "label"=>"Email",
-                    "rules"=> "required|is_unique[mahasiswa.email]",
-                    "errors"=>[
+                    "label" => "Email",
+                    "rules" => "required|is_unique[mahasiswa.email]",
+                    "errors" => [
                         "required" => "Email Tidak Boleh Kosong",
-                        "is_unique"=>"Email yang sama sudah ada"
+                        "is_unique" => "Email yang sama sudah ada"
                     ]
                 ],
                 "nik" => [
-                    "label"=>"NIK",
-                    "rules"=> "required|is_unique[mahasiswa.nik]|max_length[16]|min_length[16]",
-                    "errors"=>[
+                    "label" => "NIK",
+                    "rules" => "required|is_unique[mahasiswa.nik]|max_length[16]|min_length[16]",
+                    "errors" => [
                         "required" => "NIK Tidak Boleh Kosong",
-                        "is_unique"=>"NIK yang sama sudah ada",
-                        "max_length"=> "NIK tidak boleh lebih dari 16 karakter",
-                        "min_length"=> "NIK tidak boleh kurang dari 16 karakter",
+                        "is_unique" => "NIK yang sama sudah ada",
+                        "max_length" => "NIK tidak boleh lebih dari 16 karakter",
+                        "min_length" => "NIK tidak boleh kurang dari 16 karakter",
                     ]
                 ],
             ];
@@ -82,7 +88,8 @@ class Mahasiswa extends ResourceController
                 ]);
             }
         } catch (\Throwable $th) {
-            if($th->getCode()==1062){}
+            if ($th->getCode() == 1062) {
+            }
             return $this->failValidationErrors([
                 'status' => false,
                 'message' => "Mahasiswa dengan nama, tempat, tanggal lahir dan ibu kandung yang sama sudah ada",
@@ -152,13 +159,13 @@ class Mahasiswa extends ResourceController
         }
     }
 
-    public function paginate($page=1)
+    public function paginate($page = 1, $count = 10, $cari = null)
     {
-       
+        $item = $this->request->getJSON();
         $object = model(MahasiswaModel::class);
         $item = [
             'status' => true,
-            'data' => $object->paginate(10,'default',$page),
+            'data' => $object->paginate($count, 'default', $page),
             'pager' => $object->pager->getDetails()
         ];
         return $this->respond($item);
