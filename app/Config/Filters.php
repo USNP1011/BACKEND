@@ -33,7 +33,7 @@ class Filters extends BaseFilters
         'invalidchars'  => InvalidChars::class,
         'secureheaders' => SecureHeaders::class,
         'cors'          => \Fluent\Cors\Filters\CorsFilter::class,
-        // 'cors'          => Cors::class,
+        // 'cors'          => \App\Filters\Cors::class,
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,

@@ -10,7 +10,6 @@ use Ramsey\Uuid\Uuid;
 
 class Mahasiswa extends ResourceController
 {
-
     public function show($id = null)
     {
         $mahasiswa = new MahasiswaModel();
@@ -22,7 +21,7 @@ class Mahasiswa extends ResourceController
                 ->findAll() : $mahasiswa
                 ->select("mahasiswa.*, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.nama_program_studi, riwayat_pendidikan_mahasiswa.angkatan")
                 ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id', 'left')
-                ->where('id', $id)->first()
+                ->where('mahasiswa.id', $id)->first()
         ]);
     }
 

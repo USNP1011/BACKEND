@@ -70,7 +70,6 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
 
     $routes->get('perguruanTinggi', 'Referensi\PerguruanTinggi::store', ['filter' => 'auth']);
     $routes->get('prodi', 'Referensi\Prodi::store', ['filter' => 'auth']);
-    $routes->get('semester', 'Referensi\Semester::store', ['filter' => 'auth']);
     $routes->get('agama', 'Referensi\Agama::store', ['filter' => 'auth']);
     $routes->get('penghasilan', 'Referensi\Penghasilan::store', ['filter' => 'auth']);
     $routes->get('jenis_evaluasi', 'Referensi\JenisEvaluasi::store', ['filter' => 'auth']);
@@ -95,8 +94,13 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->get('skala_nilai', 'Referensi\SkalaNilai::store', ['filter' => 'auth']);
     $routes->get('jenis_aktivitas', 'Referensi\JenisAktivitas::store', ['filter' => 'auth']);
     $routes->get('pengajar_kelas', 'Referensi\PengajarKelas::store', ['filter' => 'auth']);
+    $routes->get('dosen', 'Referensi\Dosen::store', ['filter' => 'auth']);
     $routes->get('penugasan_dosen', 'Referensi\PenugasanDosen::store', ['filter' => 'auth']);
     
+
+    $routes->get('semester', 'Referensi\Semester::store', ['filter' => 'auth']);
+    $routes->get('semester/(:any)', 'Referensi\Semester::store/$1', ['filter' => 'auth']);
+    $routes->put('semester', 'Referensi\Semester::update', ['filter' => 'auth']);
 
     $routes->get('mahasiswa', 'Mahasiswa::show', ['filter' => 'auth']);
     $routes->get('mahasiswa/(:any)', 'Mahasiswa::show/$1', ['filter' => 'auth']);
