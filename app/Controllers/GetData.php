@@ -41,7 +41,6 @@ class GetData extends BaseController
         $this->bentuk_pendidikan();
         $this->jalur_masuk();
         $this->transportasi();
-        $this->nilai_transfer();
         $this->jenis_substansi();
         $this->jenjang_pendidikan();
         $this->kebutuhan_khusus();
@@ -65,13 +64,14 @@ class GetData extends BaseController
         $this->peserta_kelas();
         $this->status_mahasiswa();
         $this->aktivitas_kuliah();
+        $this->nilai_transfer();
         $this->aktivitas_mahasiswa();
         $this->anggota_aktivitas_mahasiswa();
         $this->bimbing_mahasiswa();
     }
 
 
-    public function     profile_pt()
+    public function profile_pt()
     {
         $data = $this->api->getData('GetProfilPT', $this->token);
         $this->pt->insert($data->data[0]);

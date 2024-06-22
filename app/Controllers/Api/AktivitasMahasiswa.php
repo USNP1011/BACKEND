@@ -2,39 +2,44 @@
 
 namespace App\Controllers\Api;
 
-use App\Models\KelasKuliahModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use Ramsey\Uuid\Uuid;
 
-class KelasKuliah extends ResourceController
+class AktivitasMahasiswa extends ResourceController
 {
+    protected $aktivitasMahasiswa;
+    protected $semester;
     public function __construct() {
         helper('semester');
+        $this->aktivitasMahasiswa = new \App\Models\AktivitasMahasiswaModel();
+        $this->semester = getSemesterAktif();
     }
-    /**
-     * @param null $id
-     * 
-     * @return object
-     */
-    public function show($id = null):object
+
+    public function show($id = null)
     {
-        $semester = getSemesterAktif();
-        $object = new KelasKuliahModel();
         return $this->respond([
             'status' => true,
-            'data' => $id == null ? $object->findAll() : $object->where('id', $id)->first()
+            'data' => $id == null ? $this->aktivitasMahasiswa->where('id_semester', $this->semester->id_semester)->findAll() : $this->aktivitasMahasiswa->where('id', $id)->first()
         ]);
     }
 
+    // public function showByMhs($id = null)
+    // {
+    //     $object = new PerkuliahanMahasiswaModel();
+    //     return $this->respond([
+    //         'status' => true,
+    //         'data' => $object->where('id_riwayat_pendidikan', $id)->findAll()
+    //     ]);
+    // }
 
     public function create()
     {
         try {
             $item = $this->request->getJSON();
             $item->id = null;
-            $object = new \App\Models\KelasKuliahModel();
-            $model = new \App\Entities\KelasKuliahEntity();
+            $object = new \App\Models\PerkuliahanMahasiswaModel();
+            $model = new \App\Entities\AktivitasKuliahEntity();
             $model->fill((array)$item);
             $object->save($model);
             return $this->respond([
@@ -52,8 +57,8 @@ class KelasKuliah extends ResourceController
     public function update($id = null)
     {
         try {
-            $object = new \App\Models\KelasKuliahModel();
-            $model = new \App\Entities\KelasKuliahEntity();
+            $object = new \App\Models\PerkuliahanMahasiswaModel();
+            $model = new \App\Entities\AktivitasKuliahEntity();
             $model->fill((array)$this->request->getJSON());
             $object->save($model);
             return $this->respond([
@@ -72,7 +77,7 @@ class KelasKuliah extends ResourceController
     public function delete($id = null)
     {
         try {
-            $object = new \App\Models\KelasKuliahModel();
+            $object = new \App\Models\PerkuliahanMahasiswaModel();
             $object->delete($id);
             return $this->respondDeleted([
                 'status' => true,
