@@ -95,6 +95,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->get('jenis_aktivitas', 'Referensi\JenisAktivitas::store', ['filter' => 'auth']);
     $routes->get('pengajar_kelas', 'Referensi\PengajarKelas::store', ['filter' => 'auth']);
     $routes->get('dosen', 'Referensi\Dosen::store', ['filter' => 'auth']);
+    $routes->get('dosen/(:any)', 'Referensi\Dosen::store/$1', ['filter' => 'auth']);
     $routes->get('penugasan_dosen', 'Referensi\PenugasanDosen::store', ['filter' => 'auth']);
     
 
@@ -104,7 +105,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
 
     $routes->get('mahasiswa', 'Mahasiswa::show', ['filter' => 'auth']);
     $routes->get('mahasiswa/(:any)', 'Mahasiswa::show/$1', ['filter' => 'auth']);
-    $routes->get('mahasiswa_paginate', 'Mahasiswa::paginate', ['filter' => 'auth']);
+    $routes->post('mahasiswa_paginate', 'Mahasiswa::paginate', ['filter' => 'auth']);
     $routes->post('mahasiswa', 'Mahasiswa::create', ['filter' => 'auth']);
     $routes->put('mahasiswa', 'Mahasiswa::update', ['filter' => 'auth']);
     $routes->delete('mahasiswa/(:any)', 'Mahasiswa::delete/$1', ['filter' => 'auth']);

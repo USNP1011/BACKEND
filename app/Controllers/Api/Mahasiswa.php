@@ -44,34 +44,7 @@ class Mahasiswa extends ResourceController
     {
         $item = $this->request->getJSON();
         try {
-            $rules = [
-                "nama_mahasiswa" => [
-                    "label" => "Nama Mahasiswa",
-                    "rules" => "required",
-                    "errors" => [
-                        "required" => "Nama Mahasiswa Tidak Boleh Kosong"
-                    ]
-                ],
-                "email" => [
-                    "label" => "Email",
-                    "rules" => "required|is_unique[mahasiswa.email]",
-                    "errors" => [
-                        "required" => "Email Tidak Boleh Kosong",
-                        "is_unique" => "Email yang sama sudah ada"
-                    ]
-                ],
-                "nik" => [
-                    "label" => "NIK",
-                    "rules" => "required|is_unique[mahasiswa.nik]|max_length[16]|min_length[16]",
-                    "errors" => [
-                        "required" => "NIK Tidak Boleh Kosong",
-                        "is_unique" => "NIK yang sama sudah ada",
-                        "max_length" => "NIK tidak boleh lebih dari 16 karakter",
-                        "min_length" => "NIK tidak boleh kurang dari 16 karakter",
-                    ]
-                ],
-            ];
-            if (!$this->validate($rules)) {
+            if (!$this->validate('mahasiswa')) {
                 $result = [
                     "status" => false,
                     "message" => $this->validator->getErrors(),
@@ -164,7 +137,7 @@ class Mahasiswa extends ResourceController
         $object = model(MahasiswaModel::class);
         $item = [
             'status' => true,
-            'data' => $object->paginate($count, 'default', $page),
+            'data' => $object->like('nama_mahasiswa', $item->cari)->paginate($item->count, 'default', $item->page),
             'pager' => $object->pager->getDetails()
         ];
         return $this->respond($item);
