@@ -66,8 +66,6 @@ $routes->group('get_data', static function($routes){
 $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($routes){
     $routes->post('register', 'AuthController::register');
     $routes->post('login', 'AuthController::login');
-
-
     $routes->get('perguruanTinggi', 'Referensi\PerguruanTinggi::store', ['filter' => 'auth']);
     $routes->get('prodi', 'Referensi\Prodi::store', ['filter' => 'auth']);
     $routes->get('agama', 'Referensi\Agama::store', ['filter' => 'auth']);
