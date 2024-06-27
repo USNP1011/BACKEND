@@ -154,4 +154,22 @@ class Validation extends BaseConfig
             ]
         ]
     ];
+
+    public array $userMahasiswa = [
+        "username" => [
+            "label" => "Email",
+            "rules" => "required",
+            "errors" => [
+                "required" => "Email Mahasiswa Tidak Boleh Kosong karna dijadikan sebagai username"
+            ]
+        ],
+        "email" => [
+            "label" => "Email",
+            "rules" => "required|is_unique[mahasiswa.email]",
+            "errors" => [
+                "required" => "Email Tidak Boleh Kosong",
+                "is_unique" => "Email yang sama sudah ada"
+            ]
+        ],
+    ];
 }

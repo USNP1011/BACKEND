@@ -8,7 +8,7 @@ class RiwayatPendidikanMahasiswaModel extends Model
     protected $primaryKey = 'id';  
 	protected $useAutoIncrement = false;
     protected $returnType       = 'App\Entities\RiwayatPendidikanMahasiswa';
-    protected $useSoftDeletes   = false;
+    protected $useSoftDeletes   = true;
     protected $protectFields    = true;  
     protected $allowedFields = [
 		'id_registrasi_mahasiswa',
@@ -54,4 +54,11 @@ class RiwayatPendidikanMahasiswaModel extends Model
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
     protected $deletedField  = 'deleted_at';
+
+	protected $beforeDelete = ['beforeDeleteCallback'];
+
+	protected function beforeDeleteCallback(array $data)
+    {
+		$this->update($data['id'][0], ['sync_at'=>null, 'status_sync'=>null]);
+    }
 }

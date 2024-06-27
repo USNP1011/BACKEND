@@ -44,7 +44,7 @@ class RiwayatPendidikanMahasiswa extends ResourceController
             $object = new \App\Models\RiwayatPendidikanMahasiswaModel();
             $model = new \App\Entities\RiwayatPendidikanMahasiswa();
             $model->fill((array)$item);
-            $object->save($model);
+            $object->insert($model);
             return $this->respond([
                 'status' => true,
                 'data' => $model

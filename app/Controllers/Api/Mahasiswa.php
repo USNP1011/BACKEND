@@ -4,9 +4,12 @@ namespace App\Controllers\Api;
 
 use App\Entities\Mahasiswa as EntitiesMahasiswa;
 use App\Models\MahasiswaModel;
+use App\Models\UserRoleModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use Ramsey\Uuid\Uuid;
+use CodeIgniter\Database\Exceptions\DatabaseException;
+use CodeIgniter\Shield\Entities\User;
 
 class Mahasiswa extends ResourceController
 {
@@ -43,25 +46,54 @@ class Mahasiswa extends ResourceController
     public function create()
     {
         $item = $this->request->getJSON();
+        $conn = \Config\Database::connect();
         try {
+            $conn->transException(true)->transStart();
+            $itemUser = [
+                'username' => $item->email,
+                'email' => $item->email,
+                'password' => 'Usn1011!'
+            ];
+            if (!$this->validateData($itemUser, 'userMahasiswa')) {
+                $result = [
+                    "status" => false,
+                    "message" => $this->validator->getErrors(),
+                ];
+                return $this->failValidationErrors($result);
+            }
             if (!$this->validate('mahasiswa')) {
                 $result = [
                     "status" => false,
                     "message" => $this->validator->getErrors(),
                 ];
                 return $this->failValidationErrors($result);
-            } else {
-                $item->id = Uuid::uuid4()->toString();
-                $object = new MahasiswaModel();
-                $model = new EntitiesMahasiswa();
-                $model->fill((array) $item);
-                $object->insert($item);
-                return $this->respond([
-                    'status' => true,
-                    'data' => $item
-                ]);
             }
-        } catch (\Throwable $th) {
+            $userObject = auth()->getProvider();
+            $userEntityObject = new User();
+            $userEntityObject->fill($itemUser);
+            $userObject->save($userEntityObject);
+            $itemData = $userObject->findById($userObject->getInsertID());
+            $item->id_user = $userObject->getInsertID();
+            $userObject->addToDefaultGroup($itemData);
+
+            $role = [
+                'users_id'=> $item->id_user,
+                'role_id'=> '6'
+            ];
+            $userRole = new UserRoleModel();
+            $userRole->insert($role);
+
+            $item->id = Uuid::uuid4()->toString();
+            $object = new MahasiswaModel();
+            $model = new EntitiesMahasiswa();
+            $model->fill((array) $item);
+            $object->insert($item);
+            $conn->transComplete();
+            return $this->respond([
+                'status' => true,
+                'data' => $item
+            ]);
+        } catch (DatabaseException $th) {
             if ($th->getCode() == 1062) {
             }
             return $this->failValidationErrors([
