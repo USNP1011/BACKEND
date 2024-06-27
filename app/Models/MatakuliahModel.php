@@ -7,8 +7,8 @@ class MatakuliahModel extends Model
     protected $table = 'matakuliah';
     protected $primaryKey = 'id';    
 	protected $useAutoIncrement = false;
-    protected $returnType       = 'object';
-    protected $useSoftDeletes   = false;
+    protected $returnType       = '\App\Entities\MatakuliahEntity';
+    protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields = [
 		'id_matkul',
@@ -21,7 +21,6 @@ class MatakuliahModel extends Model
 		'sks_tatap_muka',
 		'sks_praktek',
 		'sks_praktek_lapangan',
-		'id_jenjang_didik',
 		'sks_simulasi',
 		'metode_kuliah',
 		'ada_sap',
@@ -48,4 +47,11 @@ class MatakuliahModel extends Model
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
     protected $deletedField  = 'deleted_at';
+
+	protected $beforeDelete = ['beforeDeleteCallback'];
+
+	protected function beforeDeleteCallback(array $data)
+    {
+		$this->update($data['id'][0], ['sync_at'=>null, 'status_sync'=>null]);
+    }
 }

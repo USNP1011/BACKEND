@@ -5,6 +5,7 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
+$routes->set404Override('App\Controllers\Errors::show404');
 $routes->get('/', 'Home::index');
 
 service('auth')->routes($routes);
@@ -107,6 +108,13 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->post('mahasiswa', 'Mahasiswa::create', ['filter' => 'auth']);
     $routes->put('mahasiswa', 'Mahasiswa::update', ['filter' => 'auth']);
     $routes->delete('mahasiswa/(:any)', 'Mahasiswa::delete/$1', ['filter' => 'auth']);
+
+    $routes->get('matakuliah', 'Matakuliah::show', ['filter' => 'auth']);
+    $routes->get('matakuliah/(:any)', 'Matakuliah::show/$1', ['filter' => 'auth']);
+    $routes->post('matakuliah_paginate', 'Matakuliah::paginate', ['filter' => 'auth']);
+    $routes->post('matakuliah', 'Matakuliah::create', ['filter' => 'auth']);
+    $routes->put('matakuliah', 'Matakuliah::update', ['filter' => 'auth']);
+    $routes->delete('matakuliah/(:any)', 'Matakuliah::delete/$1', ['filter' => 'auth']);
 
     $routes->get('riwayat_pendidikan_mahasiswa', 'RiwayatPendidikanMahasiswa::show', ['filter' => 'auth']);
     $routes->get('riwayat_pendidikan_mahasiswa/(:any)', 'RiwayatPendidikanMahasiswa::show/$1', ['filter' => 'auth']);

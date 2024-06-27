@@ -69,4 +69,89 @@ class Validation extends BaseConfig
             ]
         ],
     ];
+
+    public array $matakuliah = [
+        "kode_mata_kuliah" => [
+            "label" => "Kode Matakuliah",
+            "rules" => "required|is_unique[matakuliah.kode_mata_kuliah]",
+            "errors" => [
+                "required" => "kode_mata_kuliah Tidak Boleh Kosong",
+                "is_unique" => "kode_mata_kuliah yang sama sudah ada"
+            ]
+        ],
+        "nama_mata_kuliah" => [
+            "label" => "Nama Matakuliah",
+            "rules" => "required|is_unique[matakuliah.nama_mata_kuliah]",
+            "errors" => [
+                "required" => "nama_mata_kuliah Tidak Boleh Kosong",
+                "is_unique" => "nama_mata_kuliah yang sama sudah ada"
+            ]
+        ],
+        "id_prodi" => [
+            "label" => "Id Program Studi",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_prodi Tidak Boleh Kosong"
+            ]
+        ],
+        "id_jenis_mata_kuliah" => [
+            "label" => "Jenis Matakuliah",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_jenis_mata_kuliah Tidak Boleh Kosong"
+            ]
+        ],
+        "id_kelompok_mata_kuliah" => [
+            "label" => "Kelompok Matakuliah",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_kelompok_mata_kuliah Tidak Boleh Kosong"
+            ]
+        ],
+        "sks_mata_kuliah" => [
+            "label" => "SKS Matakuliah",
+            "rules" => "required",
+            "errors" => [
+                "required" => "sks_mata_kuliah Tidak Boleh Kosong"
+            ]
+        ],
+    ];
+
+    public array $aktivitasMahasiswa = [
+        "jenis_anggota" => [
+            "label" => "Jenis Anggota",
+            "rules" => "required",
+            "errors" => [
+                "required" => "Jenis Anggota Tidak Boleh Kosong"
+            ]
+        ],
+        "id_jenis_aktivitas" => [
+            "label" => "Id Jenis Aktivitas",
+            "rules" => "required",
+            "errors" => [
+                "required" => "Id Jenis Aktivitas Tidak Boleh Kosong"
+            ]
+        ],
+        "id_prodi" => [
+            "label" => "Id Prodi",
+            "rules" => "required",
+            "errors" => [
+                "required" => "Id Prodi Tidak Boleh Kosong"
+            ]
+        ],
+        "id_semester" => [
+            "label" => "Id Semester",
+            "rules" => "required",
+            "errors" => [
+                "required" => "Id Semester Tidak Boleh Kosong"
+            ]
+        ],
+        "judul" => [
+            "label" => "Judul",
+            "rules" => "required",
+            "errors" => [
+                "required" => "Judul Tidak Boleh Kosong"
+            ]
+        ]
+    ];
 }
