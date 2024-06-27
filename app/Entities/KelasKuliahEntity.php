@@ -10,14 +10,4 @@ class KelasKuliahEntity extends Entity
     protected $datamap = [];
     protected $dates   = ['tanggal_mulai_efektif', 'tanggal_akhir_efektif', 'sync_at', 'created_at', 'updated_at', 'deleted_at'];
     protected $casts   = [];
-
-    public function setId($id) {
-        if($id==null){
-            $this->attributes['id'] = Uuid::uuid4()->toString();
-            return $this;
-        }else{
-            $this->attributes['id'] = $id;
-            return $this;
-        } 
-    }
 }

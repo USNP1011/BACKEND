@@ -3,7 +3,6 @@
 namespace App\Controllers\Api;
 
 use App\Models\DosenWaliModel;
-use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use Ramsey\Uuid\Uuid;
 
@@ -32,11 +31,11 @@ class DosenWali extends ResourceController
     {
         try {
             $item = $this->request->getJSON();
-            $item->id = null;
+            $item->id = Uuid::uuid4()->toString();
             $object = new \App\Models\DosenWaliModel();
             $model = new \App\Entities\DosenWaliEntity();
             $model->fill((array)$item);
-            $object->save($model);
+            $object->insert($model);
             return $this->respond([
                 'status' => true,
                 'data' => $model

@@ -24,7 +24,7 @@ class Kurikulum extends ResourceController
     {
         try {
             $item = $this->request->getJSON();
-            $item->id = null;
+            $item->id = Uuid::uuid4()->toString();
             $object = new \App\Models\KurikulumModel();
             $model = new \App\Entities\KurikulumEntity();
             $model->fill((array)$item);

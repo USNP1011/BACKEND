@@ -2,7 +2,6 @@
 
 namespace App\Controllers\Api;
 
-use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use Ramsey\Uuid\Uuid;
 
@@ -27,11 +26,11 @@ class PesertaKelas extends ResourceController
     {
         try {
             $item = $this->request->getJSON();
-            $item->id = null;
+            $item->id = Uuid::uuid4()->toString();
             $object = new \App\Models\PesertaKelasModel();
             $model = new \App\Entities\PesertaKelasEntity();
             $model->fill((array)$item);
-            $object->save($model);
+            $object->insert($model);
             return $this->respond([
                 'status' => true,
                 'data' => $model

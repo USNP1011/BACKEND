@@ -2,10 +2,7 @@
 
 namespace App\Controllers\Api;
 
-use App\Entities\Mahasiswa as EntitiesMahasiswa;
-use App\Models\MahasiswaModel;
 use App\Models\NilaiTransferModel;
-use App\Models\RiwayatPendidikanMahasiswaModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use Ramsey\Uuid\Uuid;
@@ -50,11 +47,11 @@ class NilaiTransfer extends ResourceController
     {
         try {
             $item = $this->request->getJSON();
-            $item->id = null;
+            $item->id = Uuid::uuid4()->toString();
             $object = new \App\Models\NilaiTransferModel();
             $model = new \App\Entities\NilaiTransferEntity();
             $model->fill((array)$item);
-            $object->save($model);
+            $object->insert($model);
             return $this->respond([
                 'status' => true,
                 'data' => $model
