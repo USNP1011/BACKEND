@@ -76,19 +76,22 @@ class MahasiswaModel extends Model
 		'nama_kebutuhan_khusus_ibu',
 		'nama_kebutuhan_khusus_wali',
 		'nama_kebutuhan_khusus_mahasiswa',
-		'created_at',
-		'updated_at',
-		'deleted_at',
 		'sync_at',
 		'status_sync'
     ];
 
     protected bool $allowEmptyInserts = false;
-
     // Dates
     protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
     protected $deletedField  = 'deleted_at';
+
+	protected $beforeDelete = ['beforeDeleteCallback'];
+
+	protected function beforeDeleteCallback(array $data)
+    {
+		$this->update($data['id'][0], ['sync_at'=>null, 'status_sync'=>null]);
+    }
 }

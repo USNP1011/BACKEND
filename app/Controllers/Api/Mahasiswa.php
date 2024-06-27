@@ -53,7 +53,9 @@ class Mahasiswa extends ResourceController
             } else {
                 $item->id = Uuid::uuid4()->toString();
                 $object = new MahasiswaModel();
-                $object->save($item);
+                $model = new EntitiesMahasiswa();
+                $model->fill((array) $item);
+                $object->insert($item);
                 return $this->respond([
                     'status' => true,
                     'data' => $item
@@ -93,6 +95,8 @@ class Mahasiswa extends ResourceController
         try {
             $item = $this->request->getJSON();
             $object = new MahasiswaModel();
+            $model = new EntitiesMahasiswa();
+            $model->fill((array) $item);
             $object->save($item);
             return $this->respondUpdated([
                 'status' => true,
@@ -117,7 +121,7 @@ class Mahasiswa extends ResourceController
     {
         try {
             $object = new MahasiswaModel();
-            $a = $object->delete($id);
+            $object->delete($id);
             return $this->respondDeleted([
                 'status' => true,
                 'message' => 'successful deleted',
