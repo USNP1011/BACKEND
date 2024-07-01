@@ -4,6 +4,9 @@ namespace App\Controllers\Api;
 
 use App\Entities\Mahasiswa as EntitiesMahasiswa;
 use App\Models\MahasiswaModel;
+use App\Models\NilaiTransferModel;
+use App\Models\PesertaKelasModel;
+use App\Models\RiwayatPendidikanMahasiswaModel;
 use App\Models\UserRoleModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
@@ -13,19 +16,53 @@ use CodeIgniter\Shield\Entities\User;
 
 class Mahasiswa extends ResourceController
 {
-    public function show($id = null)
+    public function __construct() {
+        helper('semester');
+    }
+    public function show($id = null, $req = null)
     {
-        $mahasiswa = new MahasiswaModel();
-        return $this->respond([
-            'status' => true,
-            'data' => $id == null ? $mahasiswa
-                ->select("mahasiswa.*, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.nama_program_studi, riwayat_pendidikan_mahasiswa.angkatan")
-                ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id', 'left')
-                ->findAll() : $mahasiswa
-                ->select("mahasiswa.*, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.nama_program_studi, riwayat_pendidikan_mahasiswa.angkatan")
-                ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id', 'left')
-                ->where('mahasiswa.id', $id)->first()
-        ]);
+        if (is_null($req)) {
+            $mahasiswa = new MahasiswaModel();
+            return $this->respond([
+                'status' => true,
+                'data' => $id == null ? $mahasiswa
+                    ->select("mahasiswa.*, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.nama_program_studi, riwayat_pendidikan_mahasiswa.angkatan")
+                    ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id', 'left')
+                    ->groupBy('mahasiswa.id')
+                    ->findAll() : $mahasiswa
+                    ->select("mahasiswa.*, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.nama_program_studi, riwayat_pendidikan_mahasiswa.angkatan")
+                    ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id', 'left')
+                    ->where('mahasiswa.id', $id)->first()
+            ]);
+        } else {
+            if ($req == 'riwayat_pendidikan') {
+                $object = new RiwayatPendidikanMahasiswaModel();
+                return $this->respond([
+                    'status' => true,
+                    'data' => $object->where('id_mahasiswa', $id)->findAll()
+                ]);
+            } else if ($req == 'nilai_transfer') {
+                $object = new NilaiTransferModel();
+                return $this->respond([
+                    'status' => true,
+                    'data' => $object->select("nilai_transfer.*")
+                        ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = nilai_transfer.id_riwayat_pendidikan', 'left')
+                        ->join('mahasiswa', 'mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa', 'left')
+                        ->where('mahasiswa.id', $id)->findAll()
+                ]);
+            } else if ($req == 'krsm') {
+                $semester = getSemesterAktif();
+                $object = new PesertaKelasModel();
+                return $this->respond([
+                    'status' => true,
+                    'data' => $object->select("kelas_kuliah.*")
+                        ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
+                        ->where('peserta_kelas.mahasiswa_id', $id)
+                        ->where('kelas_kuliah.id_semester', $semester->id)
+                        ->findAll()
+                ]);
+            }
+        }
     }
 
     /**
@@ -77,8 +114,8 @@ class Mahasiswa extends ResourceController
             $userObject->addToDefaultGroup($itemData);
 
             $role = [
-                'users_id'=> $item->id_user,
-                'role_id'=> '6'
+                'users_id' => $item->id_user,
+                'role_id' => '6'
             ];
             $userRole = new UserRoleModel();
             $userRole->insert($role);
