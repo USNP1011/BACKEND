@@ -57,7 +57,6 @@ class AuthController extends ResourceController
                 $this->codes['unauthorized']
             );
         }
-
         $credentials             = $this->request->getJsonVar(setting('Auth.validFields'));
         $credentials             = array_filter($credentials);
         $credentials['password'] = $this->request->getJsonVar('password');
