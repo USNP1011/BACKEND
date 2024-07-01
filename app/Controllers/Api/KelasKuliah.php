@@ -2,7 +2,9 @@
 
 namespace App\Controllers\Api;
 
+use App\Models\DosenPengajarKelasModel;
 use App\Models\KelasKuliahModel;
+use App\Models\PesertaKelasModel;
 use CodeIgniter\RESTful\ResourceController;
 use Ramsey\Uuid\Uuid;
 
@@ -16,13 +18,44 @@ class KelasKuliah extends ResourceController
      * 
      * @return object
      */
-    public function show($id = null):object
+    public function show($id = null, $req=null):object
     {
-        $semester = getSemesterAktif();
-        $object = new KelasKuliahModel();
+        if(is_null($req)){
+            $semester = getSemesterAktif();
+            $object = new KelasKuliahModel();
+            return $this->respond([
+                'status' => true,
+                'data' => $id == null ? $object
+                ->select("kelas_kuliah.*")
+                ->join('semester', 'semester.id_semester=kelas_kuliah.id_semester', 'left')
+                ->where('a_periode_aktif', '1')
+                ->findAll() : $object->where('id', $id)->first()
+            ]);
+        }else{
+            if($req=="peserta_kelas"){
+                $object = new PesertaKelasModel();
+                return $this->respond([
+                    'status' => true,
+                    'data' => $object->where('kelas_kuliah_id', $id)->findAll()
+                ]);
+            }else if($req=="dosen_pengajar_kelas"){
+                $object = new DosenPengajarKelasModel();
+                return $this->respond([
+                    'status' => true,
+                    'data' => $object->where('kelas_kuliah_id', $id)->findAll()
+                ]);
+            }else{
+                return $this->failNotFound("URL tidak ditemukan");
+            }
+        }
+    }
+
+    public function peserta_kelas($id = null):object
+    {
+        $object = new PesertaKelasModel();
         return $this->respond([
             'status' => true,
-            'data' => $id == null ? $object->findAll() : $object->where('id', $id)->first()
+            'data' => $object->where('kelas_kuliah_id', $id)->findAll()
         ]);
     }
 
@@ -31,6 +64,13 @@ class KelasKuliah extends ResourceController
     {
         try {
             $item = $this->request->getJSON();
+            if (!$this->validate('kelasKuliah')) {
+                $result = [
+                    "status" => false,
+                    "message" => $this->validator->getErrors(),
+                ];
+                return $this->failValidationErrors($result);
+            }
             $item->id = Uuid::uuid4()->toString();
             $object = new \App\Models\KelasKuliahModel();
             $model = new \App\Entities\KelasKuliahEntity();

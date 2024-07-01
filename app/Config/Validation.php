@@ -172,4 +172,183 @@ class Validation extends BaseConfig
             ]
         ],
     ];
+
+    public array $kelasKuliah = [
+        "id_prodi" => [
+            "label" => "Id Prodi",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_prodi Tidak Boleh Kosong"
+            ]
+        ],
+        "id_semester" => [
+            "label" => "Id Semester",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_semester Tidak Boleh Kosong"
+            ]
+        ],
+        "matakuliah_id" => [
+            "label" => "Matakuliah Id",
+            "rules" => "required",
+            "errors" => [
+                "required" => "matakuliah_id Tidak Boleh Kosong"
+            ]
+        ],
+        "nama_kelas_kuliah" => [
+            "label" => "Nama Kelas Kuliah",
+            "rules" => "required",
+            "errors" => [
+                "required" => "nama_kelas_kuliah Tidak Boleh Kosong"
+            ]
+        ],
+    ];
+
+    public array $pesertaKelas = [
+        "id_riwayat_pendidikan" => [
+            "label" => "id_riwayat_pendidikan",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_riwayat_pendidikan Tidak Boleh Kosong"
+            ]
+        ],
+        "kelas_kuliah_id" => [
+            "label" => "kelas_kuliah_id",
+            "rules" => "required",
+            "errors" => [
+                "required" => "kelas_kuliah_id Tidak Boleh Kosong"
+            ]
+        ],
+        "mahasiswa_id" => [
+            "label" => "mahasiswa_id",
+            "rules" => "required",
+            "errors" => [
+                "required" => "mahasiswa_id Tidak Boleh Kosong"
+            ]
+        ],
+        "matakuliah_id" => [
+            "label" => "matakuliah_id",
+            "rules" => "required",
+            "errors" => [
+                "required" => "matakuliah_id Tidak Boleh Kosong"
+            ]
+        ],
+        "id_prodi" => [
+            "label" => "id_prodi",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_prodi Tidak Boleh Kosong"
+            ]
+        ],
+    ];
+
+    public array $pengajarKelas = [
+        "id_registrasi_dosen" => [
+            "label" => "id_registrasi_dosen",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_registrasi_dosen Tidak Boleh Kosong"
+            ]
+        ],
+        "id_prodi" => [
+            "label" => "id_prodi",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_prodi Tidak Boleh Kosong"
+            ]
+        ],
+        "id_semester" => [
+            "label" => "id_semester",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_semester Tidak Boleh Kosong"
+            ]
+        ],
+        "kelas_kuliah_id" => [
+            "label" => "kelas_kuliah_id",
+            "rules" => "required",
+            "errors" => [
+                "required" => "kelas_kuliah_id Tidak Boleh Kosong"
+            ]
+        ],
+        "id_jenis_evaluasi" => [
+            "label" => "id_jenis_evaluasi",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_jenis_evaluasi Tidak Boleh Kosong"
+            ]
+        ],
+        
+    ];
+
+    public array $dosenWali = [
+        "id_riwayat_pendidikan" => [
+            "label" => "id_riwayat_pendidikan",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_riwayat_pendidikan Tidak Boleh Kosong"
+            ]
+        ],
+        "id_dosen" => [
+            "label" => "id_dosen",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_dosen Tidak Boleh Kosong"
+            ]
+        ],
+        "nama_mahasiswa" => [
+            "label" => "nama_mahasiswa",
+            "rules" => "required",
+            "errors" => [
+                "required" => "nama_mahasiswa Tidak Boleh Kosong"
+            ]
+        ],
+        "nama_dosen" => [
+            "label" => "nama_dosen",
+            "rules" => "required",
+            "errors" => [
+                "required" => "nama_dosen Tidak Boleh Kosong"
+            ]
+        ],
+        "nim" => [
+            "label" => "nim",
+            "rules" => "required",
+            "errors" => [
+                "required" => "nim Tidak Boleh Kosong"
+            ]
+        ],
+        
+    ];
+
+    public array $aktivitasKuliah = [
+        "id_riwayat_pendidikan" => [
+            "label" => "id_riwayat_pendidikan",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_riwayat_pendidikan Tidak Boleh Kosong"
+            ]
+        ],
+        "id_semester" => [
+            "label" => "id_semester",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_semester Tidak Boleh Kosong"
+            ]
+        ],
+        "nama_mahasiswa" => [
+            "label" => "nama_mahasiswa",
+            "rules" => "required",
+            "errors" => [
+                "required" => "nama_mahasiswa Tidak Boleh Kosong"
+            ]
+        ],
+        "nim" => [
+            "label" => "nim",
+            "rules" => "required",
+            "errors" => [
+                "required" => "nim Tidak Boleh Kosong"
+            ]
+        ],
+        
+    ];
 }

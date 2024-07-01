@@ -9,7 +9,7 @@ use Ramsey\Uuid\Uuid;
 class DosenWali extends ResourceController
 {
 
-    public function show($id = null)
+    public function show($id = null, $req = null)
     {
         $object = new DosenWaliModel();
         return $this->respond([
@@ -31,6 +31,13 @@ class DosenWali extends ResourceController
     {
         try {
             $item = $this->request->getJSON();
+            if (!$this->validate('dosenWali')) {
+                $result = [
+                    "status" => false,
+                    "message" => $this->validator->getErrors(),
+                ];
+                return $this->failValidationErrors($result);
+            }
             $item->id = Uuid::uuid4()->toString();
             $object = new \App\Models\DosenWaliModel();
             $model = new \App\Entities\DosenWaliEntity();
@@ -39,7 +46,7 @@ class DosenWali extends ResourceController
             return $this->respond([
                 'status' => true,
                 'data' => $model
-            ]); 
+            ]);
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,
@@ -48,7 +55,7 @@ class DosenWali extends ResourceController
         }
     }
 
-    
+
     public function update($id = null)
     {
         try {
@@ -59,7 +66,7 @@ class DosenWali extends ResourceController
             return $this->respond([
                 'status' => true,
                 'data' => $model
-            ]); 
+            ]);
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,
@@ -68,7 +75,7 @@ class DosenWali extends ResourceController
         }
     }
 
-    
+
     public function delete($id = null)
     {
         try {
@@ -77,8 +84,8 @@ class DosenWali extends ResourceController
             return $this->respondDeleted([
                 'status' => true,
                 'message' => 'successful deleted',
-                'data'=>[]
-            ]); 
+                'data' => []
+            ]);
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,

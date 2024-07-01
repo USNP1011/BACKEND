@@ -26,6 +26,13 @@ class DosenPengajarKelas extends ResourceController
     {
         try {
             $item = $this->request->getJSON();
+            if (!$this->validate('pengajarKelas')) {
+                $result = [
+                    "status" => false,
+                    "message" => $this->validator->getErrors(),
+                ];
+                return $this->failValidationErrors($result);
+            }
             $item->id = Uuid::uuid4()->toString();
             $object = new \App\Models\DosenPengajarKelasModel();
             $model = new \App\Entities\DosenPengajarKelasEntity();

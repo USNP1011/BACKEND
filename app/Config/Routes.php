@@ -145,6 +145,9 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     
     $routes->get('kelas_kuliah', 'KelasKuliah::show', ['filter' => 'auth']);
     $routes->get('kelas_kuliah/(:any)', 'KelasKuliah::show/$1', ['filter' => 'auth']);
+    $routes->get('kelas_kuliah/(:any)/peserta_kelas', 'KelasKuliah::show/$1/$2', ['filter' => 'auth']);
+    $routes->get('kelas_kuliah/(:any)/dosen_pengajar_kelas', 'KelasKuliah::show/$1/$2', ['filter' => 'auth']);
+    $routes->addRedirect('peserta_kelas/(:num)', 'kelas_kuliah/$1/peserta_kelas');
     $routes->post('kelas_kuliah', 'KelasKuliah::create', ['filter' => 'auth']);
     $routes->put('kelas_kuliah', 'KelasKuliah::update', ['filter' => 'auth']);
     $routes->delete('kelas_kuliah/(:any)', 'KelasKuliah::delete/$1', ['filter' => 'auth']);
@@ -167,6 +170,11 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->post('dosen_pengajar', 'DosenPengajarKelas::create', ['filter' => 'auth']);
     $routes->put('dosen_pengajar', 'DosenPengajarKelas::update', ['filter' => 'auth']);
     $routes->delete('dosen_pengajar/(:any)', 'DosenPengajarKelas::delete/$1', ['filter' => 'auth']);
+
+    $routes->get('peserta_kelas/(:any)', 'PesertaKelas::show/$1', ['filter' => 'auth']);
+    $routes->post('peserta_kelas', 'PesertaKelas::create', ['filter' => 'auth']);
+    $routes->put('peserta_kelas', 'PesertaKelas::update', ['filter' => 'auth']);
+    $routes->delete('peserta_kelas/(:any)', 'PesertaKelas::delete/$1', ['filter' => 'auth']);
 
     $routes->get('aktivitas_mahasiswa', 'AktivitasMahasiswa::show', ['filter' => 'auth']);
     $routes->get('aktivitas_mahasiswa/(:any)', 'AktivitasMahasiswa::show/$1', ['filter' => 'auth']);

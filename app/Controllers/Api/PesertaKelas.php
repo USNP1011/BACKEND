@@ -18,7 +18,7 @@ class PesertaKelas extends ResourceController
         $object = new \App\Models\PesertaKelasModel();
         return $this->respond([
             'status' => true,
-            'data' => $id == null ? $object->findAll() : $object->where('kelas_kuliah_id', $id)->first()
+            'data' => $id == null ? $object->findAll() : $object->where('id', $id)->first()
         ]);
     }
 
@@ -26,6 +26,13 @@ class PesertaKelas extends ResourceController
     {
         try {
             $item = $this->request->getJSON();
+            if (!$this->validate('pesertaKelas')) {
+                $result = [
+                    "status" => false,
+                    "message" => $this->validator->getErrors(),
+                ];
+                return $this->failValidationErrors($result);
+            }
             $item->id = Uuid::uuid4()->toString();
             $object = new \App\Models\PesertaKelasModel();
             $model = new \App\Entities\PesertaKelasEntity();

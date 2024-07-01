@@ -31,6 +31,13 @@ class AktivitasKuliah extends ResourceController
     {
         try {
             $item = $this->request->getJSON();
+            if (!$this->validate('aktivitasKuliah')) {
+                $result = [
+                    "status" => false,
+                    "message" => $this->validator->getErrors(),
+                ];
+                return $this->failValidationErrors($result);
+            }
             $item->id = Uuid::uuid4()->toString();
             $object = new \App\Models\PerkuliahanMahasiswaModel();
             $model = new \App\Entities\AktivitasKuliahEntity();
