@@ -75,12 +75,14 @@ class AuthController extends ResourceController
 
         $item = $userobject->findById($user->id);
         $role= new \App\Models\UserRoleModel();
+        $semester= new \App\Models\SemesterModel();
 
         $set = [
             'uid'=>$item->id,
             'username'=>$item->username,
             'email'=>$item->email,
             'status'=>$item->status,
+            'semester'=>$semester->where('a_periode_aktif', '1')->first(),
             'roles'=> $role->select("user_role.id, role.role")->join('role', 'role.id=user_role.role_id', 'left')->where('user_role.users_id', $item->id)->findAll()
         ];
 
