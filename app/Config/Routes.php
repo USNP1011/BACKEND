@@ -165,6 +165,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->get('matakuliah_kurikulum', 'MatakuliahKurikulum::show', ['filter' => 'auth']);
     $routes->get('matakuliah_kurikulum/(:any)', 'MatakuliahKurikulum::show/$1', ['filter' => 'auth']);
     $routes->get('matakuliah_kurikulum_kurikulum_id/(:any)', 'MatakuliahKurikulum::by_kurikulum_id/$1', ['filter' => 'auth']);
+    $routes->get('matakuliah_kurikulum_by_prodi/(:any)', 'MatakuliahKurikulum::by_prodi/$1', ['filter' => 'auth']);
     $routes->post('matakuliah_kurikulum', 'MatakuliahKurikulum::create', ['filter' => 'auth']);
     $routes->put('matakuliah_kurikulum', 'MatakuliahKurikulum::update', ['filter' => 'auth']);
     $routes->delete('matakuliah_kurikulum/(:any)', 'MatakuliahKurikulum::delete/$1', ['filter' => 'auth']);

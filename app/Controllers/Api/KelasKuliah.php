@@ -134,12 +134,16 @@ class KelasKuliah extends ResourceController
         $item = [
             'status' => true,
             'data' => $object
-                ->select("kelas_kuliah.*")
+                ->select("kelas_kuliah.*, dosen_pengajar_kelas.nama_dosen, matakuliah.sks_mata_kuliah, (SELECT COUNT(*) FROM peserta_kelas WHERE peserta_kelas.kelas_kuliah_id=kelas_kuliah.id)as peserta_kelas")
                 ->join('semester', 'semester.id_semester=kelas_kuliah.id_semester', 'left')
-                ->like('nama_kelas_kuliah', $item->cari)
-                ->orLike('kode_mata_kuliah', $item->cari)
-                ->orLike('nama_mata_kuliah', $item->cari)
-                ->orLike('nama_program_studi', $item->cari)
+                ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id', 'left')
+                ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
+                ->groupStart()
+                ->like('kelas_kuliah.nama_kelas_kuliah', $item->cari)
+                ->orLike('kelas_kuliah.kode_mata_kuliah', $item->cari)
+                ->orLike('kelas_kuliah.nama_mata_kuliah', $item->cari)
+                ->orLike('kelas_kuliah.nama_program_studi', $item->cari)
+                ->groupEnd()
                 ->where('a_periode_aktif', '1')
                 ->paginate($item->count, 'default', $item->page),
             'pager' => $object->pager->getDetails()

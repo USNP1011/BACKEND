@@ -27,6 +27,15 @@ class MatakuliahKurikulum extends ResourceController
         ]);
     }
 
+    public function by_prodi($id = null)
+    {
+        $object = new MatakuliahKurikulumModel();
+        return $this->respond([
+            'status' => true,
+            'data' => $object->where('id_prodi', $id)->findAll()
+        ]);
+    }
+
     public function create()
     {
         try {
