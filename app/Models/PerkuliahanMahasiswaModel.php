@@ -26,7 +26,7 @@ class PerkuliahanMahasiswaModel extends Model
 		'ips',
 		'ipk',
 		'sks_semester',
-		'total_sks',
+		'sks_total',
 		'biaya_kuliah_smt',
 		'created_at',
 		'updated_at',

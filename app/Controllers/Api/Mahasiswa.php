@@ -5,6 +5,7 @@ namespace App\Controllers\Api;
 use App\Entities\Mahasiswa as EntitiesMahasiswa;
 use App\Models\MahasiswaModel;
 use App\Models\NilaiTransferModel;
+use App\Models\PerkuliahanMahasiswaModel;
 use App\Models\PesertaKelasModel;
 use App\Models\RiwayatPendidikanMahasiswaModel;
 use App\Models\UserRoleModel;
@@ -16,7 +17,8 @@ use CodeIgniter\Shield\Entities\User;
 
 class Mahasiswa extends ResourceController
 {
-    public function __construct() {
+    public function __construct()
+    {
         helper('semester');
     }
     public function show($id = null, $req = null)
@@ -61,6 +63,17 @@ class Mahasiswa extends ResourceController
                         ->where('kelas_kuliah.id_semester', $semester->id)
                         ->findAll()
                 ]);
+            }else if ($req == 'aktivitas_kuliah') {
+                $object = new PerkuliahanMahasiswaModel();
+                return $this->respond([
+                    'status' => true,
+                    'data' => $object
+                        ->where('perkuliahan_mahasiswa.id_mahasiswa', $id)
+                        ->orderBy('id_semester', 'asc')
+                        ->findAll()
+                ]);
+            }else {
+                return $this->failNotFound("Parameter yang anda masukkan tidak sesuai");
             }
         }
     }
@@ -210,7 +223,14 @@ class Mahasiswa extends ResourceController
         $object = model(MahasiswaModel::class);
         $item = [
             'status' => true,
-            'data' => $object->like('nama_mahasiswa', $item->cari)->paginate($item->count, 'default', $item->page),
+            'data' => $object->select("mahasiswa.id, mahasiswa.nama_mahasiswa, mahasiswa.jenis_kelamin, mahasiswa.status_sync, mahasiswa.sync_at, mahasiswa.tanggal_lahir, agama.nama_agama, agama.id_agama, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.angkatan, prodi.nama_program_studi, prodi.id_prodi, (SELECT perkuliahan_mahasiswa.sks_total from perkuliahan_mahasiswa where id_mahasiswa = mahasiswa.id AND sks_total != '0' order by id_semester desc limit 1) as sks_total")
+                ->join("agama", "agama.id_agama=mahasiswa.id_agama", "LEFT")
+                ->join("riwayat_pendidikan_mahasiswa", "riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id", "LEFT")
+                ->join("prodi", "riwayat_pendidikan_mahasiswa.id_prodi=prodi.id_prodi", "LEFT")
+                ->like('mahasiswa.nama_mahasiswa', $item->cari)
+                ->orLike('riwayat_pendidikan_mahasiswa.nim', $item->cari)
+                ->orLike('prodi.nama_program_studi', $item->cari)
+                ->paginate($item->count, 'default', $item->page),
             'pager' => $object->pager->getDetails()
         ];
         return $this->respond($item);

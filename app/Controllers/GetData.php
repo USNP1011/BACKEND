@@ -421,6 +421,7 @@ class GetData extends BaseController
     {
         $aktivitasMahasiswa = new \App\Models\PerkuliahanMahasiswaModel();
         $riwayatPendidikan = new \App\Models\RiwayatPendidikanMahasiswaModel();
+        $mahasiswa = new \App\Models\MahasiswaModel();
 
         $data = $this->api->getData('GetAktivitasKuliahMahasiswa', $this->token);
         if ($data->error_code == 100) {
@@ -430,7 +431,9 @@ class GetData extends BaseController
         foreach ($data->data as $key => $value) {
             $value->id = Uuid::uuid4()->toString();
             $riwayat = $riwayatPendidikan->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
+            $mhs = $mahasiswa->where('id_mahasiswa', $value->id_mahasiswa)->first();
             $value->id_riwayat_pendidikan = $riwayat->id;
+            $value->id_mahasiswa = $mhs->id;
             $aktivitasMahasiswa->insert($value);
         }
         return response()->setJSON($data);

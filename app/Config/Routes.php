@@ -107,6 +107,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->get('mahasiswa/(:any)/riwayat_pendidikan', 'Mahasiswa::show/$1/$2', ['filter' => 'auth']);
     $routes->get('mahasiswa/(:any)/nilai_transfer', 'Mahasiswa::show/$1/$2', ['filter' => 'auth']);
     $routes->get('mahasiswa/(:any)/krsm', 'Mahasiswa::show/$1/$2', ['filter' => 'auth']);
+    $routes->get('mahasiswa/(:any)/aktivitas_kuliah', 'Mahasiswa::show/$1/$2', ['filter' => 'auth']);
     $routes->post('mahasiswa_paginate', 'Mahasiswa::paginate', ['filter' => 'auth']);
     $routes->post('mahasiswa', 'Mahasiswa::create', ['filter' => 'auth']);
     $routes->put('mahasiswa', 'Mahasiswa::update', ['filter' => 'auth']);

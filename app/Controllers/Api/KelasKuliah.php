@@ -22,7 +22,6 @@ class KelasKuliah extends ResourceController
     public function show($id = null, $req = null): object
     {
         if (is_null($req)) {
-            $semester = getSemesterAktif();
             $object = new KelasKuliahModel();
             return $this->respond([
                 'status' => true,
@@ -46,7 +45,7 @@ class KelasKuliah extends ResourceController
                     'data' => $object->where('kelas_kuliah_id', $id)->findAll()
                 ]);
             } else {
-                return $this->failNotFound("URL tidak ditemukan");
+                return $this->failNotFound("Parameter yang anda masukkan tidak sesuai");
             }
         }
     }
@@ -134,15 +133,16 @@ class KelasKuliah extends ResourceController
         $item = [
             'status' => true,
             'data' => $object
-                ->select("kelas_kuliah.*, dosen_pengajar_kelas.nama_dosen, matakuliah.sks_mata_kuliah, (SELECT COUNT(*) FROM peserta_kelas WHERE peserta_kelas.kelas_kuliah_id=kelas_kuliah.id)as peserta_kelas")
+                ->select("kelas_kuliah.id, kelas_kuliah.status_sync, kelas_kuliah.nama_kelas_kuliah, semester.nama_semester, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, prodi.nama_program_studi, dosen_pengajar_kelas.nama_dosen, matakuliah.sks_mata_kuliah, (SELECT COUNT(*) FROM peserta_kelas WHERE peserta_kelas.kelas_kuliah_id=kelas_kuliah.id)as peserta_kelas")
                 ->join('semester', 'semester.id_semester=kelas_kuliah.id_semester', 'left')
                 ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id', 'left')
                 ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
+                ->join('prodi', 'prodi.id_prodi=kelas_kuliah.id_prodi', 'left')
                 ->groupStart()
                 ->like('kelas_kuliah.nama_kelas_kuliah', $item->cari)
-                ->orLike('kelas_kuliah.kode_mata_kuliah', $item->cari)
-                ->orLike('kelas_kuliah.nama_mata_kuliah', $item->cari)
-                ->orLike('kelas_kuliah.nama_program_studi', $item->cari)
+                ->orLike('matakuliah.kode_mata_kuliah', $item->cari)
+                ->orLike('matakuliah.nama_mata_kuliah', $item->cari)
+                ->orLike('prodi.nama_program_studi', $item->cari)
                 ->groupEnd()
                 ->where('a_periode_aktif', '1')
                 ->paginate($item->count, 'default', $item->page),
