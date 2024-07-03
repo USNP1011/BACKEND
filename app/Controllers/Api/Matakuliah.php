@@ -132,7 +132,7 @@ class Matakuliah extends ResourceController
         $object = model(MatakuliahModel::class);
         $item = [
             'status' => true,
-            'data' => $object->like('nama_mahasiswa', $item->cari)->paginate($item->count, 'default', $item->page),
+            'data' => $object->like('nama_mata_kuliah', $item->cari)->paginate($item->count, 'default', $item->page),
             'pager' => $object->pager->getDetails()
         ];
         return $this->respond($item);

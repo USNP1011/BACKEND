@@ -151,6 +151,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->get('kelas_kuliah/(:any)/peserta_kelas', 'KelasKuliah::show/$1/$2', ['filter' => 'auth']);
     $routes->get('kelas_kuliah/(:any)/dosen_pengajar_kelas', 'KelasKuliah::show/$1/$2', ['filter' => 'auth']);
     $routes->addRedirect('peserta_kelas/(:num)', 'kelas_kuliah/$1/peserta_kelas');
+    $routes->post('kelas_kuliah_paginate', 'KelasKuliah::paginate', ['filter' => 'auth']);
     $routes->post('kelas_kuliah', 'KelasKuliah::create', ['filter' => 'auth']);
     $routes->put('kelas_kuliah', 'KelasKuliah::update', ['filter' => 'auth']);
     $routes->delete('kelas_kuliah/(:any)', 'KelasKuliah::delete/$1', ['filter' => 'auth']);
