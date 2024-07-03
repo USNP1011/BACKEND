@@ -139,6 +139,7 @@ class KelasKuliah extends ResourceController
                 ->like('nama_kelas_kuliah', $item->cari)
                 ->orLike('kode_mata_kuliah', $item->cari)
                 ->orLike('nama_mata_kuliah', $item->cari)
+                ->orLike('nama_program_studi', $item->cari)
                 ->where('a_periode_aktif', '1')
                 ->paginate($item->count, 'default', $item->page),
             'pager' => $object->pager->getDetails()
