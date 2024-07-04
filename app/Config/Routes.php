@@ -158,13 +158,17 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->delete('kelas_kuliah/(:any)', 'KelasKuliah::delete/$1', ['filter' => 'auth']);
 
     $routes->get('kurikulum', 'Kurikulum::show', ['filter' => 'auth']);
-    $routes->get('kurikulum/(:any)', 'Kurikulum::show/$1', ['filter' => 'auth']);
+    $routes->get('kurikulum/(:segment)', 'Kurikulum::show/$1', ['filter' => 'auth']);
+    $routes->get('kurikulum/matakuliah/(:hash)/kurikulum', 'Kurikulum::matakuliah_kurikulum/$1', ['filter' => 'auth']);
+    $routes->get('kurikulum/matakuliah/(:hash)/prodi', 'Kurikulum::matakuliah_prodi/$1', ['filter' => 'auth']);
     $routes->post('kurikulum', 'Kurikulum::create', ['filter' => 'auth']);
+    $routes->post('kurikulum/matakuliah', 'Kurikulum::create_matakuliah', ['filter' => 'auth']);
     $routes->put('kurikulum', 'Kurikulum::update', ['filter' => 'auth']);
-    $routes->delete('kurikulum/(:any)', 'Kurikulum::delete/$1', ['filter' => 'auth']);
+    $routes->put('kurikulum/matakuliah', 'Kurikulum::update_matakuliah', ['filter' => 'auth']);
+    $routes->delete('kurikulum/(:hash)', 'Kurikulum::delete/$1', ['filter' => 'auth']);
+    $routes->delete('kurikulum/matakuliah(:hash)', 'Kurikulum::delete_matakuliah/$1', ['filter' => 'auth']);
 
     $routes->get('matakuliah_kurikulum', 'MatakuliahKurikulum::show', ['filter' => 'auth']);
-    $routes->get('matakuliah_kurikulum/(:any)', 'MatakuliahKurikulum::show/$1', ['filter' => 'auth']);
     $routes->get('matakuliah_kurikulum_kurikulum_id/(:any)', 'MatakuliahKurikulum::by_kurikulum_id/$1', ['filter' => 'auth']);
     $routes->get('matakuliah_kurikulum_by_prodi/(:any)', 'MatakuliahKurikulum::by_prodi/$1', ['filter' => 'auth']);
     $routes->post('matakuliah_kurikulum', 'MatakuliahKurikulum::create', ['filter' => 'auth']);

@@ -60,7 +60,6 @@ class MahasiswaModel extends Model
 		'nama_agama',
 		'id_alat_transportasi',
 		'nama_alat_transportasi',
-		'id_negara',
 		'nama_wilayah',
 		'kewarganegaraan',
 		'nama_pendidikan_ayah',
@@ -76,6 +75,8 @@ class MahasiswaModel extends Model
 		'nama_kebutuhan_khusus_ibu',
 		'nama_kebutuhan_khusus_wali',
 		'nama_kebutuhan_khusus_mahasiswa',
+		'oap',
+		'suku',
 		'sync_at',
 		'status_sync'
     ];

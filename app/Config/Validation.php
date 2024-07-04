@@ -68,6 +68,51 @@ class Validation extends BaseConfig
                 "min_length" => "NIK tidak boleh kurang dari 16 karakter",
             ]
         ],
+        "nisn" => [
+            "label" => "nisn",
+            "rules" => "required|is_unique[mahasiswa.nisn]|max_length[10]|min_length[10]",
+            "errors" => [
+                "required" => "NISN Tidak Boleh Kosong",
+                "is_unique" => "NISN yang sama sudah ada",
+                "max_length" => "NISN tidak boleh lebih dari 10 karakter",
+                "min_length" => "NISN tidak boleh kurang dari 10 karakter",
+            ]
+        ],
+        "id_wilayah" => [
+            "label" => "id_wilayah",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_wilayah Tidak Boleh Kosong",
+            ]
+        ],
+        "id_agama" => [
+            "label" => "id_agama",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_agama Tidak Boleh Kosong",
+            ]
+        ],
+        "kewarganegaraan" => [
+            "label" => "kewarganegaraan",
+            "rules" => "required",
+            "errors" => [
+                "required" => "kewarganegaraan Tidak Boleh Kosong",
+            ]
+        ],
+        "oap" => [
+            "label" => "oap",
+            "rules" => "required",
+            "errors" => [
+                "required" => "oap Tidak Boleh Kosong",
+            ]
+        ],
+        "suku" => [
+            "label" => "suku",
+            "rules" => "required",
+            "errors" => [
+                "required" => "suku Tidak Boleh Kosong",
+            ]
+        ],
     ];
 
     public array $matakuliah = [
@@ -350,5 +395,29 @@ class Validation extends BaseConfig
             ]
         ],
         
+    ];
+
+    public array $matakuliahKurikulum = [
+        "kurikulum_id" => [
+            "label" => "kurikulum_id",
+            "rules" => "required",
+            "errors" => [
+                "required" => "kurikulum_id Tidak Boleh Kosong"
+            ]
+        ],
+        "matakuliah_id" => [
+            "label" => "matakuliah_id",
+            "rules" => "required",
+            "errors" => [
+                "required" => "matakuliah_id Tidak Boleh Kosong"
+            ]
+        ],
+        "semester" => [
+            "label" => "semester",
+            "rules" => "required",
+            "errors" => [
+                "required" => "semester Tidak Boleh Kosong"
+            ]
+        ]
     ];
 }

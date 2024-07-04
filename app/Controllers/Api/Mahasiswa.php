@@ -32,8 +32,12 @@ class Mahasiswa extends ResourceController
                     ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id', 'left')
                     ->groupBy('mahasiswa.id')
                     ->findAll() : $mahasiswa
-                    ->select("mahasiswa.*, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.nama_program_studi, riwayat_pendidikan_mahasiswa.angkatan")
+                    ->select("mahasiswa.*, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.nama_program_studi, riwayat_pendidikan_mahasiswa.angkatan, wilayah.nama_wilayah, agama.nama_agama, prodi.nama_program_studi, jenis_transportasi.nama_alat_transportasi")
                     ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id', 'left')
+                    ->join('wilayah', 'wilayah.id_wilayah=mahasiswa.id_wilayah', 'left')
+                    ->join("agama", "agama.id_agama=mahasiswa.id_agama", "LEFT")
+                    ->join("prodi", "riwayat_pendidikan_mahasiswa.id_prodi=prodi.id_prodi", "LEFT")
+                    ->join("jenis_transportasi", "jenis_transportasi.id_alat_transportasi=mahasiswa.id_alat_transportasi", "LEFT")
                     ->where('mahasiswa.id', $id)->first()
             ]);
         } else {
@@ -63,7 +67,7 @@ class Mahasiswa extends ResourceController
                         ->where('kelas_kuliah.id_semester', $semester->id)
                         ->findAll()
                 ]);
-            }else if ($req == 'aktivitas_kuliah') {
+            } else if ($req == 'aktivitas_kuliah') {
                 $object = new PerkuliahanMahasiswaModel();
                 return $this->respond([
                     'status' => true,
@@ -72,7 +76,7 @@ class Mahasiswa extends ResourceController
                         ->orderBy('id_semester', 'asc')
                         ->findAll()
                 ]);
-            }else {
+            } else {
                 return $this->failNotFound("Parameter yang anda masukkan tidak sesuai");
             }
         }

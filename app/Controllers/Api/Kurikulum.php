@@ -3,6 +3,8 @@
 namespace App\Controllers\Api;
 
 use App\Models\KurikulumModel;
+use App\Models\MatakuliahKurikulumModel;
+use App\Models\MatakuliahModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use Ramsey\Uuid\Uuid;
@@ -10,12 +12,30 @@ use Ramsey\Uuid\Uuid;
 class Kurikulum extends ResourceController
 {
 
-    public function show($id = null)
+    public function show($req = null, $id = null, $id_prodi = null)
     {
         $object = new KurikulumModel();
         return $this->respond([
             'status' => true,
             'data' => $id == null ? $object->findAll() : $object->where('id', $id)->first()
+        ]);
+    }
+
+    public function matakuliah_kurikulum($id = null)
+    {
+        $object = new MatakuliahKurikulumModel();
+        return $this->respond([
+            'status' => true,
+            'data' => $object->where('kurikulum_id', $id)->findAll()
+        ]);
+    }
+
+    public function matakuliah_prodi($id = null)
+    {
+        $object = new MatakuliahModel();
+        return $this->respond([
+            'status' => true,
+            'data' => $object->where('id_prodi', $id)->findAll()
         ]);
     }
 
@@ -32,7 +52,7 @@ class Kurikulum extends ResourceController
             return $this->respond([
                 'status' => true,
                 'data' => $model
-            ]); 
+            ]);
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,
@@ -40,14 +60,23 @@ class Kurikulum extends ResourceController
             ]);
         }
     }
-    
-    public function update($id = null)
+
+    public function create_matakuliah()
     {
         try {
-            $object = new \App\Models\KurikulumModel();
-            $model = new \App\Entities\KelasKuliahEntity();
-            $model->fill((array)$this->request->getJSON());
-            $object->save($model);
+            $item = $this->request->getJSON();
+            if (!$this->validate('matakuliahKurikulum')) {
+                $result = [
+                    "status" => false,
+                    "message" => $this->validator->getErrors(),
+                ];
+                return $this->failValidationErrors($result);
+            }
+            $item->id = Uuid::uuid4()->toString();
+            $object = new \App\Models\MatakuliahKurikulumModel();
+            $model = new \App\Entities\MatakuliahKurikulumEntity();
+            $model->fill((array)$item);
+            $object->insert($model);
             return $this->respond([
                 'status' => true,
                 'data' => $model
@@ -60,11 +89,67 @@ class Kurikulum extends ResourceController
         }
     }
 
-    
+    public function update($id = null)
+    {
+        try {
+            $object = new \App\Models\KurikulumModel();
+            $model = new \App\Entities\KelasKuliahEntity();
+            $model->fill((array)$this->request->getJSON());
+            $object->save($model);
+            return $this->respond([
+                'status' => true,
+                'data' => true
+            ]);
+        } catch (\Throwable $th) {
+            return $this->fail([
+                'status' => false,
+                'message' => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function update_matakuliah($id = null)
+    {
+        try {
+            $object = new \App\Models\MatakuliahKurikulumModel();
+            $model = new \App\Entities\MatakuliahKurikulumEntity();
+            $model->fill((array)$this->request->getJSON());
+            $object->save($model);
+            return $this->respond([
+                'status' => true,
+                'data' => true
+            ]); 
+        } catch (\Throwable $th) {
+            return $this->fail([
+                'status' => false,
+                'message' => $th->getMessage()
+            ]);
+        }
+    }
+
+
     public function delete($id = null)
     {
         try {
             $object = new \App\Models\KurikulumModel();
+            $object->delete($id);
+            return $this->respondDeleted([
+                'status' => true,
+                'message' => 'successful deleted',
+                'data' => []
+            ]);
+        } catch (\Throwable $th) {
+            return $this->fail([
+                'status' => false,
+                'message' => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function delete_matakuliah($id = null)
+    {
+        try {
+            $object = new \App\Models\MatakuliahKurikulumModel();
             $object->delete($id);
             return $this->respondDeleted([
                 'status' => true,
