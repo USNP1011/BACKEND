@@ -12,7 +12,7 @@ use Ramsey\Uuid\Uuid;
 class Kurikulum extends ResourceController
 {
 
-    public function show($req = null, $id = null, $id_prodi = null)
+    public function show($id = null, $id_prodi = null)
     {
         $object = new KurikulumModel();
         return $this->respond([

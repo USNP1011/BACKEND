@@ -398,6 +398,13 @@ class Validation extends BaseConfig
     ];
 
     public array $matakuliahKurikulum = [
+        "id_prodi" => [
+            "label" => "id_prodi",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_prodi Tidak Boleh Kosong"
+            ]
+        ],
         "kurikulum_id" => [
             "label" => "kurikulum_id",
             "rules" => "required",

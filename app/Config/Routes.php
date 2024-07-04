@@ -159,7 +159,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->delete('kelas_kuliah/(:any)', 'KelasKuliah::delete/$1', ['filter' => 'auth']);
 
     $routes->get('kurikulum', 'Kurikulum::show', ['filter' => 'auth']);
-    $routes->get('kurikulum/(:segment)', 'Kurikulum::show/$1', ['filter' => 'auth']);
+    $routes->get('kurikulum/(:hash)', 'Kurikulum::show/$1', ['filter' => 'auth']);
     $routes->get('kurikulum/matakuliah/(:hash)/kurikulum', 'Kurikulum::matakuliah_kurikulum/$1', ['filter' => 'auth']);
     $routes->get('kurikulum/matakuliah/(:hash)/prodi', 'Kurikulum::matakuliah_prodi/$1', ['filter' => 'auth']);
     $routes->post('kurikulum', 'Kurikulum::create', ['filter' => 'auth']);
