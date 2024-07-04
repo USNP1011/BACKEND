@@ -19,6 +19,15 @@ class Matakuliah extends ResourceController
         ]);
     }
 
+    public function by_prodi($id = null)
+    {
+        $object = new MatakuliahModel();
+        return $this->respond([
+            'status' => true,
+            'data' => $object->where('id_prodi', $id)->findAll()
+        ]);
+    }
+
     /**
      * Return a new resource object, with default properties.
      *

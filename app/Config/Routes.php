@@ -114,7 +114,8 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->delete('mahasiswa/(:any)', 'Mahasiswa::delete/$1', ['filter' => 'auth']);
 
     $routes->get('matakuliah', 'Matakuliah::show', ['filter' => 'auth']);
-    $routes->get('matakuliah/(:any)', 'Matakuliah::show/$1', ['filter' => 'auth']);
+    $routes->get('matakuliah/(:hash)', 'Matakuliah::show/$1', ['filter' => 'auth']);
+    $routes->get('matakuliah/byprodi/(:hash)', 'Matakuliah::by_prodi/$1', ['filter' => 'auth']);
     $routes->post('matakuliah_paginate', 'Matakuliah::paginate', ['filter' => 'auth']);
     $routes->post('matakuliah', 'Matakuliah::create', ['filter' => 'auth']);
     $routes->put('matakuliah', 'Matakuliah::update', ['filter' => 'auth']);
