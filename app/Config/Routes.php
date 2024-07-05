@@ -167,7 +167,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->put('kurikulum', 'Kurikulum::update', ['filter' => 'auth']);
     $routes->put('kurikulum/matakuliah', 'Kurikulum::update_matakuliah', ['filter' => 'auth']);
     $routes->delete('kurikulum/(:hash)', 'Kurikulum::delete/$1', ['filter' => 'auth']);
-    $routes->delete('kurikulum/matakuliah(:hash)', 'Kurikulum::delete_matakuliah/$1', ['filter' => 'auth']);
+    $routes->delete('kurikulum/matakuliah/(:hash)', 'Kurikulum::delete_matakuliah/$1', ['filter' => 'auth']);
 
     $routes->get('matakuliah_kurikulum', 'MatakuliahKurikulum::show', ['filter' => 'auth']);
     $routes->get('matakuliah_kurikulum_kurikulum_id/(:any)', 'MatakuliahKurikulum::by_kurikulum_id/$1', ['filter' => 'auth']);
