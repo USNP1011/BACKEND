@@ -26,7 +26,10 @@ class Kurikulum extends ResourceController
         $object = new MatakuliahKurikulumModel();
         return $this->respond([
             'status' => true,
-            'data' => $object->where('kurikulum_id', $id)->findAll()
+            'data' => $object
+            ->select("matakuliah_kurikulum.id, matakuliah_kurikulum.semester, matakuliah_kurikulum.matakuliah_id, matakuliah_kurikulum.status_sync, matakuliah_kurikulum.sync_at, matakuliah_kurikulum.apakah_wajib, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, matakuliah.sks_tatap_muka, matakuliah.sks_praktek, matakuliah.sks_praktek_lapangan, matakuliah.sks_simulasi")
+            ->join("matakuliah", "matakuliah.id = matakuliah_kurikulum.matakuliah_id", "left")
+            ->where('kurikulum_id', $id)->findAll()
         ]);
     }
 

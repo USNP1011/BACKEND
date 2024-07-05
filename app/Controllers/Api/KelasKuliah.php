@@ -5,6 +5,7 @@ namespace App\Controllers\Api;
 use App\Models\DosenPengajarKelasModel;
 use App\Models\KelasKuliahModel;
 use App\Models\PesertaKelasModel;
+use App\Models\RiwayatPendidikanMahasiswaModel;
 use CodeIgniter\RESTful\ResourceController;
 use Ramsey\Uuid\Uuid;
 
@@ -45,7 +46,19 @@ class KelasKuliah extends ResourceController
         return $this->respond([
             'status' => true,
             'data' => $object
-                ->select("peserta_kelas.*, ")->where('kelas_kuliah_id', $id)->findAll()
+                ->select("peserta_kelas.*")->where('kelas_kuliah_id', $id)->findAll()
+        ]);
+    }
+
+    public function mahasiswaProdi($id = null): object
+    {
+        $object = new RiwayatPendidikanMahasiswaModel();
+        return $this->respond([
+            'status' => true,
+            'data' => $object
+                ->select("riwayat_pendidikan_mahasiswa.*, mahasiswa.nama_mahasiswa")
+                ->join("mahasiswa". "mahasiswa.id=riwayat_pendidikan_mahasiswa.mahasiswa_id")
+                ->where('riwayat_pendidikan_mahasiswa.id_prodi', $id)->findAll()
         ]);
     }
 
