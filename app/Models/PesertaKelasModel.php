@@ -22,7 +22,6 @@ class PesertaKelasModel extends Model
 		'nama_mata_kuliah',
 		'id_prodi',
 		'nama_program_studi',
-		'angkatan',
 		'nilai_angka',
 		'nilai_huruf',
 		'nilai_indeks',
@@ -37,4 +36,11 @@ class PesertaKelasModel extends Model
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
     protected $deletedField  = 'deleted_at';
+
+	protected $beforeDelete = ['beforeDeleteCallback'];
+
+	protected function beforeDeleteCallback(array $data)
+    {
+		$this->update($data['id'][0], ['sync_at'=>null, 'status_sync'=>null]);
+    }
 }

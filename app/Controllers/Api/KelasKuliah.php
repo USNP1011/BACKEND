@@ -21,44 +21,42 @@ class KelasKuliah extends ResourceController
      */
     public function show($id = null, $req = null): object
     {
-        if (is_null($req)) {
-            $object = new KelasKuliahModel();
-            return $this->respond([
-                'status' => true,
-                'data' => $id == null ? $object
-                    ->select("kelas_kuliah.*")
-                    ->join('semester', 'semester.id_semester=kelas_kuliah.id_semester', 'left')
-                    ->where('a_periode_aktif', '1')
-                    ->findAll() : $object->where('id', $id)->first()
-            ]);
-        } else {
-            if ($req == "peserta_kelas") {
-                $object = new PesertaKelasModel();
-                return $this->respond([
-                    'status' => true,
-                    'data' => $object->where('kelas_kuliah_id', $id)->findAll()
-                ]);
-            } else if ($req == "dosen_pengajar_kelas") {
-                $object = new DosenPengajarKelasModel();
-                return $this->respond([
-                    'status' => true,
-                    'data' => $object->where('kelas_kuliah_id', $id)->findAll()
-                ]);
-            } else {
-                return $this->failNotFound("Parameter yang anda masukkan tidak sesuai");
-            }
-        }
+        $object = new KelasKuliahModel();
+        return $this->respond([
+            'status' => true,
+            'data' => $id == null ? $object
+                ->select("kelas_kuliah.*")
+                ->join('semester', 'semester.id_semester=kelas_kuliah.id_semester', 'left')
+                ->where('a_periode_aktif', '1')
+                ->findAll() :
+                $object
+                ->select("kelas_kuliah.*, kelas_kuliah.status_sync, kelas_kuliah.nama_kelas_kuliah, semester.nama_semester, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, prodi.nama_program_studi, dosen_pengajar_kelas.nama_dosen, matakuliah.sks_mata_kuliah, (SELECT COUNT(*) FROM peserta_kelas WHERE peserta_kelas.kelas_kuliah_id=kelas_kuliah.id)as peserta_kelas")
+                ->join('semester', 'semester.id_semester=kelas_kuliah.id_semester', 'left')
+                ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id', 'left')
+                ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
+                ->join('prodi', 'prodi.id_prodi=kelas_kuliah.id_prodi', 'left')
+                ->where('kelas_kuliah.id', $id)->first()
+        ]);
     }
 
-    public function peserta_kelas($id = null): object
+    public function pesertaKelas($id = null): object
     {
         $object = new PesertaKelasModel();
+        return $this->respond([
+            'status' => true,
+            'data' => $object
+                ->select("peserta_kelas.*, ")->where('kelas_kuliah_id', $id)->findAll()
+        ]);
+    }
+
+    public function dosenPengajarKelas($id = null): object
+    {
+        $object = new DosenPengajarKelasModel();
         return $this->respond([
             'status' => true,
             'data' => $object->where('kelas_kuliah_id', $id)->findAll()
         ]);
     }
-
 
     public function create()
     {
@@ -88,6 +86,62 @@ class KelasKuliah extends ResourceController
         }
     }
 
+    public function createMahasiswa()
+    {
+        try {
+            $item = $this->request->getJSON();
+            if (!$this->validate('pesertaKelas')) {
+                $result = [
+                    "status" => false,
+                    "message" => $this->validator->getErrors(),
+                ];
+                return $this->failValidationErrors($result);
+            }
+            $item->id = Uuid::uuid4()->toString();
+            $object = new \App\Models\PesertaKelasModel();
+            $model = new \App\Entities\PesertaKelasEntity();
+            $model->fill((array)$item);
+            $object->insert($model);
+            return $this->respond([
+                'status' => true,
+                'data' => $model
+            ]); 
+        } catch (\Throwable $th) {
+            return $this->fail([
+                'status' => false,
+                'message' => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function createDosen()
+    {
+        try {
+            $item = $this->request->getJSON();
+            if (!$this->validate('pengajarKelas')) {
+                $result = [
+                    "status" => false,
+                    "message" => $this->validator->getErrors(),
+                ];
+                return $this->failValidationErrors($result);
+            }
+            $item->id = Uuid::uuid4()->toString();
+            $object = new \App\Models\DosenPengajarKelasModel();
+            $model = new \App\Entities\DosenPengajarKelasEntity();
+            $model->fill((array)$item);
+            $object->insert($model);
+            return $this->respond([
+                'status' => true,
+                'data' => $model
+            ]); 
+        } catch (\Throwable $th) {
+            return $this->fail([
+                'status' => false,
+                'message' => $th->getMessage()
+            ]);
+        }
+    }
+
     public function update($id = null)
     {
         try {
@@ -107,6 +161,43 @@ class KelasKuliah extends ResourceController
         }
     }
 
+    public function updateMahasiswa($id = null)
+    {
+        try {
+            $object = new \App\Models\PesertaKelasModel();
+            $model = new \App\Entities\PesertaKelasEntity();
+            $model->fill((array)$this->request->getJSON());
+            $object->save($model);
+            return $this->respond([
+                'status' => true,
+                'data' => $model
+            ]); 
+        } catch (\Throwable $th) {
+            return $this->fail([
+                'status' => false,
+                'message' => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function updateDosen($id = null)
+    {
+        try {
+            $object = new \App\Models\DosenPengajarKelasModel();
+            $model = new \App\Entities\DosenPengajarKelasEntity();
+            $model->fill((array)$this->request->getJSON());
+            $object->save($model);
+            return $this->respond([
+                'status' => true,
+                'data' => $model
+            ]); 
+        } catch (\Throwable $th) {
+            return $this->fail([
+                'status' => false,
+                'message' => $th->getMessage()
+            ]);
+        }
+    }
 
     public function delete($id = null)
     {
@@ -118,6 +209,42 @@ class KelasKuliah extends ResourceController
                 'message' => 'successful deleted',
                 'data' => []
             ]);
+        } catch (\Throwable $th) {
+            return $this->fail([
+                'status' => false,
+                'message' => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function deleteMahasiswa($id = null)
+    {
+        try {
+            $object = new \App\Models\PesertaKelasModel();
+            $object->delete($id);
+            return $this->respondDeleted([
+                'status' => true,
+                'message' => 'successful deleted',
+                'data'=>[]
+            ]); 
+        } catch (\Throwable $th) {
+            return $this->fail([
+                'status' => false,
+                'message' => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function deleteDosen($id = null)
+    {
+        try {
+            $object = new \App\Models\DosenPengajarKelasModel();
+            $object->delete($id);
+            return $this->respondDeleted([
+                'status' => true,
+                'message' => 'successful deleted',
+                'data'=>[]
+            ]); 
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,

@@ -142,21 +142,29 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->delete('aktivitas_kuliah/(:any)', 'AktivitasKuliah::delete/$1', ['filter' => 'auth']);
 
     $routes->get('dosen_wali', 'DosenWali::show', ['filter' => 'auth']);
-    $routes->get('dosen_wali/(:any)', 'DosenWali::show/$1', ['filter' => 'auth']);
-    $routes->get('dosen_wali_by_dosen/(:any)', 'DosenWali::showByDsn/$1', ['filter' => 'auth']);
+    $routes->get('dosen_wali/(:hash)', 'DosenWali::show/$1', ['filter' => 'auth']);
+    $routes->get('dosen_wali_by_dosen/(:hash)', 'DosenWali::showByDsn/$1', ['filter' => 'auth']);
     $routes->post('dosen_wali', 'DosenWali::create', ['filter' => 'auth']);
     $routes->put('dosen_wali', 'DosenWali::update', ['filter' => 'auth']);
-    $routes->delete('dosen_wali/(:any)', 'DosenWali::delete/$1', ['filter' => 'auth']);
+    $routes->delete('dosen_wali/(:hash)', 'DosenWali::delete/$1', ['filter' => 'auth']);
+
+    $routes->group('kelas_kuliah', ['filter' => 'auth'], function($routes){
+        $routes->get('', 'KelasKuliah::show');
+        $routes->get('(:hash)', 'KelasKuliah::show/$1');
+        $routes->get('mahasiswa/(:hash)', 'KelasKuliah::pesertaKelas/$1');
+        $routes->get('dosen/(:hash)', 'dosenPengajarKelas::show/$1');
+        $routes->post('kelas_kuliah', 'KelasKuliah::create');
+        $routes->post('mahasiswa', 'KelasKuliah::createMahasiswa');
+        $routes->post('dosen', 'KelasKuliah::createDosen');
+        $routes->post('paginate', 'KelasKuliah::paginate');
+        $routes->put('kelas_kuliah', 'KelasKuliah::update');
+        $routes->put('mahasiswa', 'KelasKuliah::updateMahasiswa');
+        $routes->put('dosen', 'KelasKuliah::updateDosen');
+        $routes->delete('(:hash)', 'KelasKuliah::delete/$1');
+        $routes->delete('mahasiswa/(:hash)', 'deleteMahasiswa::delete/$1');
+        $routes->delete('dosen/(:hash)', 'deleteDosen::delete/$1');
+    });
     
-    $routes->get('kelas_kuliah', 'KelasKuliah::show', ['filter' => 'auth']);
-    $routes->get('kelas_kuliah/(:any)', 'KelasKuliah::show/$1', ['filter' => 'auth']);
-    $routes->get('kelas_kuliah/(:any)/peserta_kelas', 'KelasKuliah::show/$1/$2', ['filter' => 'auth']);
-    $routes->get('kelas_kuliah/(:any)/dosen_pengajar_kelas', 'KelasKuliah::show/$1/$2', ['filter' => 'auth']);
-    $routes->addRedirect('peserta_kelas/(:num)', 'kelas_kuliah/$1/peserta_kelas');
-    $routes->post('kelas_kuliah_paginate', 'KelasKuliah::paginate', ['filter' => 'auth']);
-    $routes->post('kelas_kuliah', 'KelasKuliah::create', ['filter' => 'auth']);
-    $routes->put('kelas_kuliah', 'KelasKuliah::update', ['filter' => 'auth']);
-    $routes->delete('kelas_kuliah/(:any)', 'KelasKuliah::delete/$1', ['filter' => 'auth']);
 
     $routes->get('kurikulum', 'Kurikulum::show', ['filter' => 'auth']);
     $routes->get('kurikulum/(:hash)', 'Kurikulum::show/$1', ['filter' => 'auth']);
