@@ -14,23 +14,32 @@ class Kurikulum extends ResourceController
 
     public function show($id = null, $id_prodi = null)
     {
-        $object = new KurikulumModel();
-        return $this->respond([
-            'status' => true,
-            'data' => $id == null ? $object->findAll() : $object->where('id', $id)->first()
-        ]);
+        try {
+            $object = new KurikulumModel();
+            return $this->respond([
+                'status' => true,
+                'data' => $id == null ? $object->findAll() : $object->where('id', $id)->first()
+            ]);
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage());
+        }
     }
 
     public function matakuliah_kurikulum($id = null)
     {
-        $object = new MatakuliahKurikulumModel();
-        return $this->respond([
-            'status' => true,
-            'data' => $object
-            ->select("matakuliah_kurikulum.id, matakuliah_kurikulum.semester, matakuliah_kurikulum.matakuliah_id, matakuliah_kurikulum.status_sync, matakuliah_kurikulum.sync_at, matakuliah_kurikulum.apakah_wajib, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, matakuliah.sks_tatap_muka, matakuliah.sks_praktek, matakuliah.sks_praktek_lapangan, matakuliah.sks_simulasi")
-            ->join("matakuliah", "matakuliah.id = matakuliah_kurikulum.matakuliah_id", "left")
-            ->where('kurikulum_id', $id)->findAll()
-        ]);
+        try {
+            $object = new MatakuliahKurikulumModel();
+            return $this->respond([
+                'status' => true,
+                'data' => $object
+                ->select("matakuliah_kurikulum.id, matakuliah_kurikulum.semester, matakuliah_kurikulum.matakuliah_id, matakuliah_kurikulum.status_sync, matakuliah_kurikulum.sync_at, matakuliah_kurikulum.apakah_wajib, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, matakuliah.sks_tatap_muka, matakuliah.sks_praktek, matakuliah.sks_praktek_lapangan, matakuliah.sks_simulasi")
+                ->join("matakuliah", "matakuliah.id = matakuliah_kurikulum.matakuliah_id", "left")
+                ->orderBy('matakuliah_kurikulum.created_at', 'desc')
+                ->where('kurikulum_id', $id)->findAll()
+            ]);
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage(),400);
+        }
     }
 
     public function matakuliah_prodi($id = null)

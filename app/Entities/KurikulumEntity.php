@@ -12,4 +12,5 @@ class KurikulumEntity extends Entity
     ];
     protected $dates   = ['sync_at', 'created_at', 'updated_at', 'deleted_at'];
     protected $casts   = [];
+    
 }

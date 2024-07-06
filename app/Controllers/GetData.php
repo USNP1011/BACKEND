@@ -754,16 +754,20 @@ class GetData extends BaseController
             $data = $this->api->getData('GetPesertaKelasKuliah', $this->token);
         }
         foreach ($data->data as $key => $value) {
-            $value->id = Uuid::uuid4()->toString();
-            $itemRiwayat =  $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
-            $value->id_riwayat_pendidikan = $itemRiwayat->id;
-            $itemKelasKuliah =  $kelasKuliah->where('id_kelas_kuliah', $value->id_kelas_kuliah)->first();
-            $value->kelas_kuliah_id = $itemKelasKuliah->id;
-            $itemMahasiswa =  $mahasiswa->where('id_mahasiswa', $value->id_mahasiswa)->first();
-            $value->mahasiswa_id = $itemMahasiswa->id;
-            $itemMatakuliah =  $matakuliah->where('id_matkul', $value->id_matkul)->first();
-            $value->matakuliah_id = $itemMatakuliah->id;
-            $pesertaKelas->insert($value);
+            try {
+                $value->id = Uuid::uuid4()->toString();
+                $itemRiwayat =  $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
+                $value->id_riwayat_pendidikan = $itemRiwayat->id;
+                $itemKelasKuliah =  $kelasKuliah->where('id_kelas_kuliah', $value->id_kelas_kuliah)->first();
+                $value->kelas_kuliah_id = $itemKelasKuliah->id;
+                $itemMahasiswa =  $mahasiswa->where('id_mahasiswa', $value->id_mahasiswa)->first();
+                $value->mahasiswa_id = $itemMahasiswa->id;
+                $itemMatakuliah =  $matakuliah->where('id_matkul', $value->id_matkul)->first();
+                $value->matakuliah_id = $itemMatakuliah->id;
+                $pesertaKelas->insert($value);
+            } catch (\Throwable $th) {
+                continue;
+            }
         }
         return response()->setJSON($data);
     }

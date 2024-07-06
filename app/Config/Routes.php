@@ -151,9 +151,10 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->group('kelas_kuliah', ['filter' => 'auth'], function($routes){
         $routes->get('', 'KelasKuliah::show');
         $routes->get('(:hash)', 'KelasKuliah::show/$1');
-        $routes->get('mahasiswa/(:hash)', 'KelasKuliah::pesertaKelas/$1');
+        $routes->get('mahasiswa/(:hash)/kelas', 'KelasKuliah::pesertaKelas/$1');
         $routes->get('mahasiswa/(:hash)/prodi', 'KelasKuliah::mahasiswaProdi/$1');
-        $routes->get('dosen/(:hash)', 'dosenPengajarKelas::show/$1');
+        $routes->get('dosen/(:hash)/kelas', 'KelasKuliah::dosenPengajarKelas/$1');
+        $routes->get('dosen/all', 'KelasKuliah::dosenAll/$1');
         $routes->post('kelas_kuliah', 'KelasKuliah::create');
         $routes->post('mahasiswa', 'KelasKuliah::createMahasiswa');
         $routes->post('dosen', 'KelasKuliah::createDosen');
@@ -166,7 +167,6 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
         $routes->delete('dosen/(:hash)', 'deleteDosen::delete/$1');
     });
     
-
     $routes->get('kurikulum', 'Kurikulum::show', ['filter' => 'auth']);
     $routes->get('kurikulum/(:hash)', 'Kurikulum::show/$1', ['filter' => 'auth']);
     $routes->get('kurikulum/matakuliah/(:hash)/kurikulum', 'Kurikulum::matakuliah_kurikulum/$1', ['filter' => 'auth']);

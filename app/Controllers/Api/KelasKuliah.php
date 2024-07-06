@@ -4,6 +4,7 @@ namespace App\Controllers\Api;
 
 use App\Models\DosenPengajarKelasModel;
 use App\Models\KelasKuliahModel;
+use App\Models\PenugasanDosenModel;
 use App\Models\PesertaKelasModel;
 use App\Models\RiwayatPendidikanMahasiswaModel;
 use CodeIgniter\RESTful\ResourceController;
@@ -26,12 +27,15 @@ class KelasKuliah extends ResourceController
         return $this->respond([
             'status' => true,
             'data' => $id == null ? $object
-                ->select("kelas_kuliah.*")
+                ->select("kelas_kuliah.*, semester.nama_semester, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, prodi.nama_program_studi, dosen_pengajar_kelas.nama_dosen, matakuliah.sks_mata_kuliah, (SELECT COUNT(*) FROM peserta_kelas WHERE peserta_kelas.kelas_kuliah_id=kelas_kuliah.id)as peserta_kelas")
                 ->join('semester', 'semester.id_semester=kelas_kuliah.id_semester', 'left')
+                ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id', 'left')
+                ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
+                ->join('prodi', 'prodi.id_prodi=kelas_kuliah.id_prodi', 'left')
                 ->where('a_periode_aktif', '1')
                 ->findAll() :
                 $object
-                ->select("kelas_kuliah.*, kelas_kuliah.status_sync, kelas_kuliah.nama_kelas_kuliah, semester.nama_semester, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, prodi.nama_program_studi, dosen_pengajar_kelas.nama_dosen, matakuliah.sks_mata_kuliah, (SELECT COUNT(*) FROM peserta_kelas WHERE peserta_kelas.kelas_kuliah_id=kelas_kuliah.id)as peserta_kelas")
+                ->select("kelas_kuliah.*, semester.nama_semester, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, prodi.nama_program_studi, dosen_pengajar_kelas.nama_dosen, matakuliah.sks_mata_kuliah, (SELECT COUNT(*) FROM peserta_kelas WHERE peserta_kelas.kelas_kuliah_id=kelas_kuliah.id)as peserta_kelas")
                 ->join('semester', 'semester.id_semester=kelas_kuliah.id_semester', 'left')
                 ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id', 'left')
                 ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
@@ -46,7 +50,14 @@ class KelasKuliah extends ResourceController
         return $this->respond([
             'status' => true,
             'data' => $object
-                ->select("peserta_kelas.*")->where('kelas_kuliah_id', $id)->findAll()
+                ->select("peserta_kelas.id, peserta_kelas.id_riwayat_pendidikan, peserta_kelas.kelas_kuliah_id, peserta_kelas.mahasiswa_id, peserta_kelas.matakuliah_id, peserta_kelas.nilai_angka, peserta_kelas.nilai_huruf, peserta_kelas.nilai_indeks, peserta_kelas.sync_at, peserta_kelas.status_sync, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.angkatan, kelas_kuliah.nama_kelas_kuliah, mahasiswa.nama_mahasiswa, mahasiswa.jenis_kelamin, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, kelas_kuliah.id_prodi, prodi.nama_program_studi")
+                ->join('kelas_kuliah', 'kelas_kuliah.id=peserta_kelas.kelas_kuliah_id', 'left')
+                ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=peserta_kelas.id_riwayat_pendidikan', 'left')
+                ->join('mahasiswa', 'mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa', 'left')
+                ->join('prodi', 'prodi.id_prodi=riwayat_pendidikan_mahasiswa.id_prodi', 'left')
+                ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
+                ->orderBy('sync_at', 'desc')
+                ->where('kelas_kuliah_id', $id)->findAll()
         ]);
     }
 
@@ -57,7 +68,7 @@ class KelasKuliah extends ResourceController
             'status' => true,
             'data' => $object
                 ->select("riwayat_pendidikan_mahasiswa.*, mahasiswa.nama_mahasiswa")
-                ->join("mahasiswa". "mahasiswa.id=riwayat_pendidikan_mahasiswa.mahasiswa_id")
+                ->join("mahasiswa", "mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa")
                 ->where('riwayat_pendidikan_mahasiswa.id_prodi', $id)->findAll()
         ]);
     }
@@ -67,7 +78,19 @@ class KelasKuliah extends ResourceController
         $object = new DosenPengajarKelasModel();
         return $this->respond([
             'status' => true,
-            'data' => $object->where('kelas_kuliah_id', $id)->findAll()
+            'data' => $object
+            ->select("dosen_pengajar_kelas.*, penugasan_dosen.nama_dosen, penugasan_dosen.nidn")
+            ->join("penugasan_dosen", "penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen", "left")
+            ->where('kelas_kuliah_id', $id)->findAll()
+        ]);
+    }
+
+    public function dosenAll($id = null): object
+    {
+        $object = new PenugasanDosenModel();
+        return $this->respond([
+            'status' => true,
+            'data' => $object->findAll()
         ]);
     }
 

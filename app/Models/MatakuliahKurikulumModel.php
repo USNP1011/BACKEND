@@ -13,7 +13,6 @@ class MatakuliahKurikulumModel extends Model
     protected $allowedFields = [
 		'kurikulum_id',
 		'matakuliah_id',
-        'id_semester',
 		'sks_mata_kuliah',
 		'sks_praktek',
 		'sks_praktek_lapangan',
