@@ -73,6 +73,25 @@ class KelasKuliah extends ResourceController
         ]);
     }
 
+    public function mahasiswaAll(): object
+    {
+        $param = $this->request->getJSON();
+        $object = new RiwayatPendidikanMahasiswaModel();
+        $data = $object->paginate(10,'default',1);
+        $num = $param->count == 0 ? $object->pager->getDetails()['total']: $param->count;
+        return $this->respond([
+            'status' => true,
+            'data' => $object
+                ->select("riwayat_pendidikan_mahasiswa.*, mahasiswa.nama_mahasiswa")
+                ->join("mahasiswa", "mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa", 'left')
+                ->groupStart()
+                ->like('nim', $param->cari)
+                ->orLike('mahasiswa.nama_mahasiswa', $param->cari)
+                ->groupEnd()
+                ->paginate($num,'default',1)
+        ]);
+    }
+
     public function dosenPengajarKelas($id = null): object
     {
         $object = new DosenPengajarKelasModel();

@@ -125,7 +125,12 @@ class Kurikulum extends ResourceController
         try {
             $object = new \App\Models\MatakuliahKurikulumModel();
             $model = new \App\Entities\MatakuliahKurikulumEntity();
-            $model->fill((array)$this->request->getJSON());
+            $item = [
+                'id'=>$this->request->getJsonVar('id'),
+                'semester'=>$this->request->getJsonVar('semester'),
+                'apakah_wajib'=>$this->request->getJsonVar('apakah_wajib')
+            ];
+            $model->fill((array)$item);
             $object->save($model);
             return $this->respond([
                 'status' => true,

@@ -153,6 +153,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
         $routes->get('(:hash)', 'KelasKuliah::show/$1');
         $routes->get('mahasiswa/(:hash)/kelas', 'KelasKuliah::pesertaKelas/$1');
         $routes->get('mahasiswa/(:hash)/prodi', 'KelasKuliah::mahasiswaProdi/$1');
+        $routes->post('mahasiswa/all', 'KelasKuliah::mahasiswaAll');
         $routes->get('dosen/(:hash)/kelas', 'KelasKuliah::dosenPengajarKelas/$1');
         $routes->get('dosen/all', 'KelasKuliah::dosenAll/$1');
         $routes->post('kelas_kuliah', 'KelasKuliah::create');
