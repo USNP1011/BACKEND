@@ -198,11 +198,13 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->put('peserta_kelas', 'PesertaKelas::update', ['filter' => 'auth']);
     $routes->delete('peserta_kelas/(:any)', 'PesertaKelas::delete/$1', ['filter' => 'auth']);
 
-    $routes->get('aktivitas_mahasiswa', 'AktivitasMahasiswa::show', ['filter' => 'auth']);
-    $routes->get('aktivitas_mahasiswa/(:any)', 'AktivitasMahasiswa::show/$1', ['filter' => 'auth']);
-    $routes->post('aktivitas_mahasiswa', 'AktivitasMahasiswa::create', ['filter' => 'auth']);
-    $routes->put('aktivitas_mahasiswa', 'AktivitasMahasiswa::update', ['filter' => 'auth']);
-    $routes->delete('aktivitas_mahasiswa/(:any)', 'AktivitasMahasiswa::delete/$1', ['filter' => 'auth']);
+    $routes->group('aktivitas_mahasiswa', ['filter' => 'auth'], function($routes){
+        $routes->get('', 'AktivitasMahasiswa::show');
+        $routes->get('(:hash)', 'AktivitasMahasiswa::show/$1');
+        $routes->post('', 'AktivitasMahasiswa::create');
+        $routes->put('', 'AktivitasMahasiswa::update');
+        $routes->delete('(:hash)', 'AktivitasMahasiswa::delete/$1');
+    });
 
     $routes->get('anggota_aktivitas_mahasiswa', 'AnggotaAktivitasMahasiswa::show', ['filter' => 'auth']);
     $routes->get('anggota_aktivitas_mahasiswa/(:any)', 'AnggotaAktivitasMahasiswa::show/$1', ['filter' => 'auth']);

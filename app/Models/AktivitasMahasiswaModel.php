@@ -12,19 +12,16 @@ class AktivitasMahasiswaModel extends Model
     protected $allowedFields = [
         'id_aktivitas',
 		'jenis_anggota',
-		'nama_jenis_anggota',
 		'id_jenis_aktivitas',
-		'nama_jenis_aktivitas',
 		'id_prodi',
-		'nama_prodi',
 		'id_semester',
-		'nama_semester',
 		'judul',
 		'keterangan',
 		'lokasi',
 		'sk_tugas',
 		'tanggal_sk_tugas',
-		'status_sync'
+		'status_sync',
+		'sync_at'
     ];
 	protected bool $allowEmptyInserts = false;
 }

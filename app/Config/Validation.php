@@ -277,14 +277,7 @@ class Validation extends BaseConfig
             "errors" => [
                 "required" => "matakuliah_id Tidak Boleh Kosong"
             ]
-        ],
-        "id_prodi" => [
-            "label" => "id_prodi",
-            "rules" => "required",
-            "errors" => [
-                "required" => "id_prodi Tidak Boleh Kosong"
-            ]
-        ],
+        ]
     ];
 
     public array $pengajarKelas = [

@@ -19,7 +19,11 @@ class AktivitasMahasiswa extends ResourceController
     {
         return $this->respond([
             'status' => true,
-            'data' => $id == null ? $this->aktivitasMahasiswa->where('id_semester', $this->semester->id_semester)->findAll() : $this->aktivitasMahasiswa->where('id', $id)->first()
+            'data' => $id == null ? 
+            $this->aktivitasMahasiswa
+            ->select("aktivitas_mahasiswa.*, jenis_aktivitas.nama_jenis_aktivitas_mahasiswa, ")
+            ->where('id_semester', $this->semester->id_semester)->findAll() : 
+            $this->aktivitasMahasiswa->where('id', $id)->first()
         ]);
     }
 
