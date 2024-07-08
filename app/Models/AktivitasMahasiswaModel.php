@@ -12,7 +12,7 @@ class AktivitasMahasiswaModel extends Model
     protected $allowedFields = [
         'id_aktivitas',
 		'jenis_anggota',
-		'id_jenis_aktivitas',
+		'id_jenis_aktivitas_mahasiswa',
 		'id_prodi',
 		'id_semester',
 		'judul',
