@@ -90,7 +90,6 @@ class KelasKuliah extends ResourceController
                 ->like('nim', $param->cari)
                 ->orLike('mahasiswa.nama_mahasiswa', $param->cari)
                 ->groupEnd()
-                ->where('angkatan', $param->angkatan)
                 ->paginate($num,'default',1)
         ]);
     }
