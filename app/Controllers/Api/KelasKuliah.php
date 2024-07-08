@@ -61,15 +61,17 @@ class KelasKuliah extends ResourceController
         ]);
     }
 
-    public function mahasiswaProdi($id = null): object
+    public function mahasiswaProdi($id = null, $angkatan=null): object
     {
         $object = new RiwayatPendidikanMahasiswaModel();
+        $where = "riwayat_pendidikan_mahasiswa.id_prodi='".$id."'".(!is_null($angkatan) ? "AND riwayat_pendidikan_mahasiswa.angkatan='".$angkatan."'" : "");
         return $this->respond([
             'status' => true,
             'data' => $object
                 ->select("riwayat_pendidikan_mahasiswa.*, mahasiswa.nama_mahasiswa")
                 ->join("mahasiswa", "mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa")
-                ->where('riwayat_pendidikan_mahasiswa.id_prodi', $id)->findAll()
+                ->where($where)
+                ->findAll()
         ]);
     }
 
@@ -88,6 +90,7 @@ class KelasKuliah extends ResourceController
                 ->like('nim', $param->cari)
                 ->orLike('mahasiswa.nama_mahasiswa', $param->cari)
                 ->groupEnd()
+                ->where('angkatan', $param->angkatan)
                 ->paginate($num,'default',1)
         ]);
     }
