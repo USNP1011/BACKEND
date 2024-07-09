@@ -8,7 +8,7 @@ class MatakuliahKurikulumModel extends Model
     protected $primaryKey = 'id';   
 	protected $useAutoIncrement = false;
     protected $returnType       = 'App\Entities\MatakuliahKurikulumEntity';
-    protected $useSoftDeletes   = false;
+    protected $useSoftDeletes   = true;
     protected $protectFields    = true; 
     protected $allowedFields = [
 		'kurikulum_id',
@@ -30,8 +30,6 @@ class MatakuliahKurikulumModel extends Model
 		'status_sync'
     ];
 	protected bool $allowEmptyInserts = false;
-
-    // Dates
     protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';

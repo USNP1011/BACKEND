@@ -8,7 +8,7 @@ class PesertaKelasModel extends Model
     protected $primaryKey = 'id';    
 	protected $useAutoIncrement = false;
     protected $returnType       = 'App\Entities\PesertaKelasEntity';
-    protected $useSoftDeletes   = false;
+    protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields = [
 		'kelas_kuliah_id',
@@ -37,16 +37,4 @@ class PesertaKelasModel extends Model
     protected $updatedField  = 'updated_at';
     protected $deletedField  = 'deleted_at';
 
-	protected $beforeDelete = ['beforeDeleteCallback'];
-	protected $beforeUpdate = ['beforeUpdateCallback'];
-
-	protected function beforeDeleteCallback(array $data)
-    {
-		$this->update($data['id'][0], ['status_sync'=>null]);
-    }
-
-	protected function beforeUpdateCallback(array $data)
-    {
-		$this->update($data['id'][0], ['status_sync'=>null]);
-    }
 }

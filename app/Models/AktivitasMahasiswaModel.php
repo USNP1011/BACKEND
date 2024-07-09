@@ -8,6 +8,7 @@ class AktivitasMahasiswaModel extends Model
     protected $primaryKey = 'id';    
     protected $useAutoIncrement = false;
     protected $returnType       = 'object';
+	protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields = [
         'id_aktivitas',
@@ -27,17 +28,9 @@ class AktivitasMahasiswaModel extends Model
 		'sync_at'
     ];
 	protected bool $allowEmptyInserts = false;
-
-	protected $beforeDelete = ['beforeDeleteCallback'];
-	protected $beforeUpdate = ['beforeUpdateCallback'];
-
-	protected function beforeDeleteCallback(array $data)
-    {
-		$this->update($data['id'][0], ['status_sync'=>null]);
-    }
-
-	protected function beforeUpdateCallback(array $data)
-    {
-		$this->update($data['id'][0], ['status_sync'=>null]);
-    }
+    protected $useTimestamps = true;
+    protected $dateFormat    = 'datetime';
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
 }
