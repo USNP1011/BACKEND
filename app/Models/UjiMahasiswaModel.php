@@ -2,21 +2,20 @@
 
 use CodeIgniter\Model;
 
-class BimbingMahasiswaModel extends Model
+class UjiMahasiswaModel extends Model
 {
-    protected $table = 'bimbing_mahasiswa';
+    protected $table = 'uji_mahasiswa';
     protected $primaryKey = 'id';    
     protected $useAutoIncrement = false;
-    protected $returnType       = 'App\Entities\BimbingMahasiswaEntity';
+    protected $returnType       = 'App\Entities\UjiMahasiswaEntity';
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields = [
-        'id_bimbing_mahasiswa',
+        'id_uji',
 		'aktivitas_mahasiswa_id',
 		'id_kategori_kegiatan',
 		'id_dosen',
-		'pembimbing_ke',
-		'judul',
+		'penguji_ke',
 		'status_sync',
         'sync_at'
     ];

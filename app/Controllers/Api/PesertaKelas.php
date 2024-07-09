@@ -13,7 +13,7 @@ class PesertaKelas extends ResourceController
      * 
      * @return object
      */
-    public function show($id = null):object
+    public function show($id = null):object 
     {
         $object = new \App\Models\PesertaKelasModel();
         return $this->respond([

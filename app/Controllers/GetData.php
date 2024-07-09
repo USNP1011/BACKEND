@@ -273,6 +273,19 @@ class GetData extends BaseController
         return response()->setJSON($data);
     }
 
+    public function kategori_kegiatan()
+    {
+        $kategori = new \App\Models\KategoriKegiatanModel();
+
+        $data = $this->api->getData('GetKategoriKegiatan', $this->token);
+        if ($data->error_code == 100) {
+            $this->token = $this->api->getToken()->data->token;
+            $data = $this->api->getData('GetKategoriKegiatan', $this->token);
+        }
+        $kategori->insertBatch($data->data);
+        return response()->setJSON($data);
+    }
+
     public function jenjang_pendidikan()
     {
         $jenjangPendidikan = new \App\Models\JenjangPendidikanModel();

@@ -38,9 +38,15 @@ class PesertaKelasModel extends Model
     protected $deletedField  = 'deleted_at';
 
 	protected $beforeDelete = ['beforeDeleteCallback'];
+	protected $beforeUpdate = ['beforeUpdateCallback'];
 
 	protected function beforeDeleteCallback(array $data)
     {
-		$this->update($data['id'][0], ['sync_at'=>null, 'status_sync'=>null]);
+		$this->update($data['id'][0], ['status_sync'=>null]);
+    }
+
+	protected function beforeUpdateCallback(array $data)
+    {
+		$this->update($data['id'][0], ['status_sync'=>null]);
     }
 }
