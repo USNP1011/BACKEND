@@ -20,8 +20,6 @@ class PesertaKelasModel extends Model
 		'matakuliah_id',
 		'kode_mata_kuliah',
 		'nama_mata_kuliah',
-		'id_prodi',
-		'nama_program_studi',
 		'nilai_angka',
 		'nilai_huruf',
 		'nilai_indeks',

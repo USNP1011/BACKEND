@@ -7,7 +7,7 @@ use CodeIgniter\RESTful\ResourceController;
 
 class KategoriKegiatan extends ResourceController
 {
-    public function store($req)
+    public function store($req=null)
     {
         $object = new KategoriKegiatanModel();
         if($req == 'pembimbing'){

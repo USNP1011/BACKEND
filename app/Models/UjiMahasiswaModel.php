@@ -26,16 +26,21 @@ class UjiMahasiswaModel extends Model
     protected $updatedField  = 'updated_at';
     protected $deletedField  = 'deleted_at';
 
-    protected $beforeDelete = ['beforeDeleteCallback'];
-	protected $beforeUpdate = ['beforeUpdateCallback'];
-
-	protected function beforeDeleteCallback(array $data)
+    function getById($id = null)
     {
-		$this->update($data['id'][0], ['status_sync'=>null]);
-    }
-
-	protected function beforeUpdateCallback(array $data)
-    {
-		$this->update($data['id'][0], ['status_sync'=>null]);
+        $this->db->query("SELECT
+                `bimbing_mahasiswa`.*,
+                `kategori_kegiatan`.`nama_kategori_kegiatan`,
+                `dosen`.`nama_dosen`,
+                `dosen`.`nidn`,
+                `aktivitas_mahasiswa`.`judul`
+                FROM
+                `uji_mahasiswa`
+                LEFT JOIN `aktivitas_mahasiswa`
+                ON `bimbing_mahasiswa`.`aktivitas_mahasiswa_id` = `aktivitas_mahasiswa`.`id`
+                LEFT JOIN `kategori_kegiatan` ON `kategori_kegiatan`.`id_kategori_kegiatan` =
+                `bimbing_mahasiswa`.`id_kategori_kegiatan`
+                LEFT JOIN `dosen` ON `dosen`.`id_dosen` = `bimbing_mahasiswa`.`id_dosen`
+                WHERE bimbing_mahasiswa.id='" . $id . "'")->getRowObject();
     }
 }

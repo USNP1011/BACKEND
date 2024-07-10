@@ -12,11 +12,13 @@ class AktivitasMahasiswa extends ResourceController
 {
     protected $aktivitasMahasiswa;
     protected $semester;
+    protected $conn;
     public function __construct()
     {
         helper('semester');
         $this->aktivitasMahasiswa = new \App\Models\AktivitasMahasiswaModel();
         $this->semester = getSemesterAktif();
+        $this->conn = \Config\Database::connect();
     }
 
     public function show($id = null)
@@ -84,7 +86,7 @@ class AktivitasMahasiswa extends ResourceController
             $object->insert($model);
             return $this->respond([
                 'status' => true,
-                'data' => $model
+                'data' => $object->getById($item->id)
             ]);
         } catch (\Throwable $th) {
             return $this->fail([
@@ -140,7 +142,7 @@ class AktivitasMahasiswa extends ResourceController
             $object->insert($model);
             return $this->respond([
                 'status' => true,
-                'data' => $model
+                'data' => $object->getById($item->id)
             ]);
         } catch (\Throwable $th) {
             return $this->fail([
@@ -168,7 +170,7 @@ class AktivitasMahasiswa extends ResourceController
             $object->insert($model);
             return $this->respond([
                 'status' => true,
-                'data' => $model
+                'data' => $object->getById($item->id)
             ]);
         } catch (\Throwable $th) {
             return $this->fail([
@@ -209,90 +211,6 @@ class AktivitasMahasiswa extends ResourceController
         }
     }
 
-    public function updateAnggota($id = null)
-    {
-        try {
-            $item = $this->request->getJSON();
-            $itemData = [
-                "id"=>$id,
-                "aktivitas_mahasiswa_id"=>$item->aktivitas_mahasiswa_id,
-                "id_riwayat_pendidikan"=>$item->id_riwayat_pendidikan,
-                "jenis_peran"=>$item->jenis_peran,
-                "nama_jenis_peran"=>$item->nama_jenis_peran
-            ];
-            $object = new \App\Models\AnggotaAktivitasModel();
-            $model = new \App\Entities\AnggotaAktivitasMahasiswaEntity();
-            $model->fill($itemData);
-            $object->save($model);
-            return $this->respond([
-                'status' => true,
-                'data' => $model
-            ]);
-        } catch (\Throwable $th) {
-            return $this->fail([
-                'status' => false,
-                'message' => $th->getMessage()
-            ]);
-        }
-    }
-
-    public function updatePembimbing($id = null)
-    {
-        try {
-            $item = $this->request->getJSON();
-            $itemData = [
-                "id"=>$id,
-                "id_bimbing_mahasiswa"=>$item->id_bimbing_mahasiswa,
-                "aktivitas_mahasiswa_id"=>$item->aktivitas_mahasiswa_id,
-                "id_kategori_kegiatan"=>$item->id_kategori_kegiatan,
-                "id_dosen"=>$item->id_dosen,
-                "pembimbing_ke"=>$item->pembimbing_ke,
-            ];
-            $object = new \App\Models\BimbingMahasiswaModel();
-            $model = new \App\Entities\BimbingMahasiswaEntity();
-            $model->fill($itemData);
-            $object->save($model);
-            return $this->respond([
-                'status' => true,
-                'data' => $model
-            ]);
-        } catch (\Throwable $th) {
-            return $this->fail([
-                'status' => false,
-                'message' => $th->getMessage()
-            ]);
-        }
-    }
-
-    public function updatePenguji($id = null)
-    {
-        try {
-            $item = $this->request->getJSON();
-            $itemData = [
-                "id"=>$id,
-                "id_bimbing_mahasiswa"=>$item->id_bimbing_mahasiswa,
-                "aktivitas_mahasiswa_id"=>$item->aktivitas_mahasiswa_id,
-                "id_kategori_kegiatan"=>$item->id_kategori_kegiatan,
-                "id_dosen"=>$item->id_dosen,
-                "penguji_ke"=>$item->penguji_ke,
-            ];
-            $object = new \App\Models\UjiMahasiswaModel();
-            $model = new \App\Entities\UjiMahasiswaEntity();
-            $model->fill($itemData);
-            $object->save($model);
-            return $this->respond([
-                'status' => true,
-                'data' => $model
-            ]);
-        } catch (\Throwable $th) {
-            return $this->fail([
-                'status' => false,
-                'message' => $th->getMessage()
-            ]);
-        }
-    }
-
-
     public function delete($id = null)
     {
         try {
@@ -301,7 +219,6 @@ class AktivitasMahasiswa extends ResourceController
             return $this->respondDeleted([
                 'status' => true,
                 'message' => 'successful deleted',
-                'data' => []
             ]);
         } catch (\Throwable $th) {
             return $this->fail([
@@ -319,7 +236,6 @@ class AktivitasMahasiswa extends ResourceController
             return $this->respondDeleted([
                 'status' => true,
                 'message' => 'successful deleted',
-                'data' => []
             ]);
         } catch (\Throwable $th) {
             return $this->fail([
@@ -337,7 +253,6 @@ class AktivitasMahasiswa extends ResourceController
             return $this->respondDeleted([
                 'status' => true,
                 'message' => 'successful deleted',
-                'data' => []
             ]);
         } catch (\Throwable $th) {
             return $this->fail([

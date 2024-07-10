@@ -8,8 +8,9 @@ class Rest
     {
         $curl = curl_init();
         curl_setopt_array($curl, array(
-            // CURLOPT_URL => 'http://103.160.119.51/ws/live2.php',
-            CURLOPT_URL => 'http://localhost:3003/ws/live2.php',
+            // CURLOPT_URL => 'http://103.160.119.51:3003/ws/live2.php',
+            CURLOPT_URL => 'http://103.160.119.51:3003/ws/sandbox2.php',
+            // CURLOPT_URL => 'http://localhost:3003/ws/live2.php',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -42,8 +43,9 @@ class Rest
 
         curl_setopt_array($curl, [
             CURLOPT_PORT => "3003",
-            // CURLOPT_URL => "http://103.160.119.51/ws/live2.php",
-            CURLOPT_URL => "http://localhost:3003/ws/live2.php",
+            // CURLOPT_URL => "http://103.160.119.51:3003/ws/live2.php",
+            CURLOPT_URL => "http://103.160.119.51:3003/ws/sandbox2.php",
+            // CURLOPT_URL => "http://localhost:3003/ws/live2.php",
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => "",
             CURLOPT_MAXREDIRS => 10,

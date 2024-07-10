@@ -84,7 +84,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->get('jenis_substansi', 'Referensi\JenisSubstansi::store', ['filter' => 'auth']);
     $routes->get('jenjang_pendidikan', 'Referensi\JenjangPendidikan::store', ['filter' => 'auth']);
     $routes->get('kebutuhan_khusus', 'Referensi\KebutuhanKhusus::store', ['filter' => 'auth']);
-    $routes->get('kategori_kegiatan/(:any)', 'Referensi\KategoriKegiatan::store/$1', ['filter' => 'auth']);
+    $routes->get('kategori_kegiatan/(:hash)', 'Referensi\KategoriKegiatan::store/$1', ['filter' => 'auth']);
     $routes->get('lembaga_pangkat', 'Referensi\LembagaPangkat::store', ['filter' => 'auth']);
     $routes->get('level_wilayah', 'Referensi\LevelWilayah::store', ['filter' => 'auth']);
     $routes->get('negara', 'Referensi\Negara::store', ['filter' => 'auth']);
@@ -154,8 +154,8 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
         $routes->get('', 'KelasKuliah::show');
         $routes->get('(:hash)', 'KelasKuliah::show/$1');
         $routes->get('mahasiswa/(:hash)/kelas', 'KelasKuliah::pesertaKelas/$1');
-        $routes->get('mahasiswa/(:hash)/prodi', 'KelasKuliah::mahasiswaProdi/$1');
-        $routes->get('mahasiswa/(:hash)/prodi/(:hash)', 'KelasKuliah::mahasiswaProdi/$1/$2');
+        $routes->get('mahasiswa/(:hash)/(:hash)/prodi', 'KelasKuliah::mahasiswaProdi/$1/$2');
+        $routes->get('mahasiswa/(:hash)/(:hash)/prodi/(:hash)', 'KelasKuliah::mahasiswaProdi/$1/$2/$3');
         $routes->post('mahasiswa/all', 'KelasKuliah::mahasiswaAll');
         $routes->get('dosen/(:hash)/kelas', 'KelasKuliah::dosenPengajarKelas/$1');
         $routes->get('dosen/all', 'KelasKuliah::dosenAll/$1');
@@ -211,13 +211,10 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
         $routes->post('dosen/pembimbing', 'AktivitasMahasiswa::createPembimbing');
         $routes->post('dosen/penguji', 'AktivitasMahasiswa::createPenguji');
         $routes->put('', 'AktivitasMahasiswa::update');
-        $routes->put('mahasiswa', 'AktivitasMahasiswa::updateAnggota');
-        $routes->put('dosen/pembimbing', 'AktivitasMahasiswa::updatePembimbing');
-        $routes->put('dosen/penguji', 'AktivitasMahasiswa::updatePenguji');
         $routes->delete('(:hash)', 'AktivitasMahasiswa::delete/$1');
-        $routes->delete('mahasiswa/(:hash)', 'AktivitasMahasiswa::deleteAnggota');
-        $routes->delete('dosen/pembimbing', 'AktivitasMahasiswa::deletePembimbing');
-        $routes->delete('dosen/penguji', 'AktivitasMahasiswa::deletePenguji');
+        $routes->delete('mahasiswa/(:hash)', 'AktivitasMahasiswa::deleteAnggota/$1');
+        $routes->delete('dosen/pembimbing/(:hash)', 'AktivitasMahasiswa::deletePembimbing/$1');
+        $routes->delete('dosen/penguji/(:hash)', 'AktivitasMahasiswa::deletePenguji/$1');
     });
 
     $routes->get('anggota_aktivitas_mahasiswa', 'AnggotaAktivitasMahasiswa::show', ['filter' => 'auth']);

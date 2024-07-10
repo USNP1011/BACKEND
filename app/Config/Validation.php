@@ -162,44 +162,6 @@ class Validation extends BaseConfig
         ],
     ];
 
-    public array $aktivitasMahasiswa = [
-        "jenis_anggota" => [
-            "label" => "Jenis Anggota",
-            "rules" => "required",
-            "errors" => [
-                "required" => "Jenis Anggota Tidak Boleh Kosong"
-            ]
-        ],
-        "id_jenis_aktivitas_mahasiswa" => [
-            "label" => "Id Jenis Aktivitas",
-            "rules" => "required",
-            "errors" => [
-                "required" => "Id Jenis Aktivitas Tidak Boleh Kosong"
-            ]
-        ],
-        "id_prodi" => [
-            "label" => "Id Prodi",
-            "rules" => "required",
-            "errors" => [
-                "required" => "Id Prodi Tidak Boleh Kosong"
-            ]
-        ],
-        "id_semester" => [
-            "label" => "Id Semester",
-            "rules" => "required",
-            "errors" => [
-                "required" => "Id Semester Tidak Boleh Kosong"
-            ]
-        ],
-        "judul" => [
-            "label" => "Judul",
-            "rules" => "required",
-            "errors" => [
-                "required" => "Judul Tidak Boleh Kosong"
-            ]
-        ]
-    ];
-
     public array $userMahasiswa = [
         "username" => [
             "label" => "Email",
@@ -417,6 +379,44 @@ class Validation extends BaseConfig
             "rules" => "required",
             "errors" => [
                 "required" => "semester Tidak Boleh Kosong"
+            ]
+        ]
+    ];
+
+    public array $aktivitasMahasiswa = [
+        "jenis_anggota" => [
+            "label" => "Jenis Anggota",
+            "rules" => "required",
+            "errors" => [
+                "required" => "Jenis Anggota Tidak Boleh Kosong"
+            ]
+        ],
+        "id_jenis_aktivitas_mahasiswa" => [
+            "label" => "Id Jenis Aktivitas",
+            "rules" => "required",
+            "errors" => [
+                "required" => "Id Jenis Aktivitas Tidak Boleh Kosong"
+            ]
+        ],
+        "id_prodi" => [
+            "label" => "Id Prodi",
+            "rules" => "required",
+            "errors" => [
+                "required" => "Id Prodi Tidak Boleh Kosong"
+            ]
+        ],
+        "id_semester" => [
+            "label" => "Id Semester",
+            "rules" => "required",
+            "errors" => [
+                "required" => "Id Semester Tidak Boleh Kosong"
+            ]
+        ],
+        "judul" => [
+            "label" => "Judul",
+            "rules" => "required",
+            "errors" => [
+                "required" => "Judul Tidak Boleh Kosong"
             ]
         ]
     ];

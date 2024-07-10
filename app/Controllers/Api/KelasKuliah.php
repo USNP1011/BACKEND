@@ -61,14 +61,15 @@ class KelasKuliah extends ResourceController
         ]);
     }
 
-    public function mahasiswaProdi($id = null, $angkatan=null): object
+    public function mahasiswaProdi($id_prodi = null, $kelas_kuliah_id = null, $angkatan = null): object
     {
         $object = new RiwayatPendidikanMahasiswaModel();
-        $where = "riwayat_pendidikan_mahasiswa.id_prodi='".$id."'".(!is_null($angkatan) ? "AND riwayat_pendidikan_mahasiswa.angkatan='".$angkatan."'" : "");
+        $where = "riwayat_pendidikan_mahasiswa.id_prodi='" . $id_prodi . "'" . (!is_null($angkatan) ? "AND riwayat_pendidikan_mahasiswa.angkatan='" . $angkatan . "'" : "");
+
         return $this->respond([
             'status' => true,
             'data' => $object
-                ->select("riwayat_pendidikan_mahasiswa.*, mahasiswa.nama_mahasiswa")
+                ->select("riwayat_pendidikan_mahasiswa.*, mahasiswa.nama_mahasiswa, (SELECT peserta_kelas.kelas_kuliah_id FROM peserta_kelas WHERE kelas_kuliah_id='" . $kelas_kuliah_id . "' AND id_riwayat_pendidikan=riwayat_pendidikan_mahasiswa.id limit 1) AS kelas_kuliah_id")
                 ->join("mahasiswa", "mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa")
                 ->where($where)
                 ->findAll()
@@ -79,8 +80,8 @@ class KelasKuliah extends ResourceController
     {
         $param = $this->request->getJSON();
         $object = new RiwayatPendidikanMahasiswaModel();
-        $data = $object->paginate(10,'default',1);
-        $num = $param->count == 0 ? $object->pager->getDetails()['total']: $param->count;
+        $data = $object->paginate(10, 'default', 1);
+        $num = $param->count == 0 ? $object->pager->getDetails()['total'] : $param->count;
         return $this->respond([
             'status' => true,
             'data' => $object
@@ -90,7 +91,7 @@ class KelasKuliah extends ResourceController
                 ->like('nim', $param->cari)
                 ->orLike('mahasiswa.nama_mahasiswa', $param->cari)
                 ->groupEnd()
-                ->paginate($num,'default',1)
+                ->paginate($num, 'default', 1)
         ]);
     }
 
@@ -100,9 +101,9 @@ class KelasKuliah extends ResourceController
         return $this->respond([
             'status' => true,
             'data' => $object
-            ->select("dosen_pengajar_kelas.*, penugasan_dosen.nama_dosen, penugasan_dosen.nidn")
-            ->join("penugasan_dosen", "penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen", "left")
-            ->where('kelas_kuliah_id', $id)->findAll()
+                ->select("dosen_pengajar_kelas.*, penugasan_dosen.nama_dosen, penugasan_dosen.nidn")
+                ->join("penugasan_dosen", "penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen", "left")
+                ->where('kelas_kuliah_id', $id)->findAll()
         ]);
     }
 
@@ -162,7 +163,7 @@ class KelasKuliah extends ResourceController
             return $this->respond([
                 'status' => true,
                 'data' => $model
-            ]); 
+            ]);
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,
@@ -190,7 +191,7 @@ class KelasKuliah extends ResourceController
             return $this->respond([
                 'status' => true,
                 'data' => $model
-            ]); 
+            ]);
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,
@@ -228,7 +229,7 @@ class KelasKuliah extends ResourceController
             return $this->respond([
                 'status' => true,
                 'data' => $model
-            ]); 
+            ]);
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,
@@ -247,7 +248,7 @@ class KelasKuliah extends ResourceController
             return $this->respond([
                 'status' => true,
                 'data' => $model
-            ]); 
+            ]);
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,
@@ -282,8 +283,8 @@ class KelasKuliah extends ResourceController
             return $this->respondDeleted([
                 'status' => true,
                 'message' => 'successful deleted',
-                'data'=>[]
-            ]); 
+                'data' => []
+            ]);
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,
@@ -300,8 +301,8 @@ class KelasKuliah extends ResourceController
             return $this->respondDeleted([
                 'status' => true,
                 'message' => 'successful deleted',
-                'data'=>[]
-            ]); 
+                'data' => []
+            ]);
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,
