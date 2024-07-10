@@ -78,6 +78,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->get('jenis_sertifikasi', 'Referensi\JenisSertifikasi::store', ['filter' => 'auth']);
     $routes->get('jenis_pendaftaran', 'Referensi\JenisPendaftaran::store', ['filter' => 'auth']);
     $routes->get('jenis_sms', 'Referensi\JenisSMS::store', ['filter' => 'auth']);
+    $routes->get('jenis_peran', 'Referensi\JenisPeran::store', ['filter' => 'auth']);
     $routes->get('bentuk_pendidikan', 'Referensi\BentukPendidikan::store', ['filter' => 'auth']);
     $routes->get('jalur_masuk', 'Referensi\JalurMasuk::store', ['filter' => 'auth']);
     $routes->get('transportasi', 'Referensi\Transportasi::store', ['filter' => 'auth']);

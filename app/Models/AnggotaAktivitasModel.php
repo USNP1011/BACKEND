@@ -36,11 +36,14 @@ class AnggotaAktivitasModel extends Model
             `mahasiswa`.`nama_mahasiswa`,
             `aktivitas_mahasiswa`.`id_prodi`,
             `prodi`.`kode_program_studi`,
-            `prodi`.`nama_program_studi`
+            `prodi`.`nama_program_studi`,
+            peran_peserta.nama_jenis_peran
             FROM
             `anggota_aktivitas`
             LEFT JOIN `aktivitas_mahasiswa` ON `aktivitas_mahasiswa`.`id` =
             `anggota_aktivitas`.`aktivitas_mahasiswa_id`
+            LEFT JOIN `peran_peserta` ON `anggota_aktivitas`.`jenis_peran` =
+            `peran_peserta`.`jenis_peran`
             LEFT JOIN `riwayat_pendidikan_mahasiswa`
             ON `anggota_aktivitas`.`id_riwayat_pendidikan` =
             `riwayat_pendidikan_mahasiswa`.`id`

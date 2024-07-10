@@ -69,7 +69,7 @@ class KelasKuliah extends ResourceController
         return $this->respond([
             'status' => true,
             'data' => $object
-                ->select("riwayat_pendidikan_mahasiswa.*, mahasiswa.nama_mahasiswa, (SELECT peserta_kelas.kelas_kuliah_id FROM peserta_kelas WHERE kelas_kuliah_id='" . $kelas_kuliah_id . "' AND id_riwayat_pendidikan=riwayat_pendidikan_mahasiswa.id limit 1) AS kelas_kuliah_id")
+                ->select("riwayat_pendidikan_mahasiswa.*, mahasiswa.nama_mahasiswa, (SELECT peserta_kelas.kelas_kuliah_id FROM peserta_kelas WHERE kelas_kuliah_id='" . $kelas_kuliah_id . "' AND id_riwayat_pendidikan=riwayat_pendidikan_mahasiswa.id AND peserta_kelas.deleted_at IS NULL limit 1) AS kelas_kuliah_id")
                 ->join("mahasiswa", "mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa")
                 ->where($where)
                 ->findAll()
