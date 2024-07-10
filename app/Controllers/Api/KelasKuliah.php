@@ -144,16 +144,27 @@ class KelasKuliah extends ResourceController
         }
     }
 
-    public function createMahasiswa()
+    public function createMahasiswa($data = null)
     {
         try {
-            $item = $this->request->getJSON();
-            if (!$this->validate('pesertaKelas')) {
-                $result = [
-                    "status" => false,
-                    "message" => $this->validator->getErrors(),
-                ];
-                return $this->failValidationErrors($result);
+            if(is_null($data)){
+                $item = $this->request->getJSON();
+                if (!$this->validate('pesertaKelas')) {
+                    $result = [
+                        "status" => false,
+                        "message" => $this->validator->getErrors(),
+                    ];
+                    return $this->failValidationErrors($result);
+                }
+            }else{
+                $item = $data;
+                if (!$this->validateData((array) $item, 'pesertaKelas')) {
+                    $result = [
+                        "status" => false,
+                        "message" => $this->validator->getErrors(),
+                    ];
+                    return $this->failValidationErrors($result);
+                }
             }
             $item->id = Uuid::uuid4()->toString();
             $object = new \App\Models\PesertaKelasModel();
@@ -164,6 +175,42 @@ class KelasKuliah extends ResourceController
                 'status' => true,
                 'data' => $model
             ]);
+        } catch (\Throwable $th) {
+            return $this->fail([
+                'status' => false,
+                'message' => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function createMahasiswaCollective()
+    {
+        $conn = \Config\Database::connect();
+        try {
+            $dataParam = $this->request->getJSON();
+            $conn->transBegin();
+            foreach ($dataParam as $key => $value) {
+                try {
+                    if($value->checked== true){
+                        $result = $this->createMahasiswa($value);
+                        $value->id = $result->data->id;
+                    }else{
+                        $this->deleteMahasiswa($value->id);
+                    }
+                } catch (\Throwable $th) {
+                    $conn->transRollback();
+                    return $this->fail([
+                        'status' => false,
+                        'message' => $th->getMessage()
+                    ]);
+                } finally{
+                    $conn->transCommit();
+                    return $this->fail([
+                        'status' => false,
+                        'data' =>$dataParam
+                    ]);
+                }
+            }
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,

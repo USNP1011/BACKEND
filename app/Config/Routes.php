@@ -161,6 +161,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
         $routes->get('dosen/all', 'KelasKuliah::dosenAll/$1');
         $routes->post('kelas_kuliah', 'KelasKuliah::create');
         $routes->post('mahasiswa', 'KelasKuliah::createMahasiswa');
+        $routes->post('mahasiswa/kolektif', 'KelasKuliah::createMahasiswaCollective');
         $routes->post('dosen', 'KelasKuliah::createDosen');
         $routes->post('paginate', 'KelasKuliah::paginate');
         $routes->put('kelas_kuliah', 'KelasKuliah::update');

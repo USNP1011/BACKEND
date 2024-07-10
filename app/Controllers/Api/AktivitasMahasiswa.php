@@ -46,7 +46,7 @@ class AktivitasMahasiswa extends ResourceController
         $object = new BimbingMahasiswaModel();
         return $this->respond([
             'status' => true,
-            'data' => $object->where('aktivitas_mahasiswa_id', $id)->findAll()
+            'data' => $object->getByAktivitas($id)
         ]);
     }
 
@@ -55,7 +55,7 @@ class AktivitasMahasiswa extends ResourceController
         $object = new UjiMahasiswaModel();
         return $this->respond([
             'status' => true,
-            'data' => $object->where('aktivitas_mahasiswa_id', $id)->findAll()
+            'data' => $object->getByAktivitas($id)
         ]);
     }
 
@@ -64,7 +64,7 @@ class AktivitasMahasiswa extends ResourceController
         $object = new AnggotaAktivitasModel();
         return $this->respond([
             'status' => true,
-            'data' => $object->where('aktivitas_mahasiswa_id', $id)->findAll()
+            'data' => $object->getByAktivitas($id)
         ]);
     }
 
