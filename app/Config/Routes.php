@@ -203,7 +203,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->group('aktivitas_mahasiswa', ['filter' => 'auth'], function($routes){
         $routes->get('', 'AktivitasMahasiswa::show');
         $routes->get('(:hash)', 'AktivitasMahasiswa::show/$1');
-        $routes->get('mahasiswa/(:hash)', 'AnggotaAktivitasMahasiswa::show/$1');
+        $routes->get('mahasiswa/(:hash)', 'AktivitasMahasiswa::AnggotaAktivitasMahasiswa/$1');
         $routes->get('dosen/(:hash)/pembimbing', 'AktivitasMahasiswa::dosenPembimbing/$1');
         $routes->get('dosen/(:hash)/penguji', 'AktivitasMahasiswa::dosenPenguji/$1');
         $routes->post('', 'AktivitasMahasiswa::create');
