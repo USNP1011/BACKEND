@@ -214,8 +214,8 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
         $routes->put('', 'AktivitasMahasiswa::update');
         $routes->delete('(:hash)', 'AktivitasMahasiswa::delete/$1');
         $routes->delete('mahasiswa/(:hash)', 'AktivitasMahasiswa::deleteAnggota/$1');
-        $routes->delete('dosen/pembimbing/(:hash)', 'AktivitasMahasiswa::deletePembimbing/$1');
-        $routes->delete('dosen/penguji/(:hash)', 'AktivitasMahasiswa::deletePenguji/$1');
+        $routes->delete('dosen/(:hash)/pembimbing', 'AktivitasMahasiswa::deletePembimbing/$1');
+        $routes->delete('dosen/(:hash)/penguji', 'AktivitasMahasiswa::deletePenguji/$1');
     });
 
     $routes->get('anggota_aktivitas_mahasiswa', 'AnggotaAktivitasMahasiswa::show', ['filter' => 'auth']);

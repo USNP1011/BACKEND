@@ -147,7 +147,7 @@ class KelasKuliah extends ResourceController
     public function createMahasiswa($data = null)
     {
         try {
-            if(is_null($data)){
+            if (is_null($data)) {
                 $item = $this->request->getJSON();
                 if (!$this->validate('pesertaKelas')) {
                     $result = [
@@ -156,7 +156,7 @@ class KelasKuliah extends ResourceController
                     ];
                     return $this->failValidationErrors($result);
                 }
-            }else{
+            } else {
                 $item = $data;
                 if (!$this->validateData((array) $item, 'pesertaKelas')) {
                     $result = [
@@ -171,10 +171,14 @@ class KelasKuliah extends ResourceController
             $model = new \App\Entities\PesertaKelasEntity();
             $model->fill((array)$item);
             $object->insert($model);
-            return $this->respond([
-                'status' => true,
-                'data' => $model
-            ]);
+            if (is_null($data)) {
+                return $this->respond([
+                    'status' => true,
+                    'data' => $model
+                ]);
+            } else {
+                return $model;
+            }
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,
@@ -186,16 +190,18 @@ class KelasKuliah extends ResourceController
     public function createMahasiswaCollective()
     {
         $conn = \Config\Database::connect();
+        $object = new \App\Models\PesertaKelasModel();
         try {
             $dataParam = $this->request->getJSON();
             $conn->transBegin();
             foreach ($dataParam as $key => $value) {
                 try {
-                    if($value->checked== true){
-                        $result = $this->createMahasiswa($value);
-                        $value->id = $result->data->id;
-                    }else{
-                        $this->deleteMahasiswa($value->id);
+                    if ($value->checked == true) {
+                        $this->createMahasiswa($value);
+                    } else {
+                        $object->where('kelas_kuliah_id', $value->kelas_kuliah_id)
+                            ->where('id_riwayat_pendidikan', $value->id_riwayat_pendidikan)
+                            ->delete();
                     }
                 } catch (\Throwable $th) {
                     $conn->transRollback();
@@ -203,14 +209,12 @@ class KelasKuliah extends ResourceController
                         'status' => false,
                         'message' => $th->getMessage()
                     ]);
-                } finally{
-                    $conn->transCommit();
-                    return $this->fail([
-                        'status' => false,
-                        'data' =>$dataParam
-                    ]);
                 }
             }
+            $conn->transCommit();
+            return $this->respond([
+                'status' => true
+            ]);
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,
