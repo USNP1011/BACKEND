@@ -15,7 +15,11 @@ class Matakuliah extends ResourceController
         $matakuliah = new MatakuliahModel();
         return $this->respond([
             'status' => true,
-            'data' => $id == null ? $matakuliah->findAll() : $matakuliah->where('id', $id)->first()
+            'data' => $id == null ? $matakuliah->select("matakuliah.*, prodi.nama_program_studi")
+            ->join("prodi", "matakuliah.id_prodi=prodi.id_prodi", "left")
+            ->findAll() : $matakuliah->select("matakuliah.*, prodi.nama_program_studi")
+            ->join("prodi", "matakuliah.id_prodi=prodi.id_prodi", "left")
+            ->where('id', $id)->first()
         ]);
     }
 
@@ -141,7 +145,7 @@ class Matakuliah extends ResourceController
         $object = model(MatakuliahModel::class);
         $item = [
             'status' => true,
-            'data' => $object->like('nama_mata_kuliah', $item->cari)->paginate($item->count, 'default', $item->page),
+            'data' => $object->select('matakuliah.*, prodi.nama_program_studi')->join('prodi', 'prodi.id_prodi=matakuliah.id_prodi')->like('nama_mata_kuliah', $item->cari)->paginate($item->count, 'default', $item->page),
             'pager' => $object->pager->getDetails()
         ];
         return $this->respond($item);

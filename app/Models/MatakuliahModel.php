@@ -34,7 +34,6 @@ class MatakuliahModel extends Model
 		'tgl_create',
 		'jns_mk',
 		'kel_mk',
-		'nama_program_studi',
 		'status_sync',
 		'sync_at'
     ];

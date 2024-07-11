@@ -37,6 +37,7 @@ $routes->group('get_data', static function($routes){
     $routes->get('pengajar_kelas', 'GetData::pengajar_kelas');
     $routes->get('jenis_tinggal', 'GetData::jenis_tinggal');
     $routes->get('jenis_keluar', 'GetData::jenis_keluar');
+    $routes->get('pembiayaan', 'GetData::pembiayaan');
     $routes->get('GetJenisSertifikasi', 'GetData::GetJenisSertifikasi');
     $routes->get('jenis_pendaftaran', 'GetData::jenis_pendaftaran');
     $routes->get('jenis_sms', 'GetData::jenis_sms');
@@ -93,13 +94,14 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->get('status_mahasiswa', 'Referensi\StatusMahasiswa::store', ['filter' => 'auth']);
     $routes->get('wilayah', 'Referensi\Wilayah::store', ['filter' => 'auth']);
     $routes->get('get_wilayah/(:any)/(:any)/(:any)', 'Referensi\Wilayah::by_id/$1/$2/$3', ['filter' => 'auth']);
-    $routes->get('skala_nilai', 'Referensi\SkalaNilai::store', ['filter' => 'auth']);
     $routes->get('jenis_aktivitas', 'Referensi\JenisAktivitas::store', ['filter' => 'auth']);
     $routes->get('pengajar_kelas', 'Referensi\PengajarKelas::store', ['filter' => 'auth']);
     $routes->get('dosen', 'Referensi\Dosen::store', ['filter' => 'auth']);
     $routes->get('dosen/(:any)', 'Referensi\Dosen::store/$1', ['filter' => 'auth']);
     $routes->get('penugasan_dosen', 'Referensi\PenugasanDosen::store', ['filter' => 'auth']);
     
+    $routes->get('skala_nilai', 'Referensi\SkalaNilai::store', ['filter' => 'auth']);
+    $routes->get('skala_nilai/(:hash)', 'Referensi\SkalaNilai::store/$1', ['filter' => 'auth']);
 
     $routes->get('semester', 'Referensi\Semester::store', ['filter' => 'auth']);
     $routes->get('semester/(:any)', 'Referensi\Semester::store/$1', ['filter' => 'auth']);

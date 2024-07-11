@@ -51,6 +51,6 @@ class AktivitasMahasiswaModel extends Model
 			LEFT JOIN `prodi` ON `prodi`.`id_prodi` = `aktivitas_mahasiswa`.`id_prodi`
 			LEFT JOIN `semester` ON `semester`.`id_semester` =
 			`aktivitas_mahasiswa`.`id_semester` 
-			WHERE bimbing_mahasiswa.id='" . $id . "'")->getRowObject();
+			WHERE bimbing_mahasiswa.id='" . $id . "' AND aktivitas_mahasiswa.deleted_at IS NULL")->getRowObject();
 	}
 }

@@ -18,7 +18,6 @@ class BimbingMahasiswaModel extends Model
         'id_kategori_kegiatan',
         'id_dosen',
         'pembimbing_ke',
-        'judul',
         'status_sync',
         'sync_at'
     ];
@@ -44,7 +43,7 @@ class BimbingMahasiswaModel extends Model
                 LEFT JOIN `kategori_kegiatan` ON `kategori_kegiatan`.`id_kategori_kegiatan` =
                 `bimbing_mahasiswa`.`id_kategori_kegiatan`
                 LEFT JOIN `dosen` ON `dosen`.`id_dosen` = `bimbing_mahasiswa`.`id_dosen`
-                WHERE bimbing_mahasiswa.id='" . $id . "'")->getRowObject();
+                WHERE bimbing_mahasiswa.id='" . $id . "' AND bimbing_mahasiswa.deleted_at IS NULL")->getRowObject();
     }
 
     function getByAktivitas($id = null)
@@ -62,6 +61,6 @@ class BimbingMahasiswaModel extends Model
                 LEFT JOIN `kategori_kegiatan` ON `kategori_kegiatan`.`id_kategori_kegiatan` =
                 `bimbing_mahasiswa`.`id_kategori_kegiatan`
                 LEFT JOIN `dosen` ON `dosen`.`id_dosen` = `bimbing_mahasiswa`.`id_dosen`
-                WHERE aktivitas_mahasiswa_id='" . $id . "'")->getResult();
+                WHERE aktivitas_mahasiswa_id='" . $id . "' AND bimbing_mahasiswa.deleted_at")->getResult();
     }
 }

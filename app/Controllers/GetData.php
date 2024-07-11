@@ -38,6 +38,10 @@ class GetData extends BaseController
         $this->GetJenisSertifikasi();
         $this->jenis_pendaftaran();
         $this->jenis_sms();
+        $this->jenisPrestasi();
+        $this->tingkatPrestasi();
+        $this->pembiayaan();
+        $this->kategori_kegiatan();
         $this->bentuk_pendidikan();
         $this->jalur_masuk();
         $this->transportasi();
@@ -54,6 +58,7 @@ class GetData extends BaseController
         $this->jenis_aktivitas();
         $this->mahasiswa();
         $this->riwayat_pendidikan();
+        $this->prestasiMahasiswa();
         $this->kurikulum();
         $this->matakuliah();
         $this->kurikulum_detail();
@@ -68,6 +73,7 @@ class GetData extends BaseController
         $this->aktivitas_mahasiswa();
         $this->anggota_aktivitas_mahasiswa();
         $this->bimbing_mahasiswa();
+        $this->ujiMahasiswa();
     }
 
 
@@ -75,7 +81,6 @@ class GetData extends BaseController
     {
         $data = $this->api->getData('GetProfilPT', $this->token);
         $this->pt->insert($data->data[0]);
-        return response()->setJSON($data);
     }
 
     public function prodi()
@@ -92,7 +97,6 @@ class GetData extends BaseController
             $value->id_perguruan_tinggi = $pt->id_perguruan_tinggi;
             $prodi->insert($value);
         }
-        return response()->setJSON($data);
     }
 
     public function periode()
@@ -104,10 +108,7 @@ class GetData extends BaseController
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetPeriode', $this->token);
         }
-        foreach ($data->data as $key => $value) {
-            $prodi->insert($value);
-        }
-        return response()->setJSON($data);
+        $prodi->insertBatch($data->data);
     }
 
     public function jenis_tinggal()
@@ -119,10 +120,7 @@ class GetData extends BaseController
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetJenisTinggal', $this->token);
         }
-        foreach ($data->data as $key => $value) {
-            $jenis_tinggal->insert($value);
-        }
-        return response()->setJSON($data);
+        $jenis_tinggal->insertBatch($data->data);
     }
 
     public function jenis_keluar()
@@ -134,10 +132,7 @@ class GetData extends BaseController
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetJenisKeluar', $this->token);
         }
-        foreach ($data->data as $key => $value) {
-            $jenisKeluar->insert($value);
-        }
-        return response()->setJSON($data);
+        $jenisKeluar->insertBatch($data->data);
     }
 
     public function agama()
@@ -149,10 +144,7 @@ class GetData extends BaseController
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetAgama', $this->token);
         }
-        foreach ($data->data as $key => $value) {
-            $agama->insert($value);
-        }
-        return response()->setJSON($data);
+        $agama->insertBatch($data->data);
     }
 
     public function GetJenisSertifikasi()
@@ -164,10 +156,7 @@ class GetData extends BaseController
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetJenisSertifikasi', $this->token);
         }
-        foreach ($data->data as $key => $value) {
-            $JenisSertifikasi->insert($value);
-        }
-        return response()->setJSON($data);
+        $JenisSertifikasi->insertBatch($data->data);
     }
 
     public function jenis_pendaftaran()
@@ -179,10 +168,7 @@ class GetData extends BaseController
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetJenisPendaftaran', $this->token);
         }
-        foreach ($data->data as $key => $value) {
-            $jenisPendaftaran->insert($value);
-        }
-        return response()->setJSON($data);
+        $jenisPendaftaran->insertBatch($data->data);
     }
 
     public function jenis_sms()
@@ -194,10 +180,29 @@ class GetData extends BaseController
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetJenisSMS', $this->token);
         }
-        foreach ($data->data as $key => $value) {
-            $GetJenisSMS->insert($value);
+        $GetJenisSMS->insertBatch($data->data);
+    }
+
+    public function tingkatPrestasi()
+    {
+        $tingkat = new \App\Models\TingkatPrestasiModel();
+        $data = $this->api->getData('GetTingkatPrestasi', $this->token);
+        if ($data->error_code == 100) {
+            $this->token = $this->api->getToken()->data->token;
+            $data = $this->api->getData('GetTingkatPrestasi', $this->token);
         }
-        return response()->setJSON($data);
+        $tingkat->insertBatch($data->data);
+    }
+
+    public function jenisPrestasi()
+    {
+        $prestasi = new \App\Models\JenisPrestasiModel();
+        $data = $this->api->getData('GetJenisPrestasi', $this->token);
+        if ($data->error_code == 100) {
+            $this->token = $this->api->getToken()->data->token;
+            $data = $this->api->getData('GetJenisPrestasi', $this->token);
+        }
+        $prestasi->insertBatch($data->data);
     }
 
     public function bentuk_pendidikan()
@@ -210,7 +215,6 @@ class GetData extends BaseController
             $data = $this->api->getData('GetBentukPendidikan', $this->token);
         }
         $bentukPendidikan->insertBatch($data->data);
-        return response()->setJSON($data);
     }
 
     public function jalur_masuk()
@@ -223,7 +227,6 @@ class GetData extends BaseController
             $data = $this->api->getData('GetJalurMasuk', $this->token);
         }
         $jalurMasuk->insertBatch($data->data);
-        return response()->setJSON($data);
     }
 
     public function nilai_transfer()
@@ -237,12 +240,11 @@ class GetData extends BaseController
             $data = $this->api->getData('GetNilaiTransferPendidikanMahasiswa', $this->token);
         }
         foreach ($data->data as $key => $value) {
-            $dataRiwayat = $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
             $value->id = Uuid::uuid4()->toString();
-            $value->id_riwayat_pendidikan = $dataRiwayat->id;
+            $value->id_riwayat_pendidikan = $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first()->id;
             $nilaiTransfer->insert($value);
         }
-        return response()->setJSON($data);
+        // return response()->setJSON($data);
     }
 
     public function transportasi()
@@ -255,7 +257,6 @@ class GetData extends BaseController
             $data = $this->api->getData('GetAlatTransportasi', $this->token);
         }
         $transport->insertBatch($data->data);
-        return response()->setJSON($data);
     }
 
     public function jenis_substansi()
@@ -267,10 +268,7 @@ class GetData extends BaseController
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetJenisSubstansi', $this->token);
         }
-        foreach ($data->data as $key => $value) {
-            $jenisSubstansi->insert($value);
-        }
-        return response()->setJSON($data);
+        $jenisSubstansi->insertBatch($data->data);
     }
 
     public function kategori_kegiatan()
@@ -283,7 +281,18 @@ class GetData extends BaseController
             $data = $this->api->getData('GetKategoriKegiatan', $this->token);
         }
         $kategori->insertBatch($data->data);
-        return response()->setJSON($data);
+    }
+
+    public function pembiayaan()
+    {
+        $pembiayaan = new \App\Models\PembiayaanModel();
+
+        $data = $this->api->getData('GetPembiayaan', $this->token);
+        if ($data->error_code == 100) {
+            $this->token = $this->api->getToken()->data->token;
+            $data = $this->api->getData('GetPembiayaan', $this->token);
+        }
+        $pembiayaan->insertBatch($data->data);
     }
 
     public function jenjang_pendidikan()
@@ -295,10 +304,7 @@ class GetData extends BaseController
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetJenjangPendidikan', $this->token);
         }
-        foreach ($data->data as $key => $value) {
-            $jenjangPendidikan->insert($value);
-        }
-        return response()->setJSON($data);
+        $jenjangPendidikan->insertBatch($data->data);
     }
 
     public function kebutuhan_khusus()
@@ -310,10 +316,7 @@ class GetData extends BaseController
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetKebutuhanKhusus', $this->token);
         }
-        foreach ($data->data as $key => $value) {
-            $kebutuhanKhusus->insert($value);
-        }
-        return response()->setJSON($data);
+        $kebutuhanKhusus->insertBatch($data->data);
     }
 
     public function lembaga_pangkat()
@@ -325,10 +328,7 @@ class GetData extends BaseController
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetLembagaPengangkat', $this->token);
         }
-        foreach ($data->data as $key => $value) {
-            $lembagaPangkat->insert($value);
-        }
-        return response()->setJSON($data);
+        $lembagaPangkat->insertBatch($data->data);
     }
 
     public function level_wilayah()
@@ -340,10 +340,7 @@ class GetData extends BaseController
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetLevelWilayah', $this->token);
         }
-        foreach ($data->data as $key => $value) {
-            $levelWilayah->insert($value);
-        }
-        return response()->setJSON($data);
+        $levelWilayah->insertBatch($data->data);
     }
 
     public function nagara()
@@ -356,8 +353,6 @@ class GetData extends BaseController
             $data = $this->api->getData('GetNegara', $this->token);
         }
         $negara->insertBatch($data->data);
-
-        return response()->setJSON($data);
     }
 
     public function pekerjaan()
@@ -370,8 +365,6 @@ class GetData extends BaseController
             $data = $this->api->getData('GetPekerjaan', $this->token);
         }
         $pekerjaan->insertBatch($data->data);
-
-        return response()->setJSON($data);
     }
 
     public function penghasilan()
@@ -384,8 +377,6 @@ class GetData extends BaseController
             $data = $this->api->getData('GetPenghasilan', $this->token);
         }
         $penghasilan->insertBatch($data->data);
-
-        return response()->setJSON($data);
     }
 
     public function status_mahasiswa()
@@ -398,8 +389,6 @@ class GetData extends BaseController
             $data = $this->api->getData('GetStatusMahasiswa', $this->token);
         }
         $statusMahasiswa->insertBatch($data->data);
-
-        return response()->setJSON($data);
     }
 
     public function wilayah()
@@ -412,8 +401,6 @@ class GetData extends BaseController
             $data = $this->api->getData('GetWilayah', $this->token);
         }
         $wilayah->insertBatch($data->data);
-
-        return response()->setJSON($data);
     }
 
     public function jenis_aktivitas()
@@ -426,8 +413,6 @@ class GetData extends BaseController
             $data = $this->api->getData('GetJenisAktivitasMahasiswa', $this->token);
         }
         $jenisAktivitas->insertBatch($data->data);
-
-        return response()->setJSON($data);
     }
 
     public function aktivitas_kuliah()
@@ -443,13 +428,10 @@ class GetData extends BaseController
         }
         foreach ($data->data as $key => $value) {
             $value->id = Uuid::uuid4()->toString();
-            $riwayat = $riwayatPendidikan->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
-            $mhs = $mahasiswa->where('id_mahasiswa', $value->id_mahasiswa)->first();
-            $value->id_riwayat_pendidikan = $riwayat->id;
-            $value->id_mahasiswa = $mhs->id;
+            $value->id_riwayat_pendidikan = $riwayatPendidikan->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first()->id;
+            $value->id_mahasiswa = $mahasiswa->where('id_mahasiswa', $value->id_mahasiswa)->first()->id;
             $aktivitasMahasiswa->insert($value);
         }
-        return response()->setJSON($data);
     }
 
     public function aktivitas_mahasiswa()
@@ -467,13 +449,12 @@ class GetData extends BaseController
             $value->tanggal_sk_tugas = $value->tanggal_sk_tugas != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
             $aktivitasMahasiswa->insert($value);
         }
-        return response()->setJSON($data);
     }
 
     public function anggota_aktivitas_mahasiswa()
     {
         $anggotaAktivitasMahasiswa = new \App\Models\AnggotaAktivitasModel();
-
+        $aktivitas = new \App\Models\AktivitasMahasiswaModel();
         $data = $this->api->getData('GetListAnggotaAktivitasMahasiswa', $this->token);
         if ($data->error_code == 100) {
             $this->token = $this->api->getToken()->data->token;
@@ -481,15 +462,16 @@ class GetData extends BaseController
         }
         foreach ($data->data as $key => $value) {
             $value->id = Uuid::uuid4()->toString();
+            $itemAktivitas = $aktivitas->where('id_aktivitas', $value->id_aktivitas)->first();
+            $value->aktivitas_mahasiswa_id = $itemAktivitas->id;
             $anggotaAktivitasMahasiswa->insert($value);
         }
-        return response()->setJSON($data);
     }
 
     public function bimbing_mahasiswa()
     {
         $bimbingMahasiswa = new \App\Models\BimbingMahasiswaModel();
-
+        $aktivitas = new \App\Models\AktivitasMahasiswaModel();
         $data = $this->api->getData('GetListBimbingMahasiswa', $this->token);
         if ($data->error_code == 100) {
             $this->token = $this->api->getToken()->data->token;
@@ -497,9 +479,27 @@ class GetData extends BaseController
         }
         foreach ($data->data as $key => $value) {
             $value->id = Uuid::uuid4()->toString();
+            $itemAktivitas = $aktivitas->where('id_aktivitas', $value->id_aktivitas)->first();
+            $value->aktivitas_mahasiswa_id = $itemAktivitas->id;
             $bimbingMahasiswa->insert($value);
         }
-        return response()->setJSON($data);
+    }
+
+    public function ujiMahasiswa()
+    {
+        $ujiMahasiswa = new \App\Models\UjiMahasiswaModel();
+        $aktivitas = new \App\Models\AktivitasMahasiswaModel();
+        $data = $this->api->getData('GetListUjiMahasiswa', $this->token);
+        if ($data->error_code == 100) {
+            $this->token = $this->api->getToken()->data->token;
+            $data = $this->api->getData('GetListUjiMahasiswa', $this->token);
+        }
+        foreach ($data->data as $key => $value) {
+            $value->id = Uuid::uuid4()->toString();
+            $itemAktivitas = $aktivitas->where('id_aktivitas', $value->id_aktivitas)->first();
+            $value->aktivitas_mahasiswa_id = $itemAktivitas->id;
+            $ujiMahasiswa->insert($value);
+        }
     }
 
     public function skala_nilai()
@@ -519,8 +519,6 @@ class GetData extends BaseController
             $value->tanggal_akhir_efektif = $value->tanggal_akhir_efektif != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
             $skalaNilai->insert($value);
         }
-
-        return response()->setJSON($data);
     }
 
 
@@ -543,17 +541,31 @@ class GetData extends BaseController
             $value->tanggal_lahir_wali = $value->tanggal_lahir_wali != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
             $mahasiswa->insert($value);
         }
-        return response()->setJSON($data);
+    }
+
+    public function prestasiMahasiswa()
+    {
+        $prestasiMahasiswa = new \App\Models\PrestasiMahasiswaModel();
+        $mahasiswa = new \App\Models\MahasiswaModel();
+
+        $data = $this->api->getData('GetListPrestasiMahasiswa', $this->token);
+        if ($data->error_code == 100) {
+            $this->token = $this->api->getToken()->data->token;
+            $data = $this->api->getData('GetListPrestasiMahasiswa', $this->token);
+        }
+        foreach ($data->data as $key => $value) {
+            $model = new \App\Entities\PrestasiMahasiswaEntity();
+            $value->id = Uuid::uuid4()->toString();
+            $value->mahasiswa_id = $mahasiswa->where('id_mahasiswa', $value->id_mahasiswa)->first()->id;
+            $model->fill((array)$value);
+            $prestasiMahasiswa->insert($model);
+        }
     }
 
     public function riwayat_pendidikan()
     {
         $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
-        
         $mahasiswa = new \App\Models\MahasiswaModel();
-        // $dataMahasiswa = $mahasiswa->findAll();
-        // $a = array_search('001a955e-2dc9-4264-8b60-00f4edad0246', $dataMahasiswa);
-
         $data = $this->api->getData('GetListRiwayatPendidikanMahasiswa', $this->token);
         if ($data->error_code == 100) {
             $this->token = $this->api->getToken()->data->token;
@@ -567,7 +579,6 @@ class GetData extends BaseController
             $model->fill((array)$value);
             $riwayat->insert($model);
         }
-        return response()->setJSON($data);
     }
 
     public function ta()
@@ -579,25 +590,18 @@ class GetData extends BaseController
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetTahunAjaran', $this->token);
         }
-        foreach ($data->data as $key => $value) {
-            $ta->insert($value);
-        }
-        return response()->setJSON($data);
+        $ta->insertBatch($data->data);
     }
 
     public function semester()
     {
         $semester = new \App\Models\SemesterModel();
-
         $data = $this->api->getData('GetSemester', $this->token, "id_tahun_ajaran>=2015");
         if ($data->error_code == 100) {
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetSemester', $this->token);
         }
-        foreach ($data->data as $key => $value) {
-            $semester->insert($value);
-        }
-        return response()->setJSON($data);
+        $semester->insertBatch($data->data);
     }
 
     public function kurikulum()
@@ -613,7 +617,6 @@ class GetData extends BaseController
             $value->id = Uuid::uuid4()->toString();
             $kurikulum->insert($value);
         }
-        return response()->setJSON($data);
     }
 
     public function matakuliah()
@@ -630,7 +633,6 @@ class GetData extends BaseController
             $value->status_sync = "sudah sync";
             $matakuliah->insert($value);
         }
-        return response()->setJSON($data);
     }
 
     public function kurikulum_detail()
@@ -646,14 +648,11 @@ class GetData extends BaseController
         }
         foreach ($data->data as $key => $value) {
             $value->id = Uuid::uuid4()->toString();
-            $itemKurikulum = $kurikulum->where('id_kurikulum', $value->id_kurikulum)->first();
-            $itemMatakuliah = $matakuliah->where('id_matkul', $value->id_matkul)->first();
-            $value->kurikulum_id = $itemKurikulum->id;
-            $value->matakuliah_id = $itemMatakuliah->id;
+            $value->kurikulum_id = $kurikulum->where('id_kurikulum', $value->id_kurikulum)->first()->id;
+            $value->matakuliah_id = $matakuliah->where('id_matkul', $value->id_matkul)->first()->id;
             $value->status_sync = "sudah sync";
             $detail->insert($value);
         }
-        return response()->setJSON($data);
     }
 
     public function kelas_kuliah()
@@ -672,12 +671,10 @@ class GetData extends BaseController
             $value->tanggal_mulai_efektif = $value->tanggal_mulai_efektif != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
             $tanggal = explode('-', $value->tanggal_akhir_efektif);
             $value->tanggal_akhir_efektif = $value->tanggal_akhir_efektif != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
-            $itemMatakuliah = $matakuliah->where('id_matkul', $value->id_matkul)->first();
-            $value->matakuliah_id = $itemMatakuliah->id;
+            $value->matakuliah_id = $matakuliah->where('id_matkul', $value->id_matkul)->first()->id;
             $value->status_sync = "sudah sync";
             $kelas->insert($value);
         }
-        return response()->setJSON($data);
     }
 
     public function dosen()
@@ -694,13 +691,11 @@ class GetData extends BaseController
             $value->tanggal_lahir = $value->tanggal_lahir != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
             $dosen->insert($value);
         }
-        return response()->setJSON($data);
     }
 
     public function penugasan_dosen()
     {
         $penugasan = new \App\Models\PenugasanDosenModel();
-
         $data = $this->api->getData('GetListPenugasanDosen', $this->token, "");
         if ($data->error_code == 100) {
             $this->token = $this->api->getToken()->data->token;
@@ -715,7 +710,6 @@ class GetData extends BaseController
             $value->tgl_create = $value->tgl_create != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
             $penugasan->insert($value);
         }
-        return response()->setJSON($data);
     }
 
     public function jenis_evaluasi()
@@ -727,10 +721,7 @@ class GetData extends BaseController
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetJenisEvaluasi', $this->token);
         }
-        foreach ($data->data as $key => $value) {
-            $jenis_evaluasi->insert($value);
-        }
-        return response()->setJSON($data);
+        $jenis_evaluasi->insertBatch($data->data);
     }
 
     public function pengajar_kelas()
@@ -746,11 +737,9 @@ class GetData extends BaseController
         foreach ($data->data as $key => $value) {
             $value->id = Uuid::uuid4()->toString();
             $value->status_sync = 'sudah sync';
-            $itemKelasKuliah = $kelasKuliah->where('id_kelas_kuliah', $value->id_kelas_kuliah)->first();
-            $value->kelas_kuliah_id = $itemKelasKuliah->id;
+            $value->kelas_kuliah_id = $kelasKuliah->where('id_kelas_kuliah', $value->id_kelas_kuliah)->first()->id;
             $pengajar->insert($value);
         }
-        return response()->setJSON($data);
     }
 
     public function peserta_kelas()
@@ -768,17 +757,13 @@ class GetData extends BaseController
             $data = $this->api->getData('GetPesertaKelasKuliah', $this->token);
         }
         foreach ($data->data as $key => $value) {
-            if($kelasKuliah->where('id_kelas_kuliah', $value->id_kelas_kuliah)->countAllResults()>0){
+            if ($kelasKuliah->where('id_kelas_kuliah', $value->id_kelas_kuliah)->countAllResults() > 0) {
                 try {
                     $value->id = Uuid::uuid4()->toString();
-                    $itemRiwayat =  $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
-                    $value->id_riwayat_pendidikan = $itemRiwayat->id;
-                    $itemKelasKuliah =  $kelasKuliah->where('id_kelas_kuliah', $value->id_kelas_kuliah)->first();
-                    $value->kelas_kuliah_id = $itemKelasKuliah->id;
-                    $itemMahasiswa =  $mahasiswa->where('id_mahasiswa', $value->id_mahasiswa)->first();
-                    $value->mahasiswa_id = $itemMahasiswa->id;
-                    $itemMatakuliah =  $matakuliah->where('id_matkul', $value->id_matkul)->first();
-                    $value->matakuliah_id = $itemMatakuliah->id;
+                    $value->id_riwayat_pendidikan = $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first()->id;
+                    $value->kelas_kuliah_id =  $kelasKuliah->where('id_kelas_kuliah', $value->id_kelas_kuliah)->first()->id;
+                    $value->mahasiswa_id = $mahasiswa->where('id_mahasiswa', $value->id_mahasiswa)->first()->id;
+                    $value->matakuliah_id = $matakuliah->where('id_matkul', $value->id_matkul)->first()->id;
                     $model->fill((array) $value);
                     $pesertaKelas->insert($model);
                 } catch (\Throwable $th) {
@@ -786,7 +771,7 @@ class GetData extends BaseController
                 }
             }
         }
-        return response()->setJSON($data);
+        // return response()->setJSON($data);
     }
 
     public function nilai_kelas()
@@ -802,6 +787,6 @@ class GetData extends BaseController
             $value->id = Uuid::uuid4()->toString();
             $pesertaKelas->insert($value);
         }
-        return response()->setJSON($data);
+        // return response()->setJSON($data);
     }
 }
