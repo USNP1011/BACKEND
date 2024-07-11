@@ -52,6 +52,6 @@ class AnggotaAktivitasModel extends Model
             LEFT JOIN `mahasiswa` ON `riwayat_pendidikan_mahasiswa`.`id_mahasiswa` =
             `mahasiswa`.`id`
             LEFT JOIN `prodi` ON `prodi`.`id_prodi` = `aktivitas_mahasiswa`.`id_prodi`
-            WHERE aktivitas_mahasiswa_id = '".$id."'")->getResult();
+            WHERE aktivitas_mahasiswa_id = '".$id."' AND anggota_aktivitas.deleted_at IS NULL")->getResult();
     }
 }

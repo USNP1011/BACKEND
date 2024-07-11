@@ -442,13 +442,6 @@ class Validation extends BaseConfig
             "errors" => [
                 "required" => "jenis_peran Tidak Boleh Kosong"
             ]
-        ],
-        "nama_jenis_peran" => [
-            "label" => "nama_jenis_peran",
-            "rules" => "required",
-            "errors" => [
-                "required" => "nama_jenis_peran Tidak Boleh Kosong"
-            ]
         ]
     ];
 
