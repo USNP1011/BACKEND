@@ -9,12 +9,16 @@ use Ramsey\Uuid\Uuid;
 class DosenWali extends ResourceController
 {
 
-    public function show($id = null, $req = null)
+    public function show($id = null)
     {
         $object = new DosenWaliModel();
         return $this->respond([
             'status' => true,
-            'data' => $object->select("dosen_wali.*, riwayat_pendidikan_mahasiswa.nim")->findAll()
+            'data' => $object->select("dosen_wali.*, riwayat_pendidikan_mahasiswa.nim, mahasiswa.nama_mahasiswa")
+            ->join("riwayat_pendidikan_mahasiswa", "riwayat_pendidikan_mahasiswa.id=dosen_wali.id_riwayat_pendidikan")
+            ->join("mahasiswa", "riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id")
+            ->where('dosen_wali.id_dosen', $id)
+            ->findAll()
         ]);
     }
 

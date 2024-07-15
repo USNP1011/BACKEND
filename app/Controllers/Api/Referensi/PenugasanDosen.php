@@ -12,7 +12,8 @@ class PenugasanDosen extends ResourceController
         try {
             $object = new PenugasanDosenModel();
             if(is_null($id)){
-                $data = $object->findAll();
+                $data = $object->select("penugasan_dosen.*, (SELECT tahun_ajaran.nama_tahun_ajaran FROM tahun_ajaran WHERE a_periode_aktif='1' LIMIT 1) as nama_tahun_ajaran")
+                ->findAll();
             }else{
                 $data = $object->select("penugasan_dosen.*, (SELECT tahun_ajaran.nama_tahun_ajaran FROM tahun_ajaran WHERE a_periode_aktif='1' LIMIT 1) as nama_tahun_ajaran")->where('id_registrasi_dosen', $id)->first();
             }

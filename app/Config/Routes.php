@@ -99,7 +99,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->get('pengajar_kelas', 'Referensi\PengajarKelas::store', ['filter' => 'auth']);
     $routes->get('dosen', 'Referensi\Dosen::store', ['filter' => 'auth']);
     $routes->get('dosen/(:any)', 'Referensi\Dosen::store/$1', ['filter' => 'auth']);
-    
+
     $routes->get('penugasan_dosen', 'Referensi\PenugasanDosen::store', ['filter' => 'auth']);
     $routes->get('penugasan_dosen/(:hash)', 'Referensi\PenugasanDosen::store/$1', ['filter' => 'auth']);
     
@@ -153,13 +153,11 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->delete('aktivitas_kuliah/(:any)', 'AktivitasKuliah::delete/$1', ['filter' => 'auth']);
 
     $routes->group('dosen_wali', ['filter'=>'auth'], function($routes){
-        $routes->get('dosen/(:hash)', 'DosenWali::show/$1');
-        $routes->get('dosen_wali_by_dosen/(:hash)', 'DosenWali::showByDsn/$1');
-        $routes->post('dosen_wali', 'DosenWali::create');
-        $routes->put('dosen_wali', 'DosenWali::update');
-        $routes->delete('dosen_wali/(:hash)', 'DosenWali::delete/$1');
+        $routes->get('mahasiswa/(:hash)', 'DosenWali::show/$1');
+        $routes->post('mahasiswa', 'DosenWali::create');
+        $routes->put('mahasiswa', 'DosenWali::update');
+        $routes->delete('mahasiswa/(:hash)', 'DosenWali::delete/$1');
     });
-
 
     $routes->group('kelas_kuliah', ['filter' => 'auth'], function($routes){
         $routes->get('', 'KelasKuliah::show');

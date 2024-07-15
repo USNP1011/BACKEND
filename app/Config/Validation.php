@@ -296,28 +296,6 @@ class Validation extends BaseConfig
                 "required" => "id_dosen Tidak Boleh Kosong"
             ]
         ],
-        "nama_mahasiswa" => [
-            "label" => "nama_mahasiswa",
-            "rules" => "required",
-            "errors" => [
-                "required" => "nama_mahasiswa Tidak Boleh Kosong"
-            ]
-        ],
-        "nama_dosen" => [
-            "label" => "nama_dosen",
-            "rules" => "required",
-            "errors" => [
-                "required" => "nama_dosen Tidak Boleh Kosong"
-            ]
-        ],
-        "nim" => [
-            "label" => "nim",
-            "rules" => "required",
-            "errors" => [
-                "required" => "nim Tidak Boleh Kosong"
-            ]
-        ],
-        
     ];
 
     public array $aktivitasKuliah = [
