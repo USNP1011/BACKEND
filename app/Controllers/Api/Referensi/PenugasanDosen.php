@@ -3,17 +3,25 @@
 namespace App\Controllers\Api\Referensi;
 
 use App\Models\PenugasanDosenModel;
-use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 
 class PenugasanDosen extends ResourceController
 {
-    public function store()
+    public function store($id = null)
     {
-        $object = new PenugasanDosenModel();
-        return $this->respond([
-            'status' => true,
-            'data' => $object->join('dosen', 'penugasan_dosen.id_dosen=dosen.id_dosen', 'left')->findAll()
-        ]);
+        try {
+            $object = new PenugasanDosenModel();
+            if(is_null($id)){
+                $data = $object->findAll();
+            }else{
+                $data = $object->select("penugasan_dosen.*, (SELECT tahun_ajaran.nama_tahun_ajaran FROM tahun_ajaran WHERE a_periode_aktif='1' LIMIT 1) as nama_tahun_ajaran")->where('id_registrasi_dosen', $id)->first();
+            }
+            return $this->respond([
+                'status' => true,
+                'data' => $data
+            ]);
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage());
+        }
     }
 }

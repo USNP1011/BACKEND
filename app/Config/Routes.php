@@ -99,7 +99,9 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->get('pengajar_kelas', 'Referensi\PengajarKelas::store', ['filter' => 'auth']);
     $routes->get('dosen', 'Referensi\Dosen::store', ['filter' => 'auth']);
     $routes->get('dosen/(:any)', 'Referensi\Dosen::store/$1', ['filter' => 'auth']);
+    
     $routes->get('penugasan_dosen', 'Referensi\PenugasanDosen::store', ['filter' => 'auth']);
+    $routes->get('penugasan_dosen/(:hash)', 'Referensi\PenugasanDosen::store/$1', ['filter' => 'auth']);
     
     $routes->get('skala_nilai', 'Referensi\SkalaNilai::store', ['filter' => 'auth']);
     $routes->get('skala_nilai/(:hash)', 'Referensi\SkalaNilai::store/$1', ['filter' => 'auth']);
