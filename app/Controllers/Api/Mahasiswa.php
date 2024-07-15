@@ -132,7 +132,7 @@ class Mahasiswa extends ResourceController
 
             $role = [
                 'users_id' => $item->id_user,
-                'role_id' => '6'
+                'role_id' => '4'
             ];
             $userRole = new UserRoleModel();
             $userRole->insert($role);

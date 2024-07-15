@@ -789,4 +789,49 @@ class GetData extends BaseController
         }
         // return response()->setJSON($data);
     }
+
+    function dosenWali() {
+        $conn = \Config\Database::connect('default2');
+        $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
+        $dosen = new \App\Models\DosenModel();
+        $waliDosen = new \App\Models\DosenWaliModel();
+        $waliSimak = $conn->query("SELECT * FROM dosen_wali")->getResult();
+        $dataRiwayat = $riwayat->findAll();
+        $dataDosen = $dosen->findAll();
+        $dataSave = [];
+        foreach ($dataRiwayat as $key1 => $itemRiwayat) {
+            $mhs = $this->getMhs($waliSimak, $itemRiwayat->nim);
+            if(!is_null($mhs)){
+                $dsn = $this->getDsn($dataDosen, $mhs->nidn);
+                if(!is_null($dsn)){
+                    $item = [
+                        "id"=>Uuid::uuid4()->toString(), 
+                        "id_dosen"=>$dsn->id_dosen,
+                        "id_riwayat_pendidikan"=> $itemRiwayat->id
+                    ];
+                    $dataSave[] = $item;
+                }
+            }
+        }
+        $waliDosen->insertBatch($dataSave);
+        return $this->respond($dataSave);
+    }
+
+    function getMhs($array, $npm = null){
+        foreach ($array as $key => $value) {
+            if($value->npm == $npm){
+                return $value;
+            }
+        }
+        return null;
+    }
+
+    function getDsn($array, $nidn = null){
+        foreach ($array as $key => $value) {
+            if($value->nidn == $nidn){
+                return $value;
+            }
+        }
+        return null;
+    }
 }

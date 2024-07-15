@@ -14,7 +14,7 @@ class DosenWali extends ResourceController
         $object = new DosenWaliModel();
         return $this->respond([
             'status' => true,
-            'data' => $id == null ? $object->findAll() : $object->where('id', $id)->first()
+            'data' => $object->select("dosen_wali.*, riwayat_pendidikan_mahasiswa.nim")->findAll()
         ]);
     }
 

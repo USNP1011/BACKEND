@@ -13,12 +13,6 @@ class DosenWaliModel extends Model
     protected $allowedFields = [
         'id_riwayat_pendidikan',
         'id_dosen',
-		'nama_mahasiswa',
-        'nim',
-        'id_prodi',
-        'nama_program_studi',
-		'nama_dosen',
-		'nidn',
 		'created_at',
 		'updated_at',
 		'deleted_at',

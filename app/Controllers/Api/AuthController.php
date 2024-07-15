@@ -25,12 +25,18 @@ class AuthController extends ResourceController
                 ];
                 return $this->failValidationErrors($result);
             } else {
+                $role = new \App\Models\UserRoleModel();
                 $userObject = auth()->getProvider();
                 $userEntityObject = new User();
                 $userEntityObject->fill((array)$this->request->getJSON());
                 $userObject->save($userEntityObject);
                 $itemData = $userObject->findById($userObject->getInsertID());
                 $userObject->addToDefaultGroup($itemData);
+                $itemRole = [
+                    'users_id'=>$itemData->id,
+                    'role_id'=> '1'
+                ];
+                $role->insert($itemRole);
                 $result = [
                     "status" => true,
                     "message" => "User saved successfully",
