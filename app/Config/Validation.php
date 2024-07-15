@@ -201,14 +201,7 @@ class Validation extends BaseConfig
             "errors" => [
                 "required" => "matakuliah_id Tidak Boleh Kosong"
             ]
-        ],
-        "nama_kelas_kuliah" => [
-            "label" => "Nama Kelas Kuliah",
-            "rules" => "required",
-            "errors" => [
-                "required" => "nama_kelas_kuliah Tidak Boleh Kosong"
-            ]
-        ],
+        ]
     ];
 
     public array $pesertaKelas = [

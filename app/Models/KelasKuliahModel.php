@@ -17,7 +17,7 @@ class KelasKuliahModel extends Model
 		'matakuliah_id',
 		'nama_semester',
 		'nama_program_studi',
-		'nama_kelas_kuliah',
+		'kelas_id',
 		'kode_mata_kuliah',
 		'nama_mata_kuliah',
 		'bahasan',
@@ -29,6 +29,7 @@ class KelasKuliahModel extends Model
 		'hari',
 		'jam_mulai',
 		'jam_selesai',
+		'ruangan_id',
 		'status_sync',
 		'sync_at'
     ];

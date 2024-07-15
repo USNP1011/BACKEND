@@ -10,7 +10,7 @@ use Config\Services;
 use Firebase\JWT\JWT;
 use Exception;
 
-class AdminAuth implements FilterInterface
+class MahasiswaAuth implements FilterInterface
 {
     use ResponseTrait;
 
@@ -38,10 +38,11 @@ class AdminAuth implements FilterInterface
             $data=validateJWTFromRequest($encodedToken);
             $auth = false;
             foreach ($data as $key => $value) {
-                if($value->role=="Admin") $auth = true;
+                if($value->role=="Mahasiswa") $auth = true;
             }
             if($auth)return $request;
             else throw new Exception("Anda tidak memiliki izin", 401);
+            
         } 
         catch (Exception $ex) {
             return Services::response()

@@ -14,6 +14,7 @@ use CodeIgniter\Filters\PageCache;
 use CodeIgniter\Filters\PerformanceMetrics;
 use CodeIgniter\Filters\SecureHeaders;
 use App\Filters\AdminAuth;
+use App\Filters\MahasiswaAuth;
 
 class Filters extends BaseFilters
 {
@@ -38,6 +39,7 @@ class Filters extends BaseFilters
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
         'auth'          => AdminAuth::class,
+        'mahasiswa'     => MahasiswaAuth::class,
     ];
 
     /**

@@ -64,7 +64,7 @@ class Mahasiswa extends ResourceController
                     'data' => $object->select("kelas_kuliah.*")
                         ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
                         ->where('peserta_kelas.mahasiswa_id', $id)
-                        ->where('kelas_kuliah.id_semester', $semester->id)
+                        ->where('kelas_kuliah.id_semester', $semester->id_semester)
                         ->findAll()
                 ]);
             } else if ($req == 'aktivitas_kuliah') {
@@ -87,9 +87,21 @@ class Mahasiswa extends ResourceController
      *
      * @return ResponseInterface
      */
-    public function new()
+    public function byUserId($id = null)
     {
-        //
+        $mahasiswa = new MahasiswaModel();
+
+        return $this->respond([
+            'status' => true,
+            'data' => $mahasiswa
+                ->select("mahasiswa.*, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.nama_program_studi, riwayat_pendidikan_mahasiswa.angkatan, wilayah.nama_wilayah, agama.nama_agama, prodi.nama_program_studi, jenis_transportasi.nama_alat_transportasi")
+                ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id', 'left')
+                ->join('wilayah', 'wilayah.id_wilayah=mahasiswa.id_wilayah', 'left')
+                ->join("agama", "agama.id_agama=mahasiswa.id_agama", "LEFT")
+                ->join("prodi", "riwayat_pendidikan_mahasiswa.id_prodi=prodi.id_prodi", "LEFT")
+                ->join("jenis_transportasi", "jenis_transportasi.id_alat_transportasi=mahasiswa.id_alat_transportasi", "LEFT")
+                ->where('id_user', $id)->first()
+        ]);
     }
 
     /**
