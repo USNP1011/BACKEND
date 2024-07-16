@@ -94,6 +94,7 @@ class Krsm extends ResourceController
             foreach ($param as $key => $value) {
                 $value->id = !isset($value->id) ? Uuid::uuid4()->toString() : $value->id;
                 $value->temp_krsm_id = $krsm['id'];
+                $value->id_riwayat_pendidikan = $profile->id_riwayat_pendidikan;
                 $temPeserta = new \App\Models\TempPesertaKelasModel();
                 $temPeserta->save($value);
             }

@@ -15,6 +15,7 @@ class Jadwal extends ResourceController
 
     public function show($id=null)
     {
+        $profile = getProfile();
         $param = $this->request->getJSON();
         $semester = getSemesterAktif();
         $object = new KelasKuliahModel();
@@ -31,7 +32,7 @@ class Jadwal extends ResourceController
                 ->join("prodi", "`matakuliah`.`id_prodi` = `prodi`.`id_prodi`", "left")
                 ->join("kelas", "`kelas`.`id` = `kelas_kuliah`.`kelas_id`", "left")
                 ->join("ruangan", "`ruangan`.`id` = `kelas_kuliah`.`ruangan_id`", "left")
-                ->where("prodi.id_prodi", $id)
+                ->where("prodi.id_prodi", $profile->id_prodi)
                 ->where("kelas_kuliah.id_semester", $semester->id_semester)
                 ->groupStart()
                 ->orLike('`matakuliah`.`nama_mata_kuliah`', $param->cari)

@@ -271,7 +271,7 @@ $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($
     });
 
     $routes->group('jadwal', ['filter' => 'mahasiswa'], function($routes){
-        $routes->post('(:hash)', 'Jadwal::show/$1');
+        $routes->post('', 'Jadwal::show');
     });
 
     $routes->group('krsm', ['filter' => 'mahasiswa'], function($routes){
