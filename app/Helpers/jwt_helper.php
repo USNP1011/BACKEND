@@ -23,6 +23,15 @@ function validateJWTFromRequest(string $encodedToken)
     // $userModel->findUserByEmailAddress($decodedToken->data->email);
 }
 
+function encodeJWTFromRequest(string $encodedToken)
+{
+    $decodedToken = JWT::decode($encodedToken, new Key(Services::getPublicKey(), 'RS256'));
+    return $decodedToken->data;
+    // throw new Exception('Missing or invalid JWT in request');
+    // $userModel = new UserModel();
+    // $userModel->findUserByEmailAddress($decodedToken->data->email);
+}
+
 function getSignedJWTForUser(array $itemData)
 {
     $issuedAtTime = time();

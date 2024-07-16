@@ -790,7 +790,8 @@ class GetData extends BaseController
         // return response()->setJSON($data);
     }
 
-    function dosenWali() {
+    function dosenWali()
+    {
         $conn = \Config\Database::connect('default2');
         $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
         $dosen = new \App\Models\DosenModel();
@@ -801,13 +802,13 @@ class GetData extends BaseController
         $dataSave = [];
         foreach ($dataRiwayat as $key1 => $itemRiwayat) {
             $mhs = $this->getMhs($waliSimak, $itemRiwayat->nim);
-            if(!is_null($mhs)){
+            if (!is_null($mhs)) {
                 $dsn = $this->getDsn($dataDosen, $mhs->nidn);
-                if(!is_null($dsn)){
+                if (!is_null($dsn)) {
                     $item = [
-                        "id"=>Uuid::uuid4()->toString(), 
-                        "id_dosen"=>$dsn->id_dosen,
-                        "id_riwayat_pendidikan"=> $itemRiwayat->id
+                        "id" => Uuid::uuid4()->toString(),
+                        "id_dosen" => $dsn->id_dosen,
+                        "id_riwayat_pendidikan" => $itemRiwayat->id
                     ];
                     $dataSave[] = $item;
                 }
@@ -817,18 +818,45 @@ class GetData extends BaseController
         return $this->respond($dataSave);
     }
 
-    function getMhs($array, $npm = null){
+    public function mahasiswaLulusDO()
+    {
+        $mhs = new \App\Models\MahasiswaLulusDOModel();
+        $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
+        $dataRiwayat = $riwayat->findAll();
+        $data = $this->api->getData('GetDetailMahasiswaLulusDO', $this->token, "");
+        $tempArray = [];
+        foreach ($data->data as $obj) {
+            $tempArray[$obj->{'id_registrasi_mahasiswa'}] = $obj;
+        }
+        if ($data->error_code == 100) {
+            $this->token = $this->api->getToken()->data->token;
+            $data = $this->api->getData('GetDetailMahasiswaLulusDO', $this->token);
+        }
+        foreach (array_values($tempArray) as $key => $valueLulus) {
+            foreach ($dataRiwayat as $key => $value) {
+                if ($valueLulus->id_registrasi_mahasiswa == $value->id_registrasi_mahasiswa) {
+                    $valueLulus->id_riwayat_pendidikan =  $value->id;
+                    $mhs->insert($valueLulus);
+                }
+            }
+        }
+        // return response()->setJSON($data);
+    }
+
+    function getMhs($array, $npm = null)
+    {
         foreach ($array as $key => $value) {
-            if($value->npm == $npm){
+            if ($value->npm == $npm) {
                 return $value;
             }
         }
         return null;
     }
 
-    function getDsn($array, $nidn = null){
+    function getDsn($array, $nidn = null)
+    {
         foreach ($array as $key => $value) {
-            if($value->nidn == $nidn){
+            if ($value->nidn == $nidn) {
                 return $value;
             }
         }

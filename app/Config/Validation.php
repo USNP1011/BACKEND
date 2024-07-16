@@ -477,4 +477,28 @@ class Validation extends BaseConfig
             ]
         ]
     ];
+
+    public array $skalaSKS = [
+        "ips_min" => [
+            "label" => "ips_min",
+            "rules" => "required",
+            "errors" => [
+                "required" => "ips_min Tidak Boleh Kosong"
+            ]
+        ],
+        "ips_max" => [
+            "label" => "ips_max",
+            "rules" => "required",
+            "errors" => [
+                "required" => "ips_max Tidak Boleh Kosong"
+            ]
+        ],
+        "sks_max" => [
+            "label" => "sks_max",
+            "rules" => "required",
+            "errors" => [
+                "required" => "sks_max Tidak Boleh Kosong"
+            ]
+        ]
+    ];
 }

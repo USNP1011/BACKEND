@@ -73,7 +73,9 @@ class KelasKuliah extends ResourceController
             'data' => $object
                 ->select("riwayat_pendidikan_mahasiswa.*, mahasiswa.nama_mahasiswa, (SELECT peserta_kelas.kelas_kuliah_id FROM peserta_kelas WHERE kelas_kuliah_id='" . $kelas_kuliah_id . "' AND id_riwayat_pendidikan=riwayat_pendidikan_mahasiswa.id AND peserta_kelas.deleted_at IS NULL limit 1) AS kelas_kuliah_id")
                 ->join("mahasiswa", "mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa")
+                ->join("mahasiswa_lulus_do", "riwayat_pendidikan_mahasiswa.id=mahasiswa_lulus_do.id_riwayat_pendidikan", "left")
                 ->where($where)
+                ->where('mahasiswa_lulus_do.id_riwayat_pendidikan IS NULL')
                 ->findAll()
         ]);
     }
@@ -89,10 +91,12 @@ class KelasKuliah extends ResourceController
             'data' => $object
                 ->select("riwayat_pendidikan_mahasiswa.*, mahasiswa.nama_mahasiswa")
                 ->join("mahasiswa", "mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa", 'left')
+                ->join("mahasiswa_lulus_do", "riwayat_pendidikan_mahasiswa.id=mahasiswa_lulus_do.id_riwayat_pendidikan", "left")
                 ->groupStart()
                 ->like('nim', $param->cari)
                 ->orLike('mahasiswa.nama_mahasiswa', $param->cari)
                 ->groupEnd()
+                ->where('mahasiswa_lulus_do.id_riwayat_pendidikan IS NULL')
                 ->paginate($num, 'default', 1)
         ]);
     }

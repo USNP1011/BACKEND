@@ -28,7 +28,7 @@ class Mahasiswa extends ResourceController
             return $this->respond([
                 'status' => true,
                 'data' => $id == null ? $mahasiswa
-                    ->select("mahasiswa.*, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.nama_program_studi, riwayat_pendidikan_mahasiswa.angkatan")
+                    ->select("mahasiswa.*, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.nama_program_studi, riwayat_pendidikan_mahasiswa.angkatan, (SELECT jenis_keluar.jenis_keluar FROM mahasiswa_lulus_do LEFT JOIN jenis_keluar on jenis_keluar.id_jenis_keluar = mahasiswa_lulus_do.id_jenis_keluar WHERE mahasiswa_lulus_do.id_riwayat_pendidikan = riwayat_pendidikan_mahasiswa.id  limit 1) as nama_jenis_keluar, (SELECT status_mahasiswa.nama_status_mahasiswa FROM perkuliahan_mahasiswa LEFT JOIN status_mahasiswa ON status_mahasiswa.id_status_mahasiswa=perkuliahan_mahasiswa.id_status_mahasiswa order by perkuliahan_mahasiswa.created_at desc limit 1) as nama_status_mahasiswa")
                     ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id', 'left')
                     ->groupBy('mahasiswa.id')
                     ->findAll() : $mahasiswa
@@ -239,7 +239,7 @@ class Mahasiswa extends ResourceController
         $object = model(MahasiswaModel::class);
         $item = [
             'status' => true,
-            'data' => $object->select("mahasiswa.id, mahasiswa.nama_mahasiswa, mahasiswa.jenis_kelamin, mahasiswa.status_sync, mahasiswa.sync_at, mahasiswa.tanggal_lahir, agama.nama_agama, agama.id_agama, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.angkatan, prodi.nama_program_studi, prodi.id_prodi, (SELECT perkuliahan_mahasiswa.sks_total from perkuliahan_mahasiswa where id_mahasiswa = mahasiswa.id AND sks_total != '0' order by id_semester desc limit 1) as sks_total")
+            'data' => $object->select("mahasiswa.id, mahasiswa.nama_mahasiswa, mahasiswa.jenis_kelamin, mahasiswa.status_sync, mahasiswa.sync_at, mahasiswa.tanggal_lahir, agama.nama_agama, agama.id_agama, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.angkatan, prodi.nama_program_studi, prodi.id_prodi, (SELECT perkuliahan_mahasiswa.sks_total from perkuliahan_mahasiswa where id_mahasiswa = mahasiswa.id AND sks_total != '0' order by id_semester desc limit 1) as sks_total, , (SELECT jenis_keluar.jenis_keluar FROM mahasiswa_lulus_do LEFT JOIN jenis_keluar on jenis_keluar.id_jenis_keluar = mahasiswa_lulus_do.id_jenis_keluar WHERE mahasiswa_lulus_do.id_riwayat_pendidikan = riwayat_pendidikan_mahasiswa.id  limit 1) as nama_jenis_keluar, (SELECT status_mahasiswa.nama_status_mahasiswa FROM perkuliahan_mahasiswa LEFT JOIN status_mahasiswa ON status_mahasiswa.id_status_mahasiswa=perkuliahan_mahasiswa.id_status_mahasiswa order by perkuliahan_mahasiswa.created_at desc limit 1) as nama_status_mahasiswa")
                 ->join("agama", "agama.id_agama=mahasiswa.id_agama", "LEFT")
                 ->join("riwayat_pendidikan_mahasiswa", "riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id", "LEFT")
                 ->join("prodi", "riwayat_pendidikan_mahasiswa.id_prodi=prodi.id_prodi", "LEFT")

@@ -15,9 +15,11 @@ class DosenWali extends ResourceController
         return $this->respond([
             'status' => true,
             'data' => $object->select("dosen_wali.*, riwayat_pendidikan_mahasiswa.nim, mahasiswa.nama_mahasiswa")
-            ->join("riwayat_pendidikan_mahasiswa", "riwayat_pendidikan_mahasiswa.id=dosen_wali.id_riwayat_pendidikan")
-            ->join("mahasiswa", "riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id")
+            ->join("riwayat_pendidikan_mahasiswa", "riwayat_pendidikan_mahasiswa.id=dosen_wali.id_riwayat_pendidikan", "LEFT")
+            ->join("mahasiswa", "riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id", "LEFT")
+            ->join("mahasiswa_lulus_do", "riwayat_pendidikan_mahasiswa.id=mahasiswa_lulus_do.id_riwayat_pendidikan", "LEFT")
             ->where('dosen_wali.id_dosen', $id)
+            ->where('mahasiswa_lulus_do.id_riwayat_pendidikan IS NULL')
             ->findAll()
         ]);
     }
