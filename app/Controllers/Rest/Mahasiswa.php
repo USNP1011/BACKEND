@@ -27,61 +27,52 @@ class Mahasiswa extends ResourceController
         $mahasiswa = new MahasiswaModel();
         return $this->respond([
             'status' => true,
-            'data' => $mahasiswa
-                ->select("mahasiswa.*, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.nama_program_studi, riwayat_pendidikan_mahasiswa.angkatan, wilayah.nama_wilayah, agama.nama_agama, prodi.nama_program_studi, jenis_transportasi.nama_alat_transportasi")
-                ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id', 'left')
-                ->join('wilayah', 'wilayah.id_wilayah=mahasiswa.id_wilayah', 'left')
-                ->join("agama", "agama.id_agama=mahasiswa.id_agama", "LEFT")
-                ->join("prodi", "riwayat_pendidikan_mahasiswa.id_prodi=prodi.id_prodi", "LEFT")
-                ->join("jenis_transportasi", "jenis_transportasi.id_alat_transportasi=mahasiswa.id_alat_transportasi", "LEFT")
-                ->where('id_user', $id)->first()
+            'data' => getProfile()
         ]);
     }
 
-    public function riwayatPendidikan($id = null)
+    public function riwayatPendidikan()
     {
+        $profile = getProfile();
         $object = new RiwayatPendidikanMahasiswaModel();
         return $this->respond([
             'status' => true,
-            'data' => $object->where('id_mahasiswa', $id)->findAll()
+            'data' => $object->where('id', $profile->id_riwayat_pendidikan)->findAll()
         ]);
     }
 
-    public function nilaiTransfer($id = null)
+    public function nilaiTransfer()
     {
+        $profile = getProfile();
         $object = new NilaiTransferModel();
         return $this->respond([
             'status' => true,
-            'data' => $object->select("nilai_transfer.*")
-                ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = nilai_transfer.id_riwayat_pendidikan', 'left')
-                ->join('mahasiswa', 'mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa', 'left')
-                ->where('mahasiswa.id', $id)->findAll()
+            'data' => $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->findAll()
         ]);
     }
 
-    public function krsm($id = null)
+    public function krsm()
     {
+        $profile = getProfile();
         $semester = getSemesterAktif();
         $object = new PesertaKelasModel();
         return $this->respond([
             'status' => true,
             'data' => $object->select("kelas_kuliah.*")
                 ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
-                ->where('peserta_kelas.mahasiswa_id', $id)
+                ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)
                 ->where('kelas_kuliah.id_semester', $semester->id)
                 ->findAll()
         ]);
     }
 
-    public function aktivitasKuliah($id = null)
+    public function aktivitasKuliah()
     {
+        $profile = getProfile();
         $object = new PerkuliahanMahasiswaModel();
         return $this->respond([
             'status' => true,
-            'data' => $object
-                ->where('perkuliahan_mahasiswa.id_mahasiswa', $id)
-                ->orderBy('id_semester', 'asc')
-                ->findAll()
+            'data' => $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'asc')->findAll()
         ]);
     }
 

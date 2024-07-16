@@ -140,7 +140,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     });
     
     $routes->get('mahasiswa', 'Mahasiswa::show', ['filter' => 'auth']);
-    $routes->get('mahasiswa/(:hash)', 'Mahasiswa::show/$1', ['filter' => 'auth']);
+    $routes->get('mahasiswa/(:any)', 'Mahasiswa::show/$1', ['filter' => 'auth']);
     $routes->get('mahasiswa/(:any)/riwayat_pendidikan', 'Mahasiswa::show/$1/$2', ['filter' => 'auth']);
     $routes->get('mahasiswa/(:any)/nilai_transfer', 'Mahasiswa::show/$1/$2', ['filter' => 'auth']);
     $routes->get('mahasiswa/(:any)/krsm', 'Mahasiswa::show/$1/$2', ['filter' => 'auth']);
@@ -262,11 +262,12 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
 
 $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($routes){
     $routes->group('mahasiswa', ['filter' => 'mahasiswa'], function($routes){
-        $routes->get('user/(:hash)', 'Mahasiswa::byUserId/$1');
-        $routes->get('riwayat_pendidikan/(:hash)', 'Mahasiswa::riwayatPendidikan/$1');
-        $routes->get('nilai_transfer/(:hash)', 'Mahasiswa::nilaiTransfer/$1');
-        $routes->get('krsm/(:hash)', 'Mahasiswa::krsm/$1');
-        $routes->get('aktivitas_kuliah/(:hash)', 'Mahasiswa::aktivitasKuliah/$1');
+        $routes->get('user', 'Mahasiswa::byUserId');
+        $routes->get('riwayat_pendidikan', 'Mahasiswa::riwayatPendidikan');
+        $routes->get('nilai_transfer', 'Mahasiswa::nilaiTransfer');
+        $routes->get('krsm', 'Mahasiswa::krsm');
+        $routes->get('aktivitas_kuliah', 'Mahasiswa::aktivitasKuliah');
+        $routes->put('', 'Mahasiswa::update');
     });
 
     $routes->group('jadwal', ['filter' => 'mahasiswa'], function($routes){
