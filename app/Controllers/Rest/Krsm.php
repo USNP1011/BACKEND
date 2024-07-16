@@ -10,51 +10,55 @@ class Krsm extends ResourceController
 {
     public function show($id = null)
     {
-        $profile = getProfile();
-        $object = new \App\Models\PerkuliahanMahasiswaModel();
-        if ($object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->first()->sks_semester == 0) {
-            $semester = new \App\Models\SemesterModel();
-            $itemKuliah = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1, 1)->first();
-            $skala = new \App\Models\SkalaSKSModel();
-            $itemSkala = $skala->where("ips_min<='" . $itemKuliah->ips . "' AND ips_max>='" . $itemKuliah->ips . "'")->first();
-            if ($semester->where('a_periode_aktif', 1)->where("DATE(batas_pengisian_krsm)>=CURDATE()")->countAllResults() > 0) {
-                $object = new \App\Models\TempKrsmModel();
-                $data = $object->select('temp_krsm.*')
-                    ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->first();
-                if (!is_null($data)) {
-                    $object = new \App\Models\TempPesertaKelasModel();
-                    $data->detail = $object->where('temp_krsm_id', $data->id)->findAll();
-                    $object = new \App\Models\TahapanModel();
-                    return $this->respond([
-                        'status' => true,
-                        'data' => ["pengajuan" => $object->where('id', $data->id_tahapan)->first()->tahapan, "matakuliah" => $data],
-                        'roles' => ['sks_max' => $itemSkala->sks_max]
-                    ]);
+        try {
+            $profile = getProfile();
+            $object = new \App\Models\PerkuliahanMahasiswaModel();
+            if ($object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->first()->sks_semester == 0) {
+                $semester = new \App\Models\SemesterModel();
+                $itemKuliah = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1, 1)->first();
+                $skala = new \App\Models\SkalaSKSModel();
+                $itemSkala = $skala->where("ips_min<='" . $itemKuliah->ips . "' AND ips_max>='" . $itemKuliah->ips . "'")->first();
+                if ($semester->where('a_periode_aktif', 1)->where("DATE(batas_pengisian_krsm)>=CURDATE()")->countAllResults() > 0) {
+                    $object = new \App\Models\TempKrsmModel();
+                    $data = $object->select('temp_krsm.*')
+                        ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->first();
+                    if (!is_null($data)) {
+                        $object = new \App\Models\TempPesertaKelasModel();
+                        $data->detail = $object->where('temp_krsm_id', $data->id)->findAll();
+                        $object = new \App\Models\TahapanModel();
+                        return $this->respond([
+                            'status' => true,
+                            'data' => ["pengajuan" => $object->where('id', $data->id_tahapan)->first()->tahapan, "matakuliah" => $data],
+                            'roles' => ['sks_max' => $itemSkala->sks_max]
+                        ]);
+                    } else {
+                        return $this->respond([
+                            'status' => true,
+                            'data' => ["pengajuan" => "belum pengajuan", "matakuliah" => null],
+                            'roles' => ['sks_max' => $itemSkala->sks_max]
+                        ]);
+                    }
                 } else {
-                    return $this->respond([
-                        'status' => true,
-                        'data' => ["pengajuan" => "belum pengajuan", "matakuliah" => null],
-                        'roles' => ['sks_max' => $itemSkala->sks_max]
-                    ]);
+                    return $this->fail('Pengisian KRSM telah ditutup, silahkan hubungi bagian BAAK');
                 }
             } else {
-                return $this->fail('Pengisian KRSM telah ditutup, silahkan hubungi bagian BAAK');
+                $semester = getSemesterAktif();
+                $object = new \App\Models\PesertaKelasModel();
+                return $this->respond([
+                    'status' => true,
+                    'data' => [
+                        "pengajuan" => "finish",
+                        "matakuliah" => $object->select("kelas_kuliah.*")
+                            ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
+                            ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = peserta_kelas.id_riwayat_pendidikan', 'left')
+                            ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)
+                            ->where('kelas_kuliah.id_semester', $semester->id_semester)
+                            ->findAll()
+                    ]
+                ]);
             }
-        } else {
-            $semester = getSemesterAktif();
-            $object = new \App\Models\PesertaKelasModel();
-            return $this->respond([
-                'status' => true,
-                'data' => [
-                    "pengajuan" => "finish",
-                    "matakuliah" => $object->select("kelas_kuliah.*")
-                        ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
-                        ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = peserta_kelas.id_riwayat_pendidikan', 'left')
-                        ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)
-                        ->where('kelas_kuliah.id_semester', $semester->id_semester)
-                        ->findAll()
-                ]
-            ]);
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage());
         }
     }
 

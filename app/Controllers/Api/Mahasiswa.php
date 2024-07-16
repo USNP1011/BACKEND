@@ -115,18 +115,6 @@ class Mahasiswa extends ResourceController
         $conn = \Config\Database::connect();
         try {
             $conn->transException(true)->transStart();
-            $itemUser = [
-                'username' => $item->email,
-                'email' => $item->email,
-                'password' => 'Usn1011!'
-            ];
-            if (!$this->validateData($itemUser, 'userMahasiswa')) {
-                $result = [
-                    "status" => false,
-                    "message" => $this->validator->getErrors(),
-                ];
-                return $this->failValidationErrors($result);
-            }
             if (!$this->validate('mahasiswa')) {
                 $result = [
                     "status" => false,
@@ -134,20 +122,6 @@ class Mahasiswa extends ResourceController
                 ];
                 return $this->failValidationErrors($result);
             }
-            $userObject = auth()->getProvider();
-            $userEntityObject = new User();
-            $userEntityObject->fill($itemUser);
-            $userObject->save($userEntityObject);
-            $itemData = $userObject->findById($userObject->getInsertID());
-            $item->id_user = $userObject->getInsertID();
-            $userObject->addToDefaultGroup($itemData);
-
-            $role = [
-                'users_id' => $item->id_user,
-                'role_id' => '4'
-            ];
-            $userRole = new UserRoleModel();
-            $userRole->insert($role);
 
             $item->id = Uuid::uuid4()->toString();
             $object = new MahasiswaModel();

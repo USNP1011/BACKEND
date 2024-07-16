@@ -77,6 +77,7 @@ class MahasiswaModel extends Model
 		'nama_kebutuhan_khusus_mahasiswa',
 		'oap',
 		'suku',
+		'id_user',
 		'sync_at',
 		'status_sync'
     ];
