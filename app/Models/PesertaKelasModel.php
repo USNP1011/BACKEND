@@ -12,14 +12,7 @@ class PesertaKelasModel extends Model
     protected $protectFields    = true;
     protected $allowedFields = [
 		'kelas_kuliah_id',
-		'nama_kelas_kuliah',
 		'id_riwayat_pendidikan',
-		'mahasiswa_id',
-		'nim',
-		'nama_mahasiswa',
-		'matakuliah_id',
-		'kode_mata_kuliah',
-		'nama_mata_kuliah',
 		'nilai_angka',
 		'nilai_huruf',
 		'nilai_indeks',
