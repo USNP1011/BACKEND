@@ -15,7 +15,8 @@ class Krsm extends ResourceController
             $object = new \App\Models\PerkuliahanMahasiswaModel();
             if ($object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->first()->sks_semester == 0) {
                 $semester = new \App\Models\SemesterModel();
-                $itemKuliah = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1, 1)->first();
+                $sum =$object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->countAllResults();
+                $itemKuliah = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1, $sum > 1 ? 1 :0)->first();
                 $skala = new \App\Models\SkalaSKSModel();
                 $itemSkala = $skala->where("ips_min<='" . $itemKuliah->ips . "' AND ips_max>='" . $itemKuliah->ips . "'")->first();
                 if ($semester->where('a_periode_aktif', 1)->where("DATE(batas_pengisian_krsm)>=CURDATE()")->countAllResults() > 0) {
