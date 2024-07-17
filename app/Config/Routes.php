@@ -271,9 +271,8 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->put('anggota_aktivitas_mahasiswa', 'AnggotaAktivitasMahasiswa::update', ['filter' => 'auth']);
     $routes->delete('anggota_aktivitas_mahasiswa/(:any)', 'AnggotaAktivitasMahasiswa::delete/$1', ['filter' => 'auth']);
 
-    $routes->group('reset_password', ['filter'=>'general'], function($routes){
-        $routes->post('', 'AuthController::resetPassword');
-    });
+    $routes->post('reset_password', 'AuthController::resetPassword', ['filter'=>'general']);
+    $routes->post('create_user', 'AuthController::createUser', ['filter'=>'general']);
 });
 
 $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($routes){

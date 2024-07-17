@@ -1,6 +1,6 @@
 <?php
 
-function handleErrorDB($code) {
+function handleErrorDB($code) :string {
     if($code == 1062) return "Maaf, data ini sudah digunakan";
     else if($code == 1045) return "Mohon ";
     else if($code == 1054) return "Maaf, terjadi kesalahan dalam mengakses data. Pastikan Anda memasukkan data yang benar.";

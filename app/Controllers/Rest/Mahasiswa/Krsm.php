@@ -97,16 +97,21 @@ class Krsm extends ResourceController
             } else {
                 $krsm = $temKrsm->asArray()->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->first();
             }
+            $temPeserta = new \App\Models\TempPesertaKelasModel();
+            $numInsert = 0;
             foreach ($param as $key => $value) {
-                $value->id = !isset($value->id) ? Uuid::uuid4()->toString() : $value->id;
-                $value->temp_krsm_id = $krsm['id'];
-                $value->id_riwayat_pendidikan = $profile->id_riwayat_pendidikan;
-                $temPeserta = new \App\Models\TempPesertaKelasModel();
-                $temPeserta->save($value);
+                if(is_null($value->id)){
+                    $value->id = Uuid::uuid4()->toString();
+                    $value->temp_krsm_id = $krsm['id'];
+                    $value->id_riwayat_pendidikan = $profile->id_riwayat_pendidikan;
+                    $temPeserta->save($value);
+                    $numInsert+=1;
+                }
             }
             $conn->transComplete();
             return $this->respond([
                 'status' => true,
+                'message'=> $numInsert." Ditambahkan",
                 'data' => $param
             ]);
         } catch (\Throwable $th) {
