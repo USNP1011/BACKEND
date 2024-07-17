@@ -16,28 +16,34 @@ class Krsm extends ResourceController
             $object = new \App\Models\PerkuliahanMahasiswaModel();
             if ($object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->first()->sks_semester == 0) {
                 $semester = new \App\Models\SemesterModel();
-                $sum =$object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->countAllResults();
-                $itemKuliah = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1, $sum > 1 ? 1 :0)->first();
+                $sum = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->countAllResults();
+                $itemKuliah = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1, $sum > 1 ? 1 : 0)->first();
                 $skala = new \App\Models\SkalaSKSModel();
                 $itemSkala = $skala->where("ips_min<='" . $itemKuliah->ips . "' AND ips_max>='" . $itemKuliah->ips . "'")->first();
                 if ($semester->where('a_periode_aktif', 1)->where("DATE(batas_pengisian_krsm)>=CURDATE()")->countAllResults() > 0) {
                     $object = new \App\Models\TempKrsmModel();
-                    $data = $object->select('temp_krsm.*')
+                    $data = $object->select('temp_krsm.*, semester.nama_semester')->join('semester', 'semester.id_semester=temp_krsm.id_semester')
                         ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->first();
                     if (!is_null($data)) {
                         $object = new \App\Models\TempPesertaKelasModel();
-                        $data->detail = $object->where('temp_krsm_id', $data->id)->findAll();
+                        $data->detail = $object->select('temp_peserta_kelas.*, matakuliah.nama_mata_kuliah, matakuliah.kode_mata_kuliah, matakuliah.sks_mata_kuliah, kelas.nama_kelas_kuliah, dosen.nidn, dosen.nama_dosen')
+                            ->join('kelas_kuliah', 'kelas_kuliah.id=temp_peserta_kelas.kelas_kuliah_id')
+                            ->join('matakuliah', 'kelas_kuliah.matakuliah_id=matakuliah.id')
+                            ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id')
+                            ->join('dosen', 'dosen_pengajar_kelas.id_dosen=dosen.id_dosen')
+                            ->join('kelas', 'kelas_kuliah.kelas_id=kelas.id')
+                            ->where('temp_krsm_id', $data->id)->findAll();
                         $object = new \App\Models\TahapanModel();
                         return $this->respond([
                             'status' => true,
                             'data' => ["pengajuan" => $object->where('id', $data->id_tahapan)->first()->tahapan, "matakuliah" => $data],
-                            'roles' => ['sks_max' => $itemSkala->sks_max]
+                            'roles' => ['sks_max' => $sum<=2 ? 20 : (int)$itemSkala->sks_max]
                         ]);
                     } else {
                         return $this->respond([
                             'status' => true,
                             'data' => ["pengajuan" => "belum pengajuan", "matakuliah" => null],
-                            'roles' => ['sks_max' => $itemSkala->sks_max]
+                            'roles' => ['sks_max' => $sum<=2 ? 20 : (int)$itemSkala->sks_max]
                         ]);
                     }
                 } else {
@@ -60,7 +66,7 @@ class Krsm extends ResourceController
                 ]);
             }
         } catch (\Throwable $th) {
-            return $this->fail($th->getMessage());
+            return $this->fail(handleErrorDB($th->getCode()));
         }
     }
 
@@ -69,8 +75,8 @@ class Krsm extends ResourceController
         $conn = \Config\Database::connect();
         $profile = getProfile();
         $object = new \App\Models\PerkuliahanMahasiswaModel();
-        $sum =$object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->countAllResults();
-        $itemKuliah = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1, $sum > 1 ? 1 :0)->first();
+        $sum = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->countAllResults();
+        $itemKuliah = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1, $sum > 1 ? 1 : 0)->first();
         $skala = new \App\Models\SkalaSKSModel();
         $itemSkala = $skala->where("ips_min<='" . $itemKuliah->ips . "' AND ips_max>='" . $itemKuliah->ips . "'")->first();
         try {
@@ -91,7 +97,7 @@ class Krsm extends ResourceController
                 ];
                 $temKrsm->insert($krsm);
             } else {
-                $krsm = $temKrsm->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->first();
+                $krsm = $temKrsm->asArray()->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->first();
             }
             foreach ($param as $key => $value) {
                 $value->id = !isset($value->id) ? Uuid::uuid4()->toString() : $value->id;
@@ -105,12 +111,7 @@ class Krsm extends ResourceController
                 'status' => true,
                 'data' => $param
             ]);
-            // if ($conn->transStatus()) {
-            //     $conn->transCommit();
-            // } else {
-            //     throw new \Exception("", 1);
-            // }
-        } catch (DatabaseException $th) {
+        } catch (\Throwable $th) {
             $conn->transRollback();
             return $this->fail(handleErrorDB($th->getCode()));
         }
