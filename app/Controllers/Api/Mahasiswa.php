@@ -134,11 +134,9 @@ class Mahasiswa extends ResourceController
                 'data' => $item
             ]);
         } catch (DatabaseException $th) {
-            if ($th->getCode() == 1062) {
-            }
             return $this->failValidationErrors([
                 'status' => false,
-                'message' => "Mahasiswa dengan nama, tempat, tanggal lahir dan ibu kandung yang sama sudah ada",
+                'message' => $th->getCode() == 1062 ? "Mahasiswa dengan nama, tempat, tanggal lahir dan ibu kandung yang sama sudah ada": "Maaf, Terjadi kesalahan, silahkan hubungi bagian pengembang!",
             ]);
         }
     }

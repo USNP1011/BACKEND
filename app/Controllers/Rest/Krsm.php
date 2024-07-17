@@ -4,6 +4,7 @@ namespace App\Controllers\Rest;
 
 use App\Models\KelasKuliahModel;
 use CodeIgniter\RESTful\ResourceController;
+use CodeIgniter\Database\Exceptions\DatabaseException;
 use Ramsey\Uuid\Uuid;
 
 class Krsm extends ResourceController
@@ -68,15 +69,16 @@ class Krsm extends ResourceController
         $conn = \Config\Database::connect();
         $profile = getProfile();
         $object = new \App\Models\PerkuliahanMahasiswaModel();
-        $itemKuliah = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1, 1)->first();
+        $sum =$object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->countAllResults();
+        $itemKuliah = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1, $sum > 1 ? 1 :0)->first();
         $skala = new \App\Models\SkalaSKSModel();
         $itemSkala = $skala->where("ips_min<='" . $itemKuliah->ips . "' AND ips_max>='" . $itemKuliah->ips . "'")->first();
         try {
-            $conn->transBegin();
+            $conn->transException(true)->transStart();
             $temKrsm = new \App\Models\TempKrsmModel();
             $param = $this->request->getJSON();
             if (array_reduce($param, function ($carry, $product) {
-                return $carry + $product->price;
+                return $carry + $product->sks_mata_kuliah;
             }, 0) > $itemSkala->sks_max) {
                 throw new \Exception('SKS yang dipilih melebihi ' . $itemSkala->sks_max . 'SKS', 1);
             }
@@ -98,18 +100,19 @@ class Krsm extends ResourceController
                 $temPeserta = new \App\Models\TempPesertaKelasModel();
                 $temPeserta->save($value);
             }
-            if ($conn->transStatus()) {
-                $conn->transCommit();
-                return $this->respond([
-                    'status' => true,
-                    'data' => $param
-                ]);
-            } else {
-                throw new \Exception("", 1);
-            }
-        } catch (\Throwable $th) {
+            $conn->transComplete();
+            return $this->respond([
+                'status' => true,
+                'data' => $param
+            ]);
+            // if ($conn->transStatus()) {
+            //     $conn->transCommit();
+            // } else {
+            //     throw new \Exception("", 1);
+            // }
+        } catch (DatabaseException $th) {
             $conn->transRollback();
-            return $this->fail($th->getMessage());
+            return $this->fail(handleErrorDB($th->getCode()));
         }
     }
 

@@ -24,6 +24,7 @@ class Jadwal extends ResourceController
             'data' => $object->select("`kelas_kuliah`.*,
                 `matakuliah`.`kode_mata_kuliah` AS `kode_mata_kuliah1`,
                 `matakuliah`.`nama_mata_kuliah`,
+                `matakuliah`.`sks_mata_kuliah`,
                 `prodi`.`kode_program_studi`,
                 `prodi`.`nama_program_studi` AS `nama_program_studi1`,
                 `kelas`.`nama_kelas_kuliah`,
