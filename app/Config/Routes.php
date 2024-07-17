@@ -139,44 +139,54 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
         $routes->delete('(:hash)', 'Settings::deleteSkalaSKS/$1', ['filter' => 'auth']);
     });
     
-    $routes->get('mahasiswa', 'Mahasiswa::show', ['filter' => 'auth']);
-    $routes->get('mahasiswa/(:any)', 'Mahasiswa::show/$1', ['filter' => 'auth']);
-    $routes->get('mahasiswa/(:any)/riwayat_pendidikan', 'Mahasiswa::show/$1/$2', ['filter' => 'auth']);
-    $routes->get('mahasiswa/(:any)/nilai_transfer', 'Mahasiswa::show/$1/$2', ['filter' => 'auth']);
-    $routes->get('mahasiswa/(:any)/krsm', 'Mahasiswa::show/$1/$2', ['filter' => 'auth']);
-    $routes->get('mahasiswa/(:any)/aktivitas_kuliah', 'Mahasiswa::show/$1/$2', ['filter' => 'auth']);
+    $routes->group('mahasiswa', ['filter' => 'auth'], function($routes){
+        $routes->get('', 'Mahasiswa::show');
+        $routes->get('(:any)', 'Mahasiswa::show/$1');
+        $routes->get('(:any)/riwayat_pendidikan', 'Mahasiswa::show/$1/$2');
+        $routes->get('(:any)/nilai_transfer', 'Mahasiswa::show/$1/$2');
+        $routes->get('(:any)/krsm', 'Mahasiswa::show/$1/$2');
+        $routes->get('(:any)/aktivitas_kuliah', 'Mahasiswa::show/$1/$2');
+        $routes->post('', 'Mahasiswa::create');
+        $routes->put('', 'Mahasiswa::update');
+        $routes->delete('/(:any)', 'Mahasiswa::delete/$1');
+    });
     $routes->post('mahasiswa_paginate', 'Mahasiswa::paginate', ['filter' => 'auth']);
-    $routes->post('mahasiswa', 'Mahasiswa::create', ['filter' => 'auth']);
-    $routes->put('mahasiswa', 'Mahasiswa::update', ['filter' => 'auth']);
-    $routes->delete('mahasiswa/(:any)', 'Mahasiswa::delete/$1', ['filter' => 'auth']);
 
-    $routes->get('matakuliah', 'Matakuliah::show', ['filter' => 'auth']);
-    $routes->get('matakuliah/(:hash)', 'Matakuliah::show/$1', ['filter' => 'auth']);
-    $routes->get('matakuliah/byprodi/(:hash)', 'Matakuliah::by_prodi/$1', ['filter' => 'auth']);
-    $routes->post('matakuliah_paginate', 'Matakuliah::paginate', ['filter' => 'auth']);
-    $routes->post('matakuliah', 'Matakuliah::create', ['filter' => 'auth']);
-    $routes->put('matakuliah', 'Matakuliah::update', ['filter' => 'auth']);
-    $routes->delete('matakuliah/(:any)', 'Matakuliah::delete/$1', ['filter' => 'auth']);
+    $routes->group('matakuliah', ['filter' => 'auth'], function($routes){
+        $routes->get('', 'Matakuliah::show');
+        $routes->get('(:hash)', 'Matakuliah::show/$1');
+        $routes->get('byprodi/(:hash)', 'Matakuliah::by_prodi/$1');
+        $routes->post('', 'Matakuliah::create');
+        $routes->put('', 'Matakuliah::update');
+        $routes->delete('(:hash)', 'Matakuliah::delete/$1');
+    });
+    $routes->post('matakuliah_paginate', 'Matakuliah::paginate');
 
-    $routes->get('riwayat_pendidikan_mahasiswa', 'RiwayatPendidikanMahasiswa::show', ['filter' => 'auth']);
-    $routes->get('riwayat_pendidikan_mahasiswa/(:any)', 'RiwayatPendidikanMahasiswa::show/$1', ['filter' => 'auth']);
-    $routes->post('riwayat_pendidikan_mahasiswa', 'RiwayatPendidikanMahasiswa::create', ['filter' => 'auth']);
-    $routes->put('riwayat_pendidikan_mahasiswa', 'RiwayatPendidikanMahasiswa::update', ['filter' => 'auth']);
-    $routes->delete('riwayat_pendidikan_mahasiswa/(:any)', 'RiwayatPendidikanMahasiswa::delete/$1', ['filter' => 'auth']);
+    $routes->group('riwayat_pendidikan_mahasiswa', ['filter' => 'auth'], function($routes){
+        $routes->get('', 'RiwayatPendidikanMahasiswa::show');
+        $routes->get('(:hash)', 'RiwayatPendidikanMahasiswa::show/$1');
+        $routes->post('', 'RiwayatPendidikanMahasiswa::create');
+        $routes->put('', 'RiwayatPendidikanMahasiswa::update');
+        $routes->delete('(:hash)', 'RiwayatPendidikanMahasiswa::delete/$1');
+    });
 
-    $routes->get('nilai_transfer', 'NilaiTransfer::show', ['filter' => 'auth']);
-    $routes->get('nilai_transfer/(:any)', 'NilaiTransfer::show/$1', ['filter' => 'auth']);
+    $routes->group('nilai_transfer', ['filter' => 'auth'], function($routes){
+        $routes->get('', 'NilaiTransfer::show');
+        $routes->get('(:hash)', 'NilaiTransfer::show/$1');
+        $routes->post('', 'NilaiTransfer::create');
+        $routes->put('', 'NilaiTransfer::update');
+        $routes->delete('(:hash)', 'NilaiTransfer::delete/$1');
+    });
     $routes->get('nilai_transfer_by_mahasiswa/(:any)', 'NilaiTransfer::showByMhs/$1', ['filter' => 'auth']);
-    $routes->post('nilai_transfer', 'NilaiTransfer::create', ['filter' => 'auth']);
-    $routes->put('nilai_transfer', 'NilaiTransfer::update', ['filter' => 'auth']);
-    $routes->delete('nilai_transfer/(:any)', 'NilaiTransfer::delete/$1', ['filter' => 'auth']);
 
-    $routes->get('aktivitas_kuliah', 'AktivitasKuliah::show', ['filter' => 'auth']);
-    $routes->get('aktivitas_kuliah/(:any)', 'AktivitasKuliah::show/$1', ['filter' => 'auth']);
+    $routes->group('aktivitas_kuliah', ['filter' => 'auth'], function($routes){
+        $routes->get('', 'AktivitasKuliah::show');
+        $routes->get('(:hash)', 'AktivitasKuliah::show/$1');
+        $routes->post('', 'AktivitasKuliah::create');
+        $routes->put('', 'AktivitasKuliah::update');
+        $routes->delete('(:hash)', 'AktivitasKuliah::delete/$1');
+    });
     $routes->get('aktivitas_kuliah_by_mahasiswa/(:any)', 'AktivitasKuliah::showByMhs/$1', ['filter' => 'auth']);
-    $routes->post('aktivitas_kuliah', 'AktivitasKuliah::create', ['filter' => 'auth']);
-    $routes->put('aktivitas_kuliah', 'AktivitasKuliah::update', ['filter' => 'auth']);
-    $routes->delete('aktivitas_kuliah/(:any)', 'AktivitasKuliah::delete/$1', ['filter' => 'auth']);
 
     $routes->group('dosen_wali', ['filter'=>'auth'], function($routes){
         $routes->get('mahasiswa/(:hash)', 'DosenWali::show/$1');
@@ -206,17 +216,19 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
         $routes->delete('mahasiswa/(:hash)', 'KelasKuliah::deleteMahasiswa/$1');
         $routes->delete('dosen/(:hash)', 'deleteDosen::delete/$1');
     });
-    
-    $routes->get('kurikulum', 'Kurikulum::show', ['filter' => 'auth']);
-    $routes->get('kurikulum/(:hash)', 'Kurikulum::show/$1', ['filter' => 'auth']);
-    $routes->get('kurikulum/matakuliah/(:hash)/kurikulum', 'Kurikulum::matakuliah_kurikulum/$1', ['filter' => 'auth']);
-    $routes->get('kurikulum/matakuliah/(:hash)/prodi', 'Kurikulum::matakuliah_prodi/$1', ['filter' => 'auth']);
-    $routes->post('kurikulum', 'Kurikulum::create', ['filter' => 'auth']);
-    $routes->post('kurikulum/matakuliah', 'Kurikulum::create_matakuliah', ['filter' => 'auth']);
-    $routes->put('kurikulum', 'Kurikulum::update', ['filter' => 'auth']);
-    $routes->put('kurikulum/matakuliah', 'Kurikulum::update_matakuliah', ['filter' => 'auth']);
-    $routes->delete('kurikulum/(:hash)', 'Kurikulum::delete/$1', ['filter' => 'auth']);
-    $routes->delete('kurikulum/matakuliah/(:hash)', 'Kurikulum::delete_matakuliah/$1', ['filter' => 'auth']);
+
+    $routes->group('kurikulum', ['filter' => 'auth'], function($routes){
+        $routes->get('', 'Kurikulum::show');
+        $routes->get('(:hash)', 'Kurikulum::show/$1');
+        $routes->get('matakuliah/(:hash)/kurikulum', 'Kurikulum::matakuliah_kurikulum/$1');
+        $routes->get('matakuliah/(:hash)/prodi', 'Kurikulum::matakuliah_prodi/$1');
+        $routes->post('', 'Kurikulum::create');
+        $routes->post('matakuliah', 'Kurikulum::create_matakuliah');
+        $routes->put('', 'Kurikulum::update');
+        $routes->put('matakuliah', 'Kurikulum::update_matakuliah');
+        $routes->delete('(:hash)', 'Kurikulum::delete/$1');
+        $routes->delete('matakuliah/(:hash)', 'Kurikulum::delete_matakuliah/$1');
+    });
 
     $routes->get('matakuliah_kurikulum', 'MatakuliahKurikulum::show', ['filter' => 'auth']);
     $routes->get('matakuliah_kurikulum_kurikulum_id/(:any)', 'MatakuliahKurikulum::by_kurikulum_id/$1', ['filter' => 'auth']);
@@ -258,25 +270,38 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->post('anggota_aktivitas_mahasiswa', 'AnggotaAktivitasMahasiswa::create', ['filter' => 'auth']);
     $routes->put('anggota_aktivitas_mahasiswa', 'AnggotaAktivitasMahasiswa::update', ['filter' => 'auth']);
     $routes->delete('anggota_aktivitas_mahasiswa/(:any)', 'AnggotaAktivitasMahasiswa::delete/$1', ['filter' => 'auth']);
+
+    $routes->group('reset_password', ['filter'=>'general'], function($routes){
+        $routes->post('', 'AuthController::resetPassword');
+    });
 });
 
 $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($routes){
+    //Mahasiswa 
     $routes->group('mahasiswa', ['filter' => 'mahasiswa'], function($routes){
-        $routes->get('user', 'Mahasiswa::byUserId');
-        $routes->get('riwayat_pendidikan', 'Mahasiswa::riwayatPendidikan');
-        $routes->get('nilai_transfer', 'Mahasiswa::nilaiTransfer');
-        $routes->get('krsm', 'Mahasiswa::krsm');
-        $routes->get('aktivitas_kuliah', 'Mahasiswa::aktivitasKuliah');
-        $routes->put('', 'Mahasiswa::update');
+        $routes->get('user', 'Mahasiswa\Mahasiswa::byUserId');
+        $routes->get('riwayat_pendidikan', 'Mahasiswa\Mahasiswa::riwayatPendidikan');
+        $routes->get('nilai_transfer', 'Mahasiswa\Mahasiswa::nilaiTransfer');
+        $routes->get('krsm', 'Mahasiswa\Mahasiswa::krsm');
+        $routes->get('aktivitas_kuliah', 'Mahasiswa\Mahasiswa::aktivitasKuliah');
+        $routes->put('', 'Mahasiswa\Mahasiswa::update');
     });
 
     $routes->group('jadwal', ['filter' => 'mahasiswa'], function($routes){
-        $routes->post('', 'Jadwal::show');
+        $routes->post('', 'Mahasiswa\Jadwal::show');
     });
 
     $routes->group('krsm', ['filter' => 'mahasiswa'], function($routes){
-        $routes->get('', 'Krsm::show/$1');
-        $routes->post('', 'Krsm::create/$1');
-        $routes->delete('(:hash)', 'Krsm::deleted/$1');
+        $routes->get('', 'Mahasiswa\Krsm::show/$1');
+        $routes->post('', 'Mahasiswa\Krsm::create/$1');
+        $routes->delete('(:hash)', 'Mahasiswa\Krsm::deleted/$1');
     });
+    
+    //Dosen
+    $routes->group('mahasiswa_wali', ['filter' => 'dosen'], function($routes){
+        $routes->get('', 'Mahasiswa\Krsm::show/$1');
+        $routes->post('', 'Mahasiswa\Krsm::create/$1');
+        $routes->delete('(:hash)', 'Mahasiswa\Krsm::deleted/$1');
+    });
+
 });

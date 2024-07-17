@@ -57,7 +57,7 @@ class AuthController extends ResourceController
             'password' => 'required'
         ];
         $rules = $this->getValidationRules();
-        if (!$this->validateData($this->request->getJSON(true), $itemRules, [], config('Auth')->DBGroup)) {
+        if (!$this->validateData($this->request->getJSON(true), $itemRules, [], null)) {
             return $this->fail(
                 ['errors' => $this->validator->getErrors()],
                 $this->codes['unauthorized']
@@ -104,4 +104,27 @@ class AuthController extends ResourceController
 
         return $rules->getLoginRules();
     }
+
+    function resetPassword(): ResponseInterface {
+        $request = $this->request->getJSON();
+        if($request->role == "Dosen"){
+            $dsn = new \App\Models\DosenModel();
+            $itemDosen = $dsn->where('id_user', $request->id)->first();
+            $newPassword = $itemDosen->nidn;
+        }else if($request->role == "Mahasiswa"){
+            $mhs = new \App\Models\MahasiswaModel();
+            $itemMahasiswa = $mhs->select("nim")->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id')->where('id_user', $request->id)->first();
+            $newPassword = $itemMahasiswa->nim;
+        }else{
+            return $this->fail("Role tidak ditemukan");
+        }
+        $users = auth()->getProvider();
+        $user = $users->findById($request->id);
+        $user->fill(['password'=>$newPassword]);
+        $cek = $users->save($user);
+        return $this->respond([
+            'status'=>true
+        ]);
+    }
+    
 }

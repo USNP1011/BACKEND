@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers\Rest;
+namespace App\Controllers\Rest\Mahasiswa;
 
 use App\Models\KelasKuliahModel;
 use CodeIgniter\RESTful\ResourceController;

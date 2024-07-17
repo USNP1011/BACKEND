@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers\Rest;
+namespace App\Controllers\Rest\Mahasiswa;
 
 use App\Models\KelasKuliahModel;
 use CodeIgniter\RESTful\ResourceController;
@@ -36,14 +36,12 @@ class Krsm extends ResourceController
                         $object = new \App\Models\TahapanModel();
                         return $this->respond([
                             'status' => true,
-                            'data' => ["pengajuan" => $object->where('id', $data->id_tahapan)->first()->tahapan, "matakuliah" => $data],
-                            'roles' => ['sks_max' => $sum<=2 ? 20 : (int)$itemSkala->sks_max]
+                            'data' => ["pengajuan" => $object->where('id', $data->id_tahapan)->first()->tahapan, "matakuliah" => $data, 'roles' => ['sks_max' => $sum <= 2 ? 20 : (int)$itemSkala->sks_max]],
                         ]);
                     } else {
                         return $this->respond([
                             'status' => true,
-                            'data' => ["pengajuan" => "belum pengajuan", "matakuliah" => null],
-                            'roles' => ['sks_max' => $sum<=2 ? 20 : (int)$itemSkala->sks_max]
+                            'data' => ["pengajuan" => "belum pengajuan", "matakuliah" => null, 'roles' => ['sks_max' => $sum <= 2 ? 20 : (int)$itemSkala->sks_max]]
                         ]);
                     }
                 } else {

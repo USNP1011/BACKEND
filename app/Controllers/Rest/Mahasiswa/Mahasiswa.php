@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers\Rest;
+namespace App\Controllers\Rest\Mahasiswa;
 
 use App\Entities\Mahasiswa as EntitiesMahasiswa;
 use App\Models\MahasiswaModel;
