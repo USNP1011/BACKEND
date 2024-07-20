@@ -14,12 +14,14 @@ class DosenWali extends ResourceController
         $object = new DosenWaliModel();
         return $this->respond([
             'status' => true,
-            'data' => $object->select("dosen_wali.*, riwayat_pendidikan_mahasiswa.nim, mahasiswa.nama_mahasiswa")
+            'data' => $object->select("dosen_wali.*, riwayat_pendidikan_mahasiswa.nim, mahasiswa.nama_mahasiswa, prodi.nama_program_studi, prodi.kode_program_studi, riwayat_pendidikan_mahasiswa.angkatan")
             ->join("riwayat_pendidikan_mahasiswa", "riwayat_pendidikan_mahasiswa.id=dosen_wali.id_riwayat_pendidikan", "LEFT")
             ->join("mahasiswa", "riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id", "LEFT")
             ->join("mahasiswa_lulus_do", "riwayat_pendidikan_mahasiswa.id=mahasiswa_lulus_do.id_riwayat_pendidikan", "LEFT")
+            ->join("prodi", "prodi.id_prodi=riwayat_pendidikan_mahasiswa.id_prodi", "LEFT")
             ->where('dosen_wali.id_dosen', $id)
             ->where('mahasiswa_lulus_do.id_riwayat_pendidikan IS NULL')
+            ->orderBy('dosen_wali.created_at', 'desc')
             ->findAll()
         ]);
     }

@@ -63,29 +63,29 @@ class AuthController extends ResourceController
                     $this->codes['unauthorized']
                 );
             }
-            
+
             $credentials             = $this->request->getJsonVar(setting('Auth.validFields'));
             $credentials             = array_filter($credentials);
             $credentials['password'] = $this->request->getJsonVar('password');
             $authenticator = auth('session')->getAuthenticator();
-    
+
             $result = $authenticator->check($credentials);
             if (!$result->isOK()) {
                 // @TODO Record a failed login attempt
-    
+
                 return $this->failUnauthorized($result->reason());
             }
-    
+
             $user = $result->extraInfo();
             $userobject = new UserModel();
-    
+
             $item = $userobject->findById($user->id);
-            if($item->active==0){
+            if ($item->active == 0) {
                 return $this->fail("Akun anda belum aktif");
             }
             $role = new \App\Models\UserRoleModel();
             $semester = new \App\Models\SemesterModel();
-    
+
             $set = [
                 'uid' => $item->id,
                 'username' => $item->username,
@@ -94,7 +94,7 @@ class AuthController extends ResourceController
                 'semester' => $semester->where('a_periode_aktif', '1')->first(),
                 'roles' => $role->select("user_role.id, role.role")->join('role', 'role.id=user_role.role_id', 'left')->where('user_role.users_id', $item->id)->findAll()
             ];
-    
+
             return $this->respond([
                 'message' => 'User authenticated successfully',
                 'user' => $set,
@@ -136,6 +136,40 @@ class AuthController extends ResourceController
         ]);
     }
 
+    function changePassword(): ResponseInterface
+    {
+        $credentials             = $this->request->getJsonVar(setting('Auth.validFields'));
+        $credentials             = array_filter($credentials);
+        $credentials['password'] = $this->request->getJsonVar('oldPassword');
+        $authenticator = auth('session')->getAuthenticator();
+
+        $result = $authenticator->check($credentials);
+        if (!$result->isOK()) {
+
+            return $this->failUnauthorized($result->reason());
+        }
+        // $request = $this->request->getJSON();
+        // if ($request->role == "Dosen") {
+        //     $dsn = new \App\Models\DosenModel();
+        //     $itemDosen = $dsn->where('id_user', $request->id)->first();
+        //     $newPassword = $itemDosen->nidn;
+        // } else if ($request->role == "Mahasiswa") {
+        //     $mhs = new \App\Models\MahasiswaModel();
+        //     $itemMahasiswa = $mhs->select("nim")->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id')->where('id_user', $request->id)->first();
+        //     $newPassword = $itemMahasiswa->nim;
+        // } else {
+        //     return $this->fail("Role tidak ditemukan");
+        // }
+        // $users = auth()->getProvider();
+        // $user = $users->findById($request->id);
+        // $user->activate();
+        // $user->fill(['password' => $newPassword]);
+        // $cek = $users->save($user);
+        // return $this->respond([
+        //     'status' => true
+        // ]);
+    }
+
     function createUser(): ResponseInterface
     {
         $conn = \Config\Database::connect();
@@ -152,12 +186,16 @@ class AuthController extends ResourceController
                 ];
             } else if ($request->role == "Mahasiswa") {
                 $mhs = new \App\Models\MahasiswaModel();
-                $itemMahasiswa = $mhs->select("nim")->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id')->where('id_user', $request->id)->first();
-                $newPassword = $itemMahasiswa->nim;
+                $itemMahasiswa = $mhs->select("mahasiswa.*, riwayat_pendidikan_mahasiswa.nim")->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id', 'left')->where('mahasiswa.id', $request->id)->first();
+                $itemUser = [
+                    'username' => $itemMahasiswa->nim,
+                    'email' => $itemMahasiswa->email ?? $itemMahasiswa->nim."@usn-papua.ac.id",
+                    'password' => $itemMahasiswa->nim,
+                ];
             } else {
                 return $this->fail("Role tidak ditemukan");
             }
-    
+
             $rules = [
                 "username" => "required",
                 "email" => "required|valid_email|is_unique[auth_identities.secret]",
@@ -195,14 +233,15 @@ class AuthController extends ResourceController
         }
     }
 
-    function updateUser($id, $role, $id_user) : bool {
-        if($role== 'Dosen'){
+    function updateUser($id, $role, $id_user): bool
+    {
+        if ($role == 'Dosen') {
             $object = new \App\Models\DosenModel();
-            $object->update($id, ['id_user'=>$id_user]);
+            $object->update($id, ['id_user' => $id_user]);
             return true;
-        }else if($role== 'Mahasiswa'){
+        } else if ($role == 'Mahasiswa') {
             $object = new \App\Models\MahasiswaModel();
-            $object->update($id, ['id_user'=>$id_user]);
+            $object->update($id, ['id_user' => $id_user]);
             return true;
         }
     }

@@ -295,12 +295,20 @@ $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($
         $routes->post('', 'Mahasiswa\Krsm::create/$1');
         $routes->delete('(:hash)', 'Mahasiswa\Krsm::deleted/$1');
     });
+
+    $routes->group('khsm', ['filter' => 'mahasiswa'], function($routes){
+        $routes->get('(:hash)', 'Mahasiswa\Khsm::show/$1');
+        $routes->post('', 'Mahasiswa\Khsm::create/$1');
+        $routes->delete('(:hash)', 'Mahasiswa\Khsm::deleted/$1');
+    });
     
     //Dosen
-    $routes->group('mahasiswa_wali', ['filter' => 'dosen'], function($routes){
-        $routes->get('', 'Mahasiswa\Krsm::show/$1');
-        $routes->post('', 'Mahasiswa\Krsm::create/$1');
-        $routes->delete('(:hash)', 'Mahasiswa\Krsm::deleted/$1');
+    $routes->group('perwalian', ['filter' => 'dosen'], function($routes){
+        $routes->get('mahasiswa', 'Dosen\Perwalian::show');
+        $routes->get('pengajuan', 'Dosen\Perwalian::pengajuan');
+        $routes->get('pengajuan/(:hash)', 'Dosen\Perwalian::pengajuan/$1');
+        $routes->post('pengajuan', 'Dosen\Perwalian::updatePengajuan');
+        $routes->post('', 'Perwalian\Krsm::create/$1');
+        $routes->delete('(:hash)', 'Perwalian\Krsm::deleted/$1');
     });
-
 });

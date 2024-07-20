@@ -5,9 +5,9 @@ namespace App\Entities;
 use CodeIgniter\Entity\Entity;
 use Ramsey\Uuid\Uuid;
 
-class DosenWaliEntity extends Entity
+class TempKrsmEntity extends Entity
 {
     protected $datamap = [];
-    protected $dates   = ['sync_at', 'created_at', 'updated_at', 'deleted_at'];
+    protected $dates   = ['created_at', 'updated_at', 'tanggal_pengajuan'];
     protected $casts   = [];
 }

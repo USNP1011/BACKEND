@@ -7,7 +7,7 @@ class TempKrsmModel extends Model
     protected $table = 'temp_krsm';
     protected $primaryKey = 'id';    
 	protected $useAutoIncrement = false;
-    protected $returnType       = 'object';
+    protected $returnType       = 'App\Entities\TempKrsmEntity';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields = [

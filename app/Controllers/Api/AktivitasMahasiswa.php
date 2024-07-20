@@ -31,7 +31,8 @@ class AktivitasMahasiswa extends ResourceController
                 ->join('jenis_aktivitas', 'jenis_aktivitas.id_jenis_aktivitas_mahasiswa= aktivitas_mahasiswa.id_jenis_aktivitas_mahasiswa', 'left')
                 ->join('prodi', 'prodi.id_prodi= aktivitas_mahasiswa.id_prodi', 'left')
                 ->join('semester', 'semester.id_semester= aktivitas_mahasiswa.id_semester', 'left')
-                ->where('aktivitas_mahasiswa.id_semester', $this->semester->id_semester)->findAll() :
+                ->orderBy('aktivitas_mahasiswa.created_at', 'desc')
+                ->findAll() :
                 $this->aktivitasMahasiswa
                 ->select("aktivitas_mahasiswa.*, jenis_aktivitas.nama_jenis_aktivitas_mahasiswa, prodi.nama_program_studi, semester.nama_semester")
                 ->join('jenis_aktivitas', 'jenis_aktivitas.id_jenis_aktivitas_mahasiswa= aktivitas_mahasiswa.id_jenis_aktivitas_mahasiswa', 'left')
