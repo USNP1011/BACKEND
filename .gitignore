@@ -23,6 +23,7 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
+.htaccess
 
 # Windows shortcuts
 *.lnk
