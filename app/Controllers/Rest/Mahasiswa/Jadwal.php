@@ -39,10 +39,8 @@ class Jadwal extends ResourceController
                 ->where("kelas_kuliah.id_semester", $semester->id_semester)
                 ->groupStart()
                 ->orLike('`matakuliah`.`nama_mata_kuliah`', $param->cari)
-                ->orLike('`dosen`.`nama_dosen`', $param->cari)
-                ->orLike('`matakuliah`.`kode_mata_kuliah`', $param->cari)
                 ->groupEnd()
-                ->paginate(10, 'default', 1)
+                ->paginate(5, 'default', 1)
         ]);
     }
 }
