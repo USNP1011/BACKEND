@@ -23,7 +23,10 @@ function getProfile() {
         ->where('id_user', $data->uid)->first();
     }else{
         $object = new \App\Models\DosenModel();
-        $profile = $object->where('id_user', $data->uid)->first();
+        $profile = $object->select("dosen.*, prodi.nama_program_studi")
+        ->join('penugasan_dosen', 'penugasan_dosen.id_dosen=dosen.id_dosen', 'left')
+        ->join('prodi', 'penugasan_dosen.id_prodi=prodi.id_prodi', 'left')
+        ->where('id_user', $data->uid)->first();
     }
     return $profile;
 }
