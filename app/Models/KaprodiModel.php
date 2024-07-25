@@ -2,15 +2,19 @@
 
 use CodeIgniter\Model;
 
-class RuanganModel extends Model
+class KaprodiModel extends Model
 {
-    protected $table = 'ruangan';
+    protected $table = 'kaprodi';
     protected $primaryKey = 'id';    
     protected $useAutoIncrement = false;
-    protected $returnType       = 'object';
+    protected $returnType       = 'App\Entities\KaprodiEntity';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields = [
-        'nama_ruangan'
+        'id_dosen',
+        'id_prodi',
+        'no_sk',
+        'tanggal_sk',
+        'status'
     ];
 }

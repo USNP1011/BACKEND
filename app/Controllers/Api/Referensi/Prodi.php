@@ -13,7 +13,7 @@ class Prodi extends ResourceController
         $object = new ProdiModel();
         return $this->respond([
             'status' => true,
-            'data' => $object->select('prodi.*, ')->findAll()
+            'data' => $object->select("prodi.*, (SELECT nama_dosen FROM kaprodi LEFT JOIN dosen on dosen.id_dosen=kaprodi.id_dosen WHERE kaprodi.id_prodi=prodi.id_prodi AND kaprodi.status='1') as nama_dosen")->findAll()
         ]);
     }
 }
