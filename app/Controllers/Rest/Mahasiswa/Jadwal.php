@@ -42,7 +42,7 @@ class Jadwal extends ResourceController
                 ->groupEnd()
                 ->where("prodi.id_prodi", $profile->id_prodi)
                 ->where("kelas_kuliah.id_semester", $semester->id_semester)
-                ->paginate(5, 'default', 1)
+                ->paginate(10, 'default', 1)
         ]);
     }
 }
