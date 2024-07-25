@@ -763,6 +763,7 @@ class GetData extends BaseController
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetPesertaKelasKuliah', $this->token);
         }
+        $dataSet = [];
         foreach ($data->data as $key => $value) {
             if ($kelasKuliah->where('id_kelas_kuliah', $value->id_kelas_kuliah)->countAllResults() > 0) {
                 try {
@@ -771,13 +772,16 @@ class GetData extends BaseController
                     $value->kelas_kuliah_id =  $kelasKuliah->where('id_kelas_kuliah', $value->id_kelas_kuliah)->first()->id;
                     $value->mahasiswa_id = $mahasiswa->where('id_mahasiswa', $value->id_mahasiswa)->first()->id;
                     $value->matakuliah_id = $matakuliah->where('id_matkul', $value->id_matkul)->first()->id;
-                    $model->fill((array) $value);
-                    $pesertaKelas->insert($model);
+                    $dataSet[] = $value;
+                    // $model->fill((array) $value);
+                    // $pesertaKelas->insert($model);
                 } catch (\Throwable $th) {
                     continue;
                 }
             }
         }
+        $pesertaKelas->insertBatch($dataSet);
+        
         // return response()->setJSON($data);
     }
 
