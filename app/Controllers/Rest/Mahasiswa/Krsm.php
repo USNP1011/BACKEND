@@ -12,12 +12,12 @@ class Krsm extends ResourceController
         try {
             $profile = getProfile();
             $object = new \App\Models\PerkuliahanMahasiswaModel();
+            $sum = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->countAllResults();
+            $semester = new \App\Models\SemesterModel();
+            $itemKuliah = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1, $sum > 1 ? 1 : 0)->first();
+            $skala = new \App\Models\SkalaSKSModel();
+            $itemSkala = $skala->where("ips_min<='" . $itemKuliah->ips . "' AND ips_max>='" . $itemKuliah->ips . "'")->first();
             if ($object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->first()->sks_semester == 0) {
-                $semester = new \App\Models\SemesterModel();
-                $sum = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->countAllResults();
-                $itemKuliah = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1, $sum > 1 ? 1 : 0)->first();
-                $skala = new \App\Models\SkalaSKSModel();
-                $itemSkala = $skala->where("ips_min<='" . $itemKuliah->ips . "' AND ips_max>='" . $itemKuliah->ips . "'")->first();
                 if ($semester->where('a_periode_aktif', 1)->where("DATE(batas_pengisian_krsm)>=CURDATE()")->countAllResults() > 0) {
                     $object = new \App\Models\TempKrsmModel();
                     $data = $object->select('temp_krsm.*, semester.nama_semester')->join('semester', 'semester.id_semester=temp_krsm.id_semester')
@@ -57,7 +57,8 @@ class Krsm extends ResourceController
                             ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = peserta_kelas.id_riwayat_pendidikan', 'left')
                             ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)
                             ->where('kelas_kuliah.id_semester', $semester->id_semester)
-                            ->findAll()
+                            ->findAll(),
+                        'sks_max' => $sum <= 2 ? 20 : (int)$itemSkala->sks_max
                     ]
                 ]);
             }
