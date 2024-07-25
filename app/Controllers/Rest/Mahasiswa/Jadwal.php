@@ -40,7 +40,7 @@ class Jadwal extends ResourceController
                 ->groupStart()
                 ->orLike('`matakuliah`.`nama_mata_kuliah`', $param->cari)
                 ->groupEnd()
-                ->paginate(5, 'default', 1)
+                ->paginate(200, 'default', 1)
         ]);
     }
 }
