@@ -40,7 +40,7 @@ class Kelas extends ResourceController
     {
         try {
             $item = $this->request->getJSON();
-            $object = new \App\Models\DosenWaliModel();
+            $object = new \App\Models\KelasModel();
             $object->update($item->id, $item);
             return $this->respond([
                 'status' => true,
