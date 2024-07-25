@@ -49,6 +49,7 @@ class Semester extends ResourceController
                 $kuliah = new \App\Models\PerkuliahanMahasiswaModel();
                 $kuliah->insertBatch($tempMhs);
                 $param->status_kuliah = "1";
+                $param->a_periode_aktif = "1";
             }
             $model->fill((array)$param);
             $object->set('a_periode_aktif', '0')->where('a_periode_aktif', '1')->update();
