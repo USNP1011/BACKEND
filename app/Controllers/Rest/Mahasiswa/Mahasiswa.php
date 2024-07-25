@@ -8,12 +8,7 @@ use App\Models\NilaiTransferModel;
 use App\Models\PerkuliahanMahasiswaModel;
 use App\Models\PesertaKelasModel;
 use App\Models\RiwayatPendidikanMahasiswaModel;
-use App\Models\UserRoleModel;
-use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
-use Ramsey\Uuid\Uuid;
-use CodeIgniter\Database\Exceptions\DatabaseException;
-use CodeIgniter\Shield\Entities\User;
 
 class Mahasiswa extends ResourceController
 {
@@ -24,7 +19,6 @@ class Mahasiswa extends ResourceController
 
     public function byUserId($id = null)
     {
-        $mahasiswa = new MahasiswaModel();
         return $this->respond([
             'status' => true,
             'data' => getProfile()

@@ -2,9 +2,7 @@
 
 namespace App\Controllers\Rest\Mahasiswa;
 
-use App\Models\KelasKuliahModel;
 use CodeIgniter\RESTful\ResourceController;
-use CodeIgniter\Database\Exceptions\DatabaseException;
 use Ramsey\Uuid\Uuid;
 
 class Krsm extends ResourceController

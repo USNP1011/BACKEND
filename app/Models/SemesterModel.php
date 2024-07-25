@@ -16,6 +16,7 @@ class SemesterModel extends Model
 		'semester',
 		'a_periode_aktif',
 		'tanggal_mulai',
-		'tanggal_selesai'
+		'tanggal_selesai',
+        'status_kuliah'
     ];
 }

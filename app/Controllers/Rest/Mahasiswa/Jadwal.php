@@ -4,7 +4,6 @@ namespace App\Controllers\Rest\Mahasiswa;
 
 use App\Models\KelasKuliahModel;
 use CodeIgniter\RESTful\ResourceController;
-use Ramsey\Uuid\Uuid;
 
 class Jadwal extends ResourceController
 {

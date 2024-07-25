@@ -3,7 +3,6 @@
 namespace App\Controllers\Rest\Mahasiswa;
 
 use CodeIgniter\RESTful\ResourceController;
-use CodeIgniter\Database\Exceptions\DatabaseException;
 use Ramsey\Uuid\Uuid;
 
 class Khsm extends ResourceController

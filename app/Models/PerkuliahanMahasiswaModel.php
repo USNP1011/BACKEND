@@ -19,7 +19,6 @@ class PerkuliahanMahasiswaModel extends Model
         'nim',
         'nama_mahasiswa',
         'angkatan',
-        'id_prodi',
         'nama_program_studi',
 		'id_status_mahasiswa',
 		'nama_status_mahasiswa',

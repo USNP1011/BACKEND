@@ -3,8 +3,6 @@
 namespace App\Controllers\Rest\Dosen;
 
 use CodeIgniter\RESTful\ResourceController;
-use CodeIgniter\Database\Exceptions\DatabaseException;
-use Ramsey\Uuid\Uuid;
 
 class Perwalian extends ResourceController
 {
@@ -14,7 +12,7 @@ class Perwalian extends ResourceController
         $object = new \App\Models\DosenWaliModel();
         return $this->respond([
             'status' => true,
-            'data' => $object->select("dosen_wali.id, dosen_wali.id_dosen, dosen_wali.id_riwayat_pendidikan, riwayat_pendidikan_mahasiswa.nim, mahasiswa.nama_mahasiswa, prodi.nama_program_studi, prodi.kode_program_studi, (SELECT perkuliahan_mahasiswa.sks_total from perkuliahan_mahasiswa where id_mahasiswa = mahasiswa.id AND sks_total != '0' order by id_semester desc limit 1) as sks_total, (SELECT jenis_keluar.jenis_keluar FROM mahasiswa_lulus_do LEFT JOIN jenis_keluar on jenis_keluar.id_jenis_keluar = mahasiswa_lulus_do.id_jenis_keluar WHERE mahasiswa_lulus_do.id_riwayat_pendidikan = riwayat_pendidikan_mahasiswa.id  limit 1) as nama_jenis_keluar, (SELECT status_mahasiswa.nama_status_mahasiswa FROM perkuliahan_mahasiswa LEFT JOIN status_mahasiswa ON status_mahasiswa.id_status_mahasiswa=perkuliahan_mahasiswa.id_status_mahasiswa order by perkuliahan_mahasiswa.created_at desc limit 1) as nama_status_mahasiswa")
+            'data' => $object->select("dosen_wali.id, dosen_wali.id_dosen, dosen_wali.id_riwayat_pendidikan, riwayat_pendidikan_mahasiswa.nim, mahasiswa.nama_mahasiswa, prodi.nama_program_studi, prodi.kode_program_studi, (SELECT perkuliahan_mahasiswa.sks_total from perkuliahan_mahasiswa where id_mahasiswa = mahasiswa.id AND sks_total != '0' order by id_semester desc limit 1) as sks_total, (SELECT jenis_keluar.jenis_keluar FROM mahasiswa_lulus_do LEFT JOIN jenis_keluar on jenis_keluar.id_jenis_keluar = mahasiswa_lulus_do.id_jenis_keluar WHERE mahasiswa_lulus_do.id_riwayat_pendidikan = riwayat_pendidikan_mahasiswa.id  limit 1) as nama_jenis_keluar, (SELECT status_mahasiswa.nama_status_mahasiswa FROM perkuliahan_mahasiswa LEFT JOIN status_mahasiswa ON status_mahasiswa.id_status_mahasiswa=perkuliahan_mahasiswa.id_status_mahasiswa order by perkuliahan_mahasiswa.created_at desc limit 1) as nama_status_mahasiswa, (SELECT ips from perkuliahan_mahasiswa where perkuliahan_mahasiswa.id_riwayat_pendidikan = dosen_wali.id_riwayat_pendidikan order by id_semester desc limit 1,1) as ips, (SELECT ipk from perkuliahan_mahasiswa where perkuliahan_mahasiswa.id_riwayat_pendidikan = dosen_wali.id_riwayat_pendidikan order by id_semester desc limit 1,1) as ipk")
                 ->join('dosen', 'dosen.id_dosen=dosen_wali.id_dosen', 'left')
                 ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=dosen_wali.id_riwayat_pendidikan')
                 ->join('mahasiswa', 'mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa', 'left')
@@ -36,7 +34,7 @@ class Perwalian extends ResourceController
         $detail = new \App\Models\TempPesertaKelasModel();
         return $this->respond([
             'status' => true,
-            'data' => is_null($id) ? $object->select("temp_krsm.id, temp_krsm.id_riwayat_pendidikan, temp_krsm.id_tahapan, temp_krsm.id_semester, temp_krsm.created_at as tanggal_pengajuan, mahasiswa.nama_mahasiswa, riwayat_pendidikan_mahasiswa.nim, prodi.nama_program_studi, prodi.kode_program_studi, (SELECT sum(matakuliah.sks_mata_kuliah) FROM `temp_peserta_kelas` LEFT JOIN `kelas_kuliah` ON `kelas_kuliah`.`id` = `temp_peserta_kelas`.`kelas_kuliah_id` LEFT JOIN `matakuliah` ON `kelas_kuliah`.`matakuliah_id` = `matakuliah`.`id`) as total_sks_pengajuan, (SELECT ips from perkuliahan_mahasiswa where id_riwayat_pendidikan = 'ec23eeb6-21bc-483b-9ccf-042b12a720ce' order by id_semester desc limit 1,1) as ips, (SELECT ipk from perkuliahan_mahasiswa where id_riwayat_pendidikan = 'ec23eeb6-21bc-483b-9ccf-042b12a720ce' order by id_semester desc limit 1,1) as ipk")
+            'data' => is_null($id) ? $object->select("temp_krsm.id, temp_krsm.id_riwayat_pendidikan, temp_krsm.id_tahapan, temp_krsm.id_semester, temp_krsm.created_at as tanggal_pengajuan, mahasiswa.nama_mahasiswa, riwayat_pendidikan_mahasiswa.nim, prodi.nama_program_studi, prodi.kode_program_studi, (SELECT sum(matakuliah.sks_mata_kuliah) FROM `temp_peserta_kelas` LEFT JOIN `kelas_kuliah` ON `kelas_kuliah`.`id` = `temp_peserta_kelas`.`kelas_kuliah_id` LEFT JOIN `matakuliah` ON `kelas_kuliah`.`matakuliah_id` = `matakuliah`.`id`) as total_sks_pengajuan, (SELECT ips from perkuliahan_mahasiswa where perkuliahan_mahasiswa.id_riwayat_pendidikan = temp_krsm.id_riwayat_pendidikan order by id_semester desc limit 1,1) as ips, (SELECT ipk from perkuliahan_mahasiswa where perkuliahan_mahasiswa.id_riwayat_pendidikan = temp_krsm.id_riwayat_pendidikan order by id_semester desc limit 1,1) as ipk")
             ->join("riwayat_pendidikan_mahasiswa", "riwayat_pendidikan_mahasiswa.id=temp_krsm.id_riwayat_pendidikan", "left")
             ->join("mahasiswa", "mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa", "left")
             ->join('prodi', 'prodi.id_prodi=riwayat_pendidikan_mahasiswa.id_prodi', 'left')

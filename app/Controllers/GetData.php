@@ -453,18 +453,25 @@ class GetData extends BaseController
 
     public function anggota_aktivitas_mahasiswa()
     {
-        $anggotaAktivitasMahasiswa = new \App\Models\AnggotaAktivitasModel();
-        $aktivitas = new \App\Models\AktivitasMahasiswaModel();
-        $data = $this->api->getData('GetListAnggotaAktivitasMahasiswa', $this->token);
-        if ($data->error_code == 100) {
-            $this->token = $this->api->getToken()->data->token;
+        try {
+            $anggotaAktivitasMahasiswa = new \App\Models\AnggotaAktivitasModel();
+            $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
+            $aktivitas = new \App\Models\AktivitasMahasiswaModel();
             $data = $this->api->getData('GetListAnggotaAktivitasMahasiswa', $this->token);
-        }
-        foreach ($data->data as $key => $value) {
-            $value->id = Uuid::uuid4()->toString();
-            $itemAktivitas = $aktivitas->where('id_aktivitas', $value->id_aktivitas)->first();
-            $value->aktivitas_mahasiswa_id = $itemAktivitas->id;
-            $anggotaAktivitasMahasiswa->insert($value);
+            if ($data->error_code == 100) {
+                $this->token = $this->api->getToken()->data->token;
+                $data = $this->api->getData('GetListAnggotaAktivitasMahasiswa', $this->token);
+            }
+            foreach ($data->data as $key => $value) {
+                $value->id = Uuid::uuid4()->toString();
+                $itemAktivitas = $aktivitas->where('id_aktivitas', $value->id_aktivitas)->first();
+                $value->aktivitas_mahasiswa_id = $itemAktivitas->id;
+                $itemRiwayat = $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
+                $value->id_riwayat_pendidikan = $itemRiwayat->id;
+                $anggotaAktivitasMahasiswa->insert($value);
+            }
+        } catch (\Throwable $th) {
+            echo $th->getMessage();
         }
     }
 
