@@ -8,7 +8,7 @@ class KaprodiModel extends Model
     protected $primaryKey = 'id';    
     protected $useAutoIncrement = false;
     protected $returnType       = 'App\Entities\KaprodiEntity';
-    protected $useSoftDeletes   = false;
+    protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields = [
         'id_dosen',
@@ -17,4 +17,11 @@ class KaprodiModel extends Model
         'tanggal_sk',
         'status'
     ];
+
+    protected bool $allowEmptyInserts = false;
+    protected $useTimestamps = true;
+    protected $dateFormat    = 'datetime';
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
 }

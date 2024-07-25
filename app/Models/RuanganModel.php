@@ -6,7 +6,7 @@ class RuanganModel extends Model
 {
     protected $table = 'ruangan';
     protected $primaryKey = 'id';    
-    protected $useAutoIncrement = false;
+    protected $useAutoIncrement = true;
     protected $returnType       = 'object';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;

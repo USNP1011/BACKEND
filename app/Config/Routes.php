@@ -72,7 +72,6 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->post('register', 'AuthController::register');
     $routes->post('login', 'AuthController::login');
     $routes->get('perguruanTinggi', 'Referensi\PerguruanTinggi::store', ['filter' => 'general']);
-    $routes->get('prodi', 'Referensi\Prodi::store', ['filter' => 'general']);
     $routes->get('agama', 'Referensi\Agama::store', ['filter' => 'general']);
     $routes->get('penghasilan', 'Referensi\Penghasilan::store', ['filter' => 'general']);
     $routes->get('jenis_evaluasi', 'Referensi\JenisEvaluasi::store', ['filter' => 'general']);
@@ -100,6 +99,11 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->get('pengajar_kelas', 'Referensi\PengajarKelas::store', ['filter' => 'general']);
     $routes->get('dosen', 'Referensi\Dosen::store', ['filter' => 'general']);
     $routes->get('dosen/(:any)', 'Referensi\Dosen::store/$1', ['filter' => 'general']);
+
+
+    $routes->group('prodi', function($routes){
+        $routes->get('', 'Referensi\Prodi::store', ['filter' => 'general']);
+    });
 
     $routes->group('kelas', function($routes){
         $routes->get('', 'Referensi\Kelas::store');
