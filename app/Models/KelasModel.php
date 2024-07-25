@@ -6,7 +6,7 @@ class KelasModel extends Model
 {
     protected $table = 'kelas';
     protected $primaryKey = 'id';    
-    protected $useAutoIncrement = false;
+    protected $useAutoIncrement = true;
     protected $returnType       = 'object';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;

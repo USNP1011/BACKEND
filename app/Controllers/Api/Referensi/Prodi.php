@@ -13,7 +13,7 @@ class Prodi extends ResourceController
         $object = new ProdiModel();
         return $this->respond([
             'status' => true,
-            'data' => $object->findAll()
+            'data' => $object->select('prodi.*, ')->findAll()
         ]);
     }
 }
