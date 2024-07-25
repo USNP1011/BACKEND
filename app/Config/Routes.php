@@ -103,6 +103,9 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
 
     $routes->group('prodi', function($routes){
         $routes->get('', 'Referensi\Prodi::store', ['filter' => 'general']);
+        $routes->get('kaprodi/(:hash)', 'Referensi\Prodi::kaprodi/$1', ['filter' => 'general']);
+        $routes->post('kaprodi', 'Referensi\Prodi::createKaprodi', ['filter' => 'general']);
+        $routes->put('kaprodi', 'Referensi\Prodi::UpdateKaprodi', ['filter' => 'general']);
     });
 
     $routes->group('kelas', function($routes){
