@@ -28,10 +28,7 @@ class Ruangan extends ResourceController
                 'data' => $item
             ]);
         } catch (\Throwable $th) {
-            return $this->fail([
-                'status' => false,
-                'message' => $th->getMessage()
-            ]);
+            return $this->fail($th->getMessage());
         }
     }
 
@@ -46,10 +43,7 @@ class Ruangan extends ResourceController
                 'status' => true,
             ]);
         } catch (\Throwable $th) {
-            return $this->fail([
-                'status' => false,
-                'message' => $th->getMessage()
-            ]);
+            return $this->fail($th->getMessage());
         }
     }
 
@@ -64,10 +58,7 @@ class Ruangan extends ResourceController
                 'message' => 'successful deleted',
             ]);
         } catch (\Throwable $th) {
-            return $this->fail([
-                'status' => false,
-                'message' => $th->getMessage()
-            ]);
+            return $this->fail($th->getMessage());
         }
     }
 }
