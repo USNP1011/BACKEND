@@ -217,7 +217,7 @@ class AuthController extends ResourceController
             $userObject->addToDefaultGroup($itemData);
             $itemRole = [
                 'users_id' => $itemData->id,
-                'role_id' => $request->role == "Dosen" ? 2 : 1
+                'role_id' => $request->role == "Dosen" ? 2 : 4
             ];
             $itemData->forcePasswordReset();
             $itemData->activate();
