@@ -36,15 +36,24 @@ class Prodi extends ResourceController
     public function createKaprodi() {
         $object = new KaprodiModel();
         $param = $this->request->getJSON();
+        $conn = \Config\Database::connect();
         try {
+            $conn->transException(true)->transStart();
             $param->id = Uuid::uuid4()->toString();
             $param->status = '1';
             $object->set('status', '1')->update();
             $role = new \App\Models\UserRoleModel();
-            // $item
+            $dosen = new \App\Models\DosenModel();
+            $itemDosen = $dosen->where('id_dosen', $param->id_dosen)->first();
+            $itemRole = [
+                'role_id'=>'3',
+                'users_id'=>$itemDosen->id_user
+            ];
+            $role->insert($itemRole);
             $model = new \App\Entities\KaprodiEntity();
             $model->fill((array)$param);
             $object->insert($model);
+            $conn->transComplete();
             return $this->respond([
                 'status'=>true,
                 'data'=>$param
