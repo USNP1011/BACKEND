@@ -35,13 +35,13 @@ class Jadwal extends ResourceController
                 ->join("ruangan", "`ruangan`.`id` = `kelas_kuliah`.`ruangan_id`", "left")
                 ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id')
                 ->join('dosen', 'dosen_pengajar_kelas.id_dosen=dosen.id_dosen')
-                ->groupStart()
-                ->like('`matakuliah`.`nama_mata_kuliah`', $param->cari)
-                // ->orLike('`dosen`.`nama_dosen`', $param->cari)
-                // ->orLike('`matakuliah`.`kode_mata_kuliah`', $param->cari)
-                ->groupEnd()
                 ->where("prodi.id_prodi", $profile->id_prodi)
                 ->where("kelas_kuliah.id_semester", $semester->id_semester)
+                ->groupStart()
+                ->orLike('`matakuliah`.`nama_mata_kuliah`', $param->cari)
+                ->orLike('`dosen`.`nama_dosen`', $param->cari)
+                ->orLike('`matakuliah`.`kode_mata_kuliah`', $param->cari)
+                ->groupEnd()
                 ->paginate(10, 'default', 1)
         ]);
     }
