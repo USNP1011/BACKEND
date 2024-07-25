@@ -99,13 +99,14 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->get('pengajar_kelas', 'Referensi\PengajarKelas::store', ['filter' => 'general']);
     $routes->get('dosen', 'Referensi\Dosen::store', ['filter' => 'general']);
     $routes->get('dosen/(:any)', 'Referensi\Dosen::store/$1', ['filter' => 'general']);
+    $routes->get('prodi', 'Referensi\Prodi::store', ['filter' => 'general']);
 
 
-    $routes->group('prodi', function($routes){
-        $routes->get('', 'Referensi\Prodi::store', ['filter' => 'general']);
-        $routes->get('kaprodi/(:hash)', 'Referensi\Prodi::kaprodi/$1', ['filter' => 'auth']);
-        $routes->post('kaprodi', 'Referensi\Prodi::createKaprodi', ['filter' => 'auth']);
-        $routes->put('kaprodi', 'Referensi\Prodi::UpdateKaprodi', ['filter' => 'auth']);
+    $routes->group('kaprodi', ['filter' => 'auth'], function($routes){
+        $routes->get('', 'Kaprodi::store');
+        $routes->get('(:hash)', 'Kaprodi::store/$1');
+        $routes->post('', 'Kaprodi::create');
+        $routes->put('', 'Kaprodi::update');
     });
 
     $routes->group('kelas', function($routes){
