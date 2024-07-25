@@ -181,7 +181,7 @@ class AuthController extends ResourceController
                 $itemDosen = $dsn->where('id_dosen', $request->id)->first();
                 $itemUser = [
                     'username' => $itemDosen->nidn,
-                    'email' => $itemDosen->email,
+                    'email' => $itemDosen->email ?? ($itemDosen->nidn."@usn-papua.ac.id"),
                     'password' => $itemDosen->nidn,
                 ];
             } else if ($request->role == "Mahasiswa") {

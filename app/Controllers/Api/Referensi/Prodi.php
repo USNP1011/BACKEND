@@ -40,6 +40,8 @@ class Prodi extends ResourceController
             $param->id = Uuid::uuid4()->toString();
             $param->status = '1';
             $object->set('status', '1')->update();
+            $role = new \App\Models\UserRoleModel();
+            // $item
             $model = new \App\Entities\KaprodiEntity();
             $model->fill((array)$param);
             $object->insert($model);
