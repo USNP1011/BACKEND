@@ -11,8 +11,9 @@ class Krsm extends ResourceController
     {
         try {
             $profile = getProfile();
+            $semester = getSemesterAktif();
             $object = new \App\Models\PerkuliahanMahasiswaModel();
-            if ($object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->first()->sks_semester == 0) {
+            if ($object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->where('id_semester', $semester->id_semester)->orderBy('id_semester', 'desc')->first()->sks_semester == 0) {
                 $sum = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->countAllResults();
                 $semester = new \App\Models\SemesterModel();
                 $itemKuliah = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1, $sum > 1 ? 1 : 0)->first();

@@ -14,7 +14,7 @@ class Semester extends ResourceController
         $object = new SemesterModel();
         return $this->respond([
             'status' => true,
-            'data' => $id == null ? $object->findAll() : $object->where('id_semester', $id)->first()
+            'data' => $id == null ? $object->where("id_semester>='20231'")->findAll() : $object->where('id_semester', $id)->first()
         ]);
     }
 
@@ -27,7 +27,7 @@ class Semester extends ResourceController
             $object = new \App\Models\SemesterModel();
             $model = new \App\Entities\Semester();
             $itemSemester = $object->where('id_semester', $param->id_semester)->first();
-            if($itemSemester->status_kuliah=='0' || is_null($itemSemester->status_kuliah)){
+            if(($itemSemester->status_kuliah=='0' || is_null($itemSemester->status_kuliah)) && substr($param->id_semester, -1) < 3){
                 $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
                 $dataRiwayat = $riwayat->select("riwayat_pendidikan_mahasiswa.id, (SELECT jenis_keluar.jenis_keluar FROM mahasiswa_lulus_do LEFT JOIN jenis_keluar on jenis_keluar.id_jenis_keluar = mahasiswa_lulus_do.id_jenis_keluar WHERE mahasiswa_lulus_do.id_riwayat_pendidikan = riwayat_pendidikan_mahasiswa.id  limit 1) as nama_jenis_keluar")->findAll();
                 $tempMhs = [];

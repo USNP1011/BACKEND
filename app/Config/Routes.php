@@ -152,14 +152,14 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     
     $routes->group('mahasiswa', ['filter' => 'auth'], function($routes){
         $routes->get('', 'Mahasiswa::show');
-        $routes->get('(:any)', 'Mahasiswa::show/$1');
-        $routes->get('(:any)/riwayat_pendidikan', 'Mahasiswa::show/$1/$2');
-        $routes->get('(:any)/nilai_transfer', 'Mahasiswa::show/$1/$2');
-        $routes->get('(:any)/krsm', 'Mahasiswa::show/$1/$2');
-        $routes->get('(:any)/aktivitas_kuliah', 'Mahasiswa::show/$1/$2');
+        $routes->get('(:hash)', 'Mahasiswa::show/$1');
+        $routes->get('(:hash)/riwayat_pendidikan', 'Mahasiswa::show/$1/$2');
+        $routes->get('(:hash)/nilai_transfer', 'Mahasiswa::show/$1/$2');
+        $routes->get('(:hash)/krsm', 'Mahasiswa::show/$1/$2');
+        $routes->get('(:hash)/aktivitas_kuliah', 'Mahasiswa::show/$1/$2');
         $routes->post('', 'Mahasiswa::create');
         $routes->put('', 'Mahasiswa::update');
-        $routes->delete('/(:any)', 'Mahasiswa::delete/$1');
+        $routes->delete('(:hash)', 'Mahasiswa::delete/$1');
     });
     $routes->post('mahasiswa_paginate', 'Mahasiswa::paginate', ['filter' => 'auth']);
 
