@@ -32,7 +32,7 @@ class Kaprodi extends ResourceController
                 ->select("kaprodi.*, dosen.nama_dosen, prodi.nama_program_studi")
                 ->join('dosen', 'dosen.id_dosen=kaprodi.id_dosen', 'left')
                 ->join('prodi', 'prodi.id_prodi=kaprodi.id_prodi', 'left')
-                ->where('kelas_kuliah.id', $id)->first()
+                ->where('kaprodi.id', $id)->first()
         ]);
     }
 
