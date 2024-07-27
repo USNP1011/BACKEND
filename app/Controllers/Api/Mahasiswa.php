@@ -21,65 +21,24 @@ class Mahasiswa extends ResourceController
     {
         helper('semester');
     }
-    public function show($id = null, $req = null)
+    public function show($id = null)
     {
-        if (is_null($req)) {
-            $mahasiswa = new MahasiswaModel();
-            return $this->respond([
-                'status' => true,
-                'data' => $id == null ? $mahasiswa
-                    ->select("mahasiswa.*, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.nama_program_studi, riwayat_pendidikan_mahasiswa.angkatan, (SELECT jenis_keluar.jenis_keluar FROM mahasiswa_lulus_do LEFT JOIN jenis_keluar on jenis_keluar.id_jenis_keluar = mahasiswa_lulus_do.id_jenis_keluar WHERE mahasiswa_lulus_do.id_riwayat_pendidikan = riwayat_pendidikan_mahasiswa.id  limit 1) as nama_jenis_keluar, (SELECT status_mahasiswa.nama_status_mahasiswa FROM perkuliahan_mahasiswa LEFT JOIN status_mahasiswa ON status_mahasiswa.id_status_mahasiswa=perkuliahan_mahasiswa.id_status_mahasiswa order by perkuliahan_mahasiswa.created_at desc limit 1) as nama_status_mahasiswa")
-                    ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id', 'left')
-                    ->groupBy('mahasiswa.id')
-                    ->findAll() : $mahasiswa
-                    ->select("mahasiswa.*, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.nama_program_studi, riwayat_pendidikan_mahasiswa.angkatan, wilayah.nama_wilayah, agama.nama_agama, prodi.nama_program_studi, jenis_transportasi.nama_alat_transportasi")
-                    ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id', 'left')
-                    ->join('wilayah', 'wilayah.id_wilayah=mahasiswa.id_wilayah', 'left')
-                    ->join("agama", "agama.id_agama=mahasiswa.id_agama", "LEFT")
-                    ->join("prodi", "riwayat_pendidikan_mahasiswa.id_prodi=prodi.id_prodi", "LEFT")
-                    ->join("jenis_transportasi", "jenis_transportasi.id_alat_transportasi=mahasiswa.id_alat_transportasi", "LEFT")
-                    ->where('mahasiswa.id', $id)->first()
-            ]);
-        } else {
-            if ($req == 'riwayat_pendidikan') {
-                $object = new RiwayatPendidikanMahasiswaModel();
-                return $this->respond([
-                    'status' => true,
-                    'data' => $object->where('id_mahasiswa', $id)->findAll()
-                ]);
-            } else if ($req == 'nilai_transfer') {
-                $object = new NilaiTransferModel();
-                return $this->respond([
-                    'status' => true,
-                    'data' => $object->select("nilai_transfer.*")
-                        ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = nilai_transfer.id_riwayat_pendidikan', 'left')
-                        ->join('mahasiswa', 'mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa', 'left')
-                        ->where('mahasiswa.id', $id)->findAll()
-                ]);
-            } else if ($req == 'krsm') {
-                $semester = getSemesterAktif();
-                $object = new PesertaKelasModel();
-                return $this->respond([
-                    'status' => true,
-                    'data' => $object->select("kelas_kuliah.*")
-                        ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
-                        ->where('peserta_kelas.mahasiswa_id', $id)
-                        ->where('kelas_kuliah.id_semester', $semester->id_semester)
-                        ->findAll()
-                ]);
-            } else if ($req == 'aktivitas_kuliah') {
-                $object = new PerkuliahanMahasiswaModel();
-                return $this->respond([
-                    'status' => true,
-                    'data' => $object
-                        ->where('perkuliahan_mahasiswa.id_mahasiswa', $id)
-                        ->orderBy('id_semester', 'asc')
-                        ->findAll()
-                ]);
-            } else {
-                return $this->failNotFound("Parameter yang anda masukkan tidak sesuai");
-            }
-        }
+        $mahasiswa = new MahasiswaModel();
+        return $this->respond([
+            'status' => true,
+            'data' => $id == null ? $mahasiswa
+                ->select("mahasiswa.*, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.nama_program_studi, riwayat_pendidikan_mahasiswa.angkatan, (SELECT jenis_keluar.jenis_keluar FROM mahasiswa_lulus_do LEFT JOIN jenis_keluar on jenis_keluar.id_jenis_keluar = mahasiswa_lulus_do.id_jenis_keluar WHERE mahasiswa_lulus_do.id_riwayat_pendidikan = riwayat_pendidikan_mahasiswa.id  limit 1) as nama_jenis_keluar, (SELECT status_mahasiswa.nama_status_mahasiswa FROM perkuliahan_mahasiswa LEFT JOIN status_mahasiswa ON status_mahasiswa.id_status_mahasiswa=perkuliahan_mahasiswa.id_status_mahasiswa order by perkuliahan_mahasiswa.created_at desc limit 1) as nama_status_mahasiswa")
+                ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id', 'left')
+                ->groupBy('mahasiswa.id')
+                ->findAll() : $mahasiswa
+                ->select("mahasiswa.*, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.nama_program_studi, riwayat_pendidikan_mahasiswa.angkatan, wilayah.nama_wilayah, agama.nama_agama, prodi.nama_program_studi, jenis_transportasi.nama_alat_transportasi")
+                ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id', 'left')
+                ->join('wilayah', 'wilayah.id_wilayah=mahasiswa.id_wilayah', 'left')
+                ->join("agama", "agama.id_agama=mahasiswa.id_agama", "LEFT")
+                ->join("prodi", "riwayat_pendidikan_mahasiswa.id_prodi=prodi.id_prodi", "LEFT")
+                ->join("jenis_transportasi", "jenis_transportasi.id_alat_transportasi=mahasiswa.id_alat_transportasi", "LEFT")
+                ->where('mahasiswa.id', $id)->first()
+        ]);
     }
 
     /**
@@ -87,6 +46,53 @@ class Mahasiswa extends ResourceController
      *
      * @return ResponseInterface
      */
+    public function riwayatPendidikan($id = null)
+    {
+        $object = new RiwayatPendidikanMahasiswaModel();
+        return $this->respond([
+            'status' => true,
+            'data' => $object->where('id_mahasiswa', $id)->findAll()
+        ]);
+    }
+
+    public function nilaiTransfer($id = null)
+    {
+        $object = new NilaiTransferModel();
+        return $this->respond([
+            'status' => true,
+            'data' => $object->select("nilai_transfer.*")
+                ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = nilai_transfer.id_riwayat_pendidikan', 'left')
+                ->join('mahasiswa', 'mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa', 'left')
+                ->where('mahasiswa.id', $id)->findAll()
+        ]);
+    }
+
+    public function krsm($id = null)
+    {
+        $semester = getSemesterAktif();
+        $object = new PesertaKelasModel();
+        return $this->respond([
+            'status' => true,
+            'data' => $object->select("kelas_kuliah.*")
+                ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
+                ->where('peserta_kelas.mahasiswa_id', $id)
+                ->where('kelas_kuliah.id_semester', $semester->id_semester)
+                ->findAll()
+        ]);
+    }
+
+    public function aktivitasKuliah($id = null)
+    {
+        $object = new PerkuliahanMahasiswaModel();
+        return $this->respond([
+            'status' => true,
+            'data' => $object
+                ->where('perkuliahan_mahasiswa.id_mahasiswa', $id)
+                ->orderBy('id_semester', 'asc')
+                ->findAll()
+        ]);
+    }
+
     public function byUserId($id = null)
     {
         $mahasiswa = new MahasiswaModel();
@@ -136,7 +142,7 @@ class Mahasiswa extends ResourceController
         } catch (DatabaseException $th) {
             return $this->failValidationErrors([
                 'status' => false,
-                'message' => $th->getCode() == 1062 ? "Mahasiswa dengan nama, tempat, tanggal lahir dan ibu kandung yang sama sudah ada": "Maaf, Terjadi kesalahan, silahkan hubungi bagian pengembang!",
+                'message' => $th->getCode() == 1062 ? "Mahasiswa dengan nama, tempat, tanggal lahir dan ibu kandung yang sama sudah ada" : "Maaf, Terjadi kesalahan, silahkan hubungi bagian pengembang!",
             ]);
         }
     }
