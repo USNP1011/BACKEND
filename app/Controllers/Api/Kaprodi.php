@@ -41,19 +41,22 @@ class Kaprodi extends ResourceController
         $object = new KaprodiModel();
         $param = $this->request->getJSON();
         $conn = \Config\Database::connect();
+        $role = new \App\Models\UserRoleModel();
+        $dosen = new \App\Models\DosenModel();
         try {
             $conn->transException(true)->transStart();
             $param->id = Uuid::uuid4()->toString();
             $param->status = '1';
             // Get Kaprodi Lama dan set tidak aktif
             $itemOldKaprodi = $object->where('id_prodi', $param->id_prodi)->where('status', '1')->first();
-            $object->set('status', '1')->update();
-            // End
-            $role = new \App\Models\UserRoleModel();
-            $dosen = new \App\Models\DosenModel();
-            // Get Data Dosen berdasarkan Kaprodi Lama untuk menghapus userRole
-            $itemOldDosen = $dosen->where('id_dosen', $itemOldKaprodi->id_dosen)->first();
-            $role->where('role_id', '3')->where('users_id', $itemOldDosen->id_user)->delete();
+            if (!is_null($itemOldKaprodi)) {
+                $object->set('status', '1')->update();
+                // Get Data Dosen berdasarkan Kaprodi Lama untuk menghapus userRole
+                $itemOldDosen = $dosen->where('id_dosen', $itemOldKaprodi->id_dosen)->first();
+                if (!is_null($itemOldDosen))
+                    $role->where('role_id', '3')->where('users_id', $itemOldDosen->id_user)->delete();
+                // End
+            }
             // End
             // Tambahkan role prodi untuk kaprodi baru
             $itemDosen = $dosen->where('id_dosen', $param->id_dosen)->first();
