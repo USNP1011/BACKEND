@@ -305,22 +305,7 @@ class Validation extends BaseConfig
             "errors" => [
                 "required" => "id_semester Tidak Boleh Kosong"
             ]
-        ],
-        "nama_mahasiswa" => [
-            "label" => "nama_mahasiswa",
-            "rules" => "required",
-            "errors" => [
-                "required" => "nama_mahasiswa Tidak Boleh Kosong"
-            ]
-        ],
-        "nim" => [
-            "label" => "nim",
-            "rules" => "required",
-            "errors" => [
-                "required" => "nim Tidak Boleh Kosong"
-            ]
-        ],
-        
+        ]
     ];
 
     public array $matakuliahKurikulum = [
