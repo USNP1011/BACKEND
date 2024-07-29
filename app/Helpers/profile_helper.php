@@ -26,14 +26,16 @@ function getProfile() {
         ->join("jenis_transportasi", "jenis_transportasi.id_alat_transportasi=mahasiswa.id_alat_transportasi", "LEFT")
         ->where('id_user', $data->uid)->first();
     }else{
-        if(!$prodi){
-            $object = new \App\Models\DosenModel();
-            $profile = $object->select("dosen.*, prodi.nama_program_studi, (SELECT nama_program_studi FROM kaprodi LEFT JOIN prodi on prodi.id_prodi=kaprodi.id_prodi WHERE kaprodi.id_prodi=penugasan_dosen.id_prodi AND kaprodi.status='1' LIMIT 1) as kaprodi")
-            ->join('penugasan_dosen', 'penugasan_dosen.id_dosen=dosen.id_dosen', 'left')
-            ->join('prodi', 'penugasan_dosen.id_prodi=prodi.id_prodi', 'left')
-            ->where('id_user', $data->uid)->first();
-        }else{
-
+        $object = new \App\Models\DosenModel();
+        $profile = $object->select("dosen.*, prodi.nama_program_studi")
+        ->join('penugasan_dosen', 'penugasan_dosen.id_dosen=dosen.id_dosen', 'left')
+        ->join('prodi', 'penugasan_dosen.id_prodi=prodi.id_prodi', 'left')
+        ->where('id_user', $data->uid)->first();
+        if($prodi){
+            $kaprodi = new \App\Models\KaprodiModel();
+            $profile->kaprodi = $kaprodi->select('kaprodi.id, kaprodi.id_prodi, prodi.nama_program_studi, kaprodi.no_sk, kaprodi.tanggal_sk')
+            ->join('prodi', 'prodi.id_prodi=kaprodi.id_prodi', 'left')
+            ->where('id_dosen', $profile->id_dosen)->first();
         }
     }
     return $profile;

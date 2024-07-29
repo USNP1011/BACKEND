@@ -17,6 +17,7 @@ use App\Filters\AdminAuth;
 use App\Filters\DosenAuth;
 use App\Filters\GeneralAuth;
 use App\Filters\MahasiswaAuth;
+use App\Filters\ProdiAuth;
 
 class Filters extends BaseFilters
 {
@@ -44,6 +45,7 @@ class Filters extends BaseFilters
         'mahasiswa'     => MahasiswaAuth::class,
         'dosen'         => DosenAuth::class,
         'general'       => GeneralAuth::class,
+        'prodi'         => ProdiAuth::class,
     ];
 
     /**

@@ -213,7 +213,7 @@ class Mahasiswa extends ResourceController
 
     public function paginate($page = 1, $count = 10, $cari = null)
     {
-        $item = $this->request->getJSON();
+        $param = $this->request->getJSON();
         $object = model(MahasiswaModel::class);
         $item = [
             'status' => true,
@@ -221,11 +221,11 @@ class Mahasiswa extends ResourceController
                 ->join("agama", "agama.id_agama=mahasiswa.id_agama", "LEFT")
                 ->join("riwayat_pendidikan_mahasiswa", "riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id", "LEFT")
                 ->join("prodi", "riwayat_pendidikan_mahasiswa.id_prodi=prodi.id_prodi", "LEFT")
-                ->like('mahasiswa.nama_mahasiswa', $item->cari)
-                ->orLike('riwayat_pendidikan_mahasiswa.nim', $item->cari)
-                ->orLike('prodi.nama_program_studi', $item->cari)
-                ->orderBy('mahasiswa.created_at', 'desc')
-                ->paginate($item->count, 'default', $item->page),
+                ->like('mahasiswa.nama_mahasiswa', $param->cari)
+                ->orLike('riwayat_pendidikan_mahasiswa.nim', $param->cari)
+                ->orLike('prodi.nama_program_studi', $param->cari)
+                ->orderBy(isset($param->order) && $param->order != "" ? $param->order->field : 'mahasiswa.created_at', isset($param->order) && $param->order != "" ? $param->order->direction : 'desc')
+                ->paginate($param->count, 'default', $param->page),
             'pager' => $object->pager->getDetails()
         ];
         return $this->respond($item);

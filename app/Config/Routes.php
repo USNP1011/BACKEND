@@ -101,6 +101,10 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->get('dosen/(:any)', 'Referensi\Dosen::store/$1', ['filter' => 'general']);
     $routes->get('prodi', 'Referensi\Prodi::store', ['filter' => 'general']);
 
+    $routes->group('user', ['filter' => 'auth'], function($routes){
+        $routes->get('dosen', 'User::dosen');
+        $routes->get('mahasiswa', 'User::mahasiswa');
+    });
 
     $routes->group('kaprodi', ['filter' => 'auth'], function($routes){
         $routes->get('', 'Kaprodi::store');
@@ -319,11 +323,21 @@ $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($
         $routes->get('pengajuan', 'Dosen\Perwalian::pengajuan');
         $routes->get('pengajuan/(:hash)', 'Dosen\Perwalian::pengajuan/$1');
         $routes->post('pengajuan', 'Dosen\Perwalian::updatePengajuan');
-        $routes->post('', 'Perwalian\Krsm::create/$1');
-        $routes->delete('(:hash)', 'Perwalian\Krsm::deleted/$1');
     });
 
     $routes->group('dosen', ['filter' => 'dosen'], function($routes){
         $routes->get('profile', 'Dosen\Dosen::profile');
+    });
+
+    //Prodi
+    $routes->group('approve', ['filter' => 'prodi'], function($routes){
+        $routes->get('mahasiswa', 'Prodi\Perwalian::show');
+        $routes->get('pengajuan', 'Prodi\Perwalian::pengajuan');
+        $routes->get('pengajuan/(:hash)', 'Prodi\Perwalian::pengajuan/$1');
+        $routes->post('pengajuan', 'Prodi\Perwalian::updatePengajuan');
+    });
+
+    $routes->group('prodi', ['filter' => 'dosen'], function($routes){
+        $routes->get('profile', 'Prodi\Prodi::profile');
     });
 });

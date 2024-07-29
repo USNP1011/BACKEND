@@ -25,6 +25,10 @@ class Role extends Seeder
                 'id'=>4,
                 'role'=>'Mahasiswa'
             ],
+            [
+                'id'=>5,
+                'role'=>'Keuangan'
+            ],
         ];
 
         foreach ($data as $key => $value) {
