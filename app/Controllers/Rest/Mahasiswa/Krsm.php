@@ -40,7 +40,16 @@ class Krsm extends ResourceController
                     } else {
                         return $this->respond([
                             'status' => true,
-                            'data' => ["pengajuan" => "belum pengajuan", "matakuliah" => null, 'roles' => ['sks_max' => $sum <= 2 ? 20 : (int)$itemSkala->sks_max]]
+                            'data' => [
+                                "pengajuan" => "belum pengajuan",
+                                "matakuliah" => [
+                                    'id_riwayat_pendidikan' => $profile->id_riwayat_pendidikan,
+                                    'id_semester' => $semester->id_semester,
+                                    'nama_semester' => $semester->nama_semester,
+                                    'detail' => []
+                                ],
+                                'roles' => ['sks_max' => $sum <= 2 ? 20 : (int)$itemSkala->sks_max]
+                            ]
                         ]);
                     }
                 } else {
@@ -50,24 +59,24 @@ class Krsm extends ResourceController
                 $semester = getSemesterAktif();
                 $object = new \App\Models\PesertaKelasModel();
                 $items = $object->select("kelas_kuliah.*, kelas.nama_kelas_kuliah")
-                ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
-                ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = peserta_kelas.id_riwayat_pendidikan', 'left')
-                ->join('kelas', 'kelas.id = kelas_kuliah.kelas_id', 'left')
-                ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)
-                ->where('kelas_kuliah.id_semester', $semester->id_semester)
-                ->findAll();
+                    ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
+                    ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = peserta_kelas.id_riwayat_pendidikan', 'left')
+                    ->join('kelas', 'kelas.id = kelas_kuliah.kelas_id', 'left')
+                    ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)
+                    ->where('kelas_kuliah.id_semester', $semester->id_semester)
+                    ->findAll();
                 $matakuliah = [
-                    'id_riwayat_pendidikan'=>$profile->id_riwayat_pendidikan, 
-                    'id_semester'=>$semester->id_semester,
-                    'nama_semester'=>$semester->nama_semester,
-                    'detail'=>$items
+                    'id_riwayat_pendidikan' => $profile->id_riwayat_pendidikan,
+                    'id_semester' => $semester->id_semester,
+                    'nama_semester' => $semester->nama_semester,
+                    'detail' => $items
                 ];
                 return $this->respond([
                     'status' => true,
                     'data' => [
                         "pengajuan" => "Aktif",
                         "matakuliah" => $matakuliah,
-                        "roles"=>['sks_max'=>0]
+                        "roles" => ['sks_max' => 0]
                     ]
                 ]);
             }
@@ -108,18 +117,18 @@ class Krsm extends ResourceController
             $temPeserta = new \App\Models\TempPesertaKelasModel();
             $numInsert = 0;
             foreach ($param as $key => $value) {
-                if(is_null($value->id)){
+                if (is_null($value->id)) {
                     $value->id = Uuid::uuid4()->toString();
                     $value->temp_krsm_id = $krsm['id'];
                     $value->id_riwayat_pendidikan = $profile->id_riwayat_pendidikan;
                     $temPeserta->save($value);
-                    $numInsert+=1;
+                    $numInsert += 1;
                 }
             }
             $conn->transComplete();
             return $this->respond([
                 'status' => true,
-                'message'=> $numInsert." Ditambahkan",
+                'message' => $numInsert . " Ditambahkan",
                 'data' => $param
             ]);
         } catch (\Throwable $th) {

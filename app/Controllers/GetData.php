@@ -781,24 +781,40 @@ class GetData extends BaseController
             }
         }
         $pesertaKelas->insertBatch($dataSet);
-        
+
         // return response()->setJSON($data);
     }
 
     public function nilai_kelas()
     {
         $pesertaKelas = new \App\Models\PesertaKelasModel();
-
         $data = $this->api->getData('GetDetailNilaiPerkuliahanKelas', $this->token, "");
         if ($data->error_code == 100) {
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetDetailNilaiPerkuliahanKelas', $this->token);
         }
-        foreach ($data->data as $key => $value) {
-            $value->id = Uuid::uuid4()->toString();
-            $pesertaKelas->insert($value);
+        $conn = \Config\Database::connect();
+        try {
+            $conn->transException(true)->transStart();
+            $dataUpdate = [];
+            foreach ($data->data as $key => $value) {
+                $itemKelas = $pesertaKelas->select('peserta_kelas.id')
+                    ->join('kelas_kuliah', 'kelas_kuliah.id=peserta_kelas.kelas_kuliah_id', 'left')
+                    ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=peserta_kelas.id_riwayat_pendidikan', 'left')
+                    ->where('kelas_kuliah.id_kelas_kuliah', $value->id_kelas_kuliah)->where('riwayat_pendidikan_mahasiswa.id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
+                $itemUpdate = [
+                    'id'=>$itemKelas->id,
+                    'nilai_angka'=>$value->nilai_angka,
+                    'nilai_huruf'=>$value->nilai_huruf,
+                    'nilai_indeks'=>$value->nilai_indeks,
+                ];
+                $dataUpdate[] = $itemUpdate;
+            }
+            $pesertaKelas->updateBatch($dataUpdate, 'id');
+            $conn->transComplete();
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage());
         }
-        // return response()->setJSON($data);
     }
 
     function dosenWali()
