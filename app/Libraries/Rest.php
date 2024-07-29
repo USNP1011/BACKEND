@@ -12,6 +12,8 @@ class Rest
             // CURLOPT_URL => 'http://103.160.119.51:3003/ws/sandbox2.php',
             // CURLOPT_URL => 'http://localhost:3003/ws/live2.php',
             CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => 0,
+            CURLOPT_SSL_VERIFYHOST => 0,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 0,
@@ -40,12 +42,11 @@ class Rest
     function getToken()
     {
         $curl = curl_init();
-
         curl_setopt_array($curl, [
             CURLOPT_URL => 'https://feeder.usn-papua.ac.id/ws/live2.php',
-            // CURLOPT_URL => "http://103.160.119.51:3003/ws/sandbox2.php",
-            // CURLOPT_URL => "http://localhost:3003/ws/live2.php",
             CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => 0,
+            CURLOPT_SSL_VERIFYHOST => 0,
             CURLOPT_ENCODING => "",
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -53,8 +54,7 @@ class Rest
             CURLOPT_CUSTOMREQUEST => "POST",
             CURLOPT_POSTFIELDS => "{\n    \"act\":\"GetToken\",\n    \"username\":\"sherifadjie@gmail.com\",\n    \"password\":\"UNYsepnop1011.\"\n}",
             CURLOPT_HTTPHEADER => [
-                "Content-Type: application/json",
-                "User-Agent: insomnia/9.2.0"
+                "Content-Type: application/json"
             ],
         ]);
 
