@@ -24,7 +24,6 @@ class GetData extends BaseController
         $this->pt = new PerguruanTinggiModel();
         try {
             $this->token = $this->api->getToken()->data->token;
-            dd($this->token);
         } catch (\Throwable $th) {
             echo $th->getMessage();
         }
