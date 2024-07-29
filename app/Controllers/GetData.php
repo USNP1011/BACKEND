@@ -796,10 +796,6 @@ class GetData extends BaseController
         $conn = \Config\Database::connect();
         try {
             $data = $this->api->getData('GetDetailNilaiPerkuliahanKelas', $this->token, "");
-            if ($data->error_code == 100) {
-                $this->token = $this->api->getToken()->data->token;
-                $data = $this->api->getData('GetDetailNilaiPerkuliahanKelas', $this->token);
-            }
             $conn->transException(true)->transStart();
             $dataUpdate = [];
             foreach ($data->data as $key => $value) {
