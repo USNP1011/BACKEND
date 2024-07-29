@@ -116,7 +116,9 @@ class Krsm extends ResourceController
                 $krsm['nama_tahapan'] = $itemTahapan->tahapan;
                 $krsm['nama_semester'] = $semester->nama_semester;
             } else {
-                $krsm = $temKrsm->asArray()->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->first();
+                $krsm = $temKrsm->asArray()->select('temp_krsm.*, semester.nama_semester')
+                ->join('semester', 'semester.id_semester=temp_krsm.id_semester', 'left')
+                ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->first();
             }
             $temPeserta = new \App\Models\TempPesertaKelasModel();
             $numInsert = 0;
