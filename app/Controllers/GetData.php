@@ -802,13 +802,15 @@ class GetData extends BaseController
                     ->join('kelas_kuliah', 'kelas_kuliah.id=peserta_kelas.kelas_kuliah_id', 'left')
                     ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=peserta_kelas.id_riwayat_pendidikan', 'left')
                     ->where('kelas_kuliah.id_kelas_kuliah', $value->id_kelas_kuliah)->where('riwayat_pendidikan_mahasiswa.id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
-                $itemUpdate = [
-                    'id'=>$itemKelas->id,
-                    'nilai_angka'=>$value->nilai_angka,
-                    'nilai_huruf'=>$value->nilai_huruf,
-                    'nilai_indeks'=>$value->nilai_indeks,
-                ];
-                $dataUpdate[] = $itemUpdate;
+                if (!is_null($itemKelas)) {
+                    $itemUpdate = [
+                        'id' => $itemKelas->id,
+                        'nilai_angka' => $value->nilai_angka,
+                        'nilai_huruf' => $value->nilai_huruf,
+                        'nilai_indeks' => $value->nilai_indeks,
+                    ];
+                    $dataUpdate[] = $itemUpdate;
+                }
             }
             $pesertaKelas->updateBatch($dataUpdate, 'id');
             $conn->transComplete();
