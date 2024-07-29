@@ -15,11 +15,11 @@ class Krsm extends ResourceController
             $object = new \App\Models\PerkuliahanMahasiswaModel();
             if ($object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->where('id_semester', $semester->id_semester)->orderBy('id_semester', 'desc')->first()->sks_semester == 0) {
                 $sum = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->countAllResults();
-                $semester = new \App\Models\SemesterModel();
+                $smt = new \App\Models\SemesterModel();
                 $itemKuliah = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1, $sum > 1 ? 1 : 0)->first();
                 $skala = new \App\Models\SkalaSKSModel();
                 $itemSkala = $skala->where("ips_min<='" . $itemKuliah->ips . "' AND ips_max>='" . $itemKuliah->ips . "'")->first();
-                if ($semester->where('a_periode_aktif', 1)->where("DATE(batas_pengisian_krsm)>=CURDATE()")->countAllResults() > 0) {
+                if ($smt->where('a_periode_aktif', 1)->where("DATE(batas_pengisian_krsm)>=CURDATE()")->countAllResults() > 0) {
                     $object = new \App\Models\TempKrsmModel();
                     $data = $object->select('temp_krsm.*, semester.nama_semester')->join('semester', 'semester.id_semester=temp_krsm.id_semester')
                         ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->first();
@@ -56,7 +56,6 @@ class Krsm extends ResourceController
                     return $this->fail('Pengisian KRSM telah ditutup, silahkan hubungi bagian BAAK');
                 }
             } else {
-                $semester = getSemesterAktif();
                 $object = new \App\Models\PesertaKelasModel();
                 $items = $object->select("kelas_kuliah.*, kelas.nama_kelas_kuliah")
                     ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
