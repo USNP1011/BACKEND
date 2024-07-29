@@ -88,6 +88,7 @@ class Krsm extends ResourceController
     {
         $conn = \Config\Database::connect();
         $profile = getProfile();
+        $semester = getSemesterAktif();
         $object = new \App\Models\PerkuliahanMahasiswaModel();
         $sum = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->countAllResults();
         $itemKuliah = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1, $sum > 1 ? 1 : 0)->first();
@@ -102,14 +103,18 @@ class Krsm extends ResourceController
             }, 0) > $itemSkala->sks_max) {
                 throw new \Exception('SKS yang dipilih melebihi ' . $itemSkala->sks_max . 'SKS', 1);
             }
+            $tahapan = new \App\Models\TahapanModel();
+            $itemTahapan = $tahapan->where('id', '1')->first();
             if ($temKrsm->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->countAllResults() == 0) {
                 $krsm = [
                     'id' => Uuid::uuid4()->toString(),
                     'id_riwayat_pendidikan' => $profile->id_riwayat_pendidikan,
                     'id_tahapan' => '1',
-                    'id_semester' => getSemesterAktif()->id_semester
+                    'id_semester' => $semester->id_semester
                 ];
                 $temKrsm->insert($krsm);
+                $krsm['nama_tahapan'] = $itemTahapan->tahapan;
+                $krsm['nama_semester'] = $semester->nama_semester;
             } else {
                 $krsm = $temKrsm->asArray()->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->first();
             }
@@ -124,11 +129,15 @@ class Krsm extends ResourceController
                     $numInsert += 1;
                 }
             }
+            $krsm['detail'] = $param;
             $conn->transComplete();
             return $this->respond([
                 'status' => true,
-                'message' => $numInsert . " Ditambahkan",
-                'data' => $param
+                'data' => [
+                    "pengajuan" => $itemTahapan->tahapan,
+                    "matakuliah" => $krsm,
+                    "roles" => ['sks_max' => $itemSkala->sks_max]
+                ]
             ]);
         } catch (\Throwable $th) {
             $conn->transRollback();
