@@ -22,7 +22,11 @@ class GetData extends BaseController
     {
         $this->api = new Rest();
         $this->pt = new PerguruanTinggiModel();
-        $this->token = $this->api->getToken()->data->token;
+        try {
+            $this->token = $this->api->getToken()->data->token;
+        } catch (\Throwable $th) {
+            echo $th->getMessage();
+        }
     }
     public function index()
     {
