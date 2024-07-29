@@ -18,7 +18,7 @@ function getProfile() {
     if($mhs){
         $object = new \App\Models\MahasiswaModel();
         $profile = $object
-        ->select("mahasiswa.*, riwayat_pendidikan_mahasiswa.id as id_riwayat_pendidikan, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.id_prodi, prodi.nama_program_studi, riwayat_pendidikan_mahasiswa.angkatan, wilayah.nama_wilayah, agama.nama_agama, prodi.nama_program_studi, jenis_transportasi.nama_alat_transportasi")
+        ->select("mahasiswa.*, riwayat_pendidikan_mahasiswa.id as id_riwayat_pendidikan, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.id_prodi, prodi.nama_program_studi, riwayat_pendidikan_mahasiswa.angkatan, wilayah.nama_wilayah, agama.nama_agama, prodi.nama_program_studi, jenis_transportasi.nama_alat_transportasi, (SELECT dosen.nama_dosen FROM dosen_wali LEFT JOIN dosen on dosen.id_dosen = dosen_wali.id_dosen WHERE dosen_wali.id_riwayat_pendidikan = id_riwayat_pendidikan LIMIT 1) as dosen_wali")
         ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id', 'left')
         ->join('wilayah', 'wilayah.id_wilayah=mahasiswa.id_wilayah', 'left')
         ->join("agama", "agama.id_agama=mahasiswa.id_agama", "LEFT")
