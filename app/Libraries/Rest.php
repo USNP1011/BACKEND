@@ -9,8 +9,6 @@ class Rest
         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_URL => 'https://feeder.usn-papua.ac.id/ws/live2.php',
-            // CURLOPT_URL => 'http://103.160.119.51:3003/ws/sandbox2.php',
-            // CURLOPT_URL => 'http://localhost:3003/ws/live2.php',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_SSL_VERIFYPEER => 0,
             CURLOPT_SSL_VERIFYHOST => 0,
@@ -41,6 +39,7 @@ class Rest
 
     function getToken()
     {
+        
         $curl = curl_init();
         curl_setopt_array($curl, [
             CURLOPT_URL => 'https://feeder.usn-papua.ac.id/ws/live2.php',
