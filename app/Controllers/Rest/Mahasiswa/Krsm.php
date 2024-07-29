@@ -65,7 +65,7 @@ class Krsm extends ResourceController
                 return $this->respond([
                     'status' => true,
                     'data' => [
-                        "pengajuan" => "finish",
+                        "pengajuan" => "Aktif",
                         "matakuliah" => $matakuliah,
                         "roles"=>['sks_max'=>0]
                     ]
