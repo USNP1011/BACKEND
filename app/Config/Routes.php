@@ -102,8 +102,11 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->get('prodi', 'Referensi\Prodi::store', ['filter' => 'general']);
 
     $routes->group('user', ['filter' => 'auth'], function($routes){
-        $routes->get('dosen', 'User::dosen');
-        $routes->get('mahasiswa', 'User::mahasiswa');
+        $routes->get('', 'Referensi\SkalaSKS::store');
+        $routes->get('(:hash)', 'Referensi\SkalaSKS::store/$1');
+        $routes->post('', 'Referensi\SkalaSKS::create');
+        $routes->put('', 'Referensi\SkalaSKS::update');
+        $routes->delete('(:hash)', 'Referensi\SkalaSKS::delete/$1');
     });
 
     $routes->group('kaprodi', ['filter' => 'auth'], function($routes){
