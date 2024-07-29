@@ -16,7 +16,7 @@ class Khsm extends ResourceController
             'data' => $object->select("peserta_kelas.*, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah")
                 ->join('kelas_kuliah', 'kelas_kuliah.id=peserta_kelas.kelas_kuliah_id', 'left')
                 ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id')
-                ->where('kelas_kuliahh.id_semester', $id)
+                ->where('kelas_kuliah.id_semester', $id)
                 ->where('peserta_kelas.id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->findAll()
         ]);
         try {
