@@ -49,17 +49,25 @@ class Krsm extends ResourceController
             } else {
                 $semester = getSemesterAktif();
                 $object = new \App\Models\PesertaKelasModel();
+                $items = $object->select("kelas_kuliah.*, kelas.nama_kelas_kuliah")
+                ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
+                ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = peserta_kelas.id_riwayat_pendidikan', 'left')
+                ->join('kelas', 'kelas.id = kelas_kuliah.kelas_id', 'left')
+                ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)
+                ->where('kelas_kuliah.id_semester', $semester->id_semester)
+                ->findAll();
+                $matakuliah = [
+                    'id_riwayat_pendidikan'=>$profile->id_riwayat_pendidikan, 
+                    'id_semester'=>$semester->id_semester,
+                    'nama_semester'=>$semester->nama_semester,
+                    'detail'=>$items
+                ];
                 return $this->respond([
                     'status' => true,
                     'data' => [
                         "pengajuan" => "finish",
-                        "matakuliah" => $object->select("kelas_kuliah.*, kelas.nama_kelas_kuliah")
-                            ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
-                            ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = peserta_kelas.id_riwayat_pendidikan', 'left')
-                            ->join('kelas', 'kelas.id = kelas_kuliah.kelas_id', 'left')
-                            ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)
-                            ->where('kelas_kuliah.id_semester', $semester->id_semester)
-                            ->findAll()
+                        "matakuliah" => $matakuliah,
+                        "roles"=>['sks_max'=>0]
                     ]
                 ]);
             }
