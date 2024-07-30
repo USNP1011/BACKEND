@@ -43,6 +43,7 @@ class Perwalian extends ResourceController
                         ->where('temp_krsm.id_semester', $semester->id_semester)->where('id_tahapan', 1)->findAll()
                 ]);
             } else {
+                $tahapan = new \App\Models\TahapanModel();
                 $itemMhs = $object->where('id', $id)->first();
                 $detail = is_null($id) ? $object->select("temp_krsm.id, temp_krsm.id_riwayat_pendidikan, temp_krsm.id_tahapan, temp_krsm.id_semester, temp_krsm.created_at as tanggal_pengajuan, mahasiswa.nama_mahasiswa, riwayat_pendidikan_mahasiswa.nim, prodi.id_prodi, prodi.nama_program_studi, prodi.kode_program_studi, (SELECT sum(matakuliah.sks_mata_kuliah) FROM `temp_peserta_kelas` LEFT JOIN `kelas_kuliah` ON `kelas_kuliah`.`id` = `temp_peserta_kelas`.`kelas_kuliah_id` LEFT JOIN `matakuliah` ON `kelas_kuliah`.`matakuliah_id` = `matakuliah`.`id`) as total_sks_pengajuan, (SELECT ips from perkuliahan_mahasiswa where perkuliahan_mahasiswa.id_riwayat_pendidikan = temp_krsm.id_riwayat_pendidikan order by id_semester desc limit 1,1) as ips, (SELECT ipk from perkuliahan_mahasiswa where perkuliahan_mahasiswa.id_riwayat_pendidikan = temp_krsm.id_riwayat_pendidikan order by id_semester desc limit 1,1) as ipk")
                     ->join("riwayat_pendidikan_mahasiswa", "riwayat_pendidikan_mahasiswa.id=temp_krsm.id_riwayat_pendidikan", "left")
@@ -54,15 +55,23 @@ class Perwalian extends ResourceController
                     ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
                     ->where('temp_krsm_id', $id)
                     ->findAll();
+                $itemTahapan = $tahapan->where('id', $itemMhs->id_tahapan)->first();
+                $object = new \App\Models\PerkuliahanMahasiswaModel();
+                $sum = $object->where('id_riwayat_pendidikan', $itemMhs->id_riwayat_pendidikan)->countAllResults();
+                $itemKuliah = $object->where('id_riwayat_pendidikan', $itemMhs->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1, $sum > 1 ? 1 : 0)->first();
+                $skala = new \App\Models\SkalaSKSModel();
+                $itemSkala = $skala->where("ips_min<='" . $itemKuliah->ips . "' AND ips_max>='" . $itemKuliah->ips . "'")->first();
                 return $this->respond([
                     'status' => true,
                     'data' => [
+                        "pengajuan" => $itemTahapan->tahapan,
                         'matakuliah' => [
                             'id_riwayat_pendidikan' => $itemMhs->id_riwayat_pendidikan,
                             'id_semester' => $itemMhs->id_semester,
                             'nama_semester' => $semester->nama_semester,
                             'detail' => $detail
-                        ]
+                        ],
+                        'roles' => ['sks_max' => $sum <= 2 ? 20 : (int)$itemSkala->sks_max]
                     ]
                 ]);
             }
