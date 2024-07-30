@@ -328,7 +328,7 @@ $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($
         $routes->get('pengajuan', 'Dosen\Perwalian::pengajuan');
         $routes->get('pengajuan/(:hash)', 'Dosen\Perwalian::pengajuan/$1');
         $routes->get('jadwal/(:hash)', 'Dosen\Jadwal::show/$1');
-        $routes->post('pengajuan', 'Dosen\Perwalian::updatePengajuan');
+        $routes->post('', 'Dosen\Perwalian::updatePengajuan');
     });
 
     $routes->group('dosen', ['filter' => 'dosen'], function($routes){
