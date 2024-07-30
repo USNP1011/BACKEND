@@ -225,7 +225,7 @@ class Mahasiswa extends ResourceController
                 ->like('mahasiswa.nama_mahasiswa', $param->cari)
                 ->orLike('riwayat_pendidikan_mahasiswa.nim', $param->cari)
                 ->orLike('prodi.nama_program_studi', $param->cari)
-                ->orderBy(isset($param->order) && $param->order != "" ? $param->order->field : 'mahasiswa.created_at', isset($param->order) && $param->order != "" ? $param->order->direction : 'desc')
+                ->orderBy(isset($param->order) && $param->order->field != "" ? $param->order->field : 'mahasiswa.created_at', isset($param->order) && $param->order != "" ? $param->order->direction : 'desc')
                 ->paginate($param->count, 'default', $param->page),
             'pager' => $object->pager->getDetails()
         ];
