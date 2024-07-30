@@ -13,7 +13,6 @@ class PerkuliahanMahasiswaModel extends Model
     protected $allowedFields = [
         'id_registrasi_mahasiswa',
         'id_riwayat_pendidikan',
-        'id_mahasiswa',
 		'id_semester',
         'nama_semester',
         'nama_program_studi',
