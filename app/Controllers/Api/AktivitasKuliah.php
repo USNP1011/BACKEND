@@ -99,7 +99,8 @@ class AktivitasKuliah extends ResourceController
         $object = new PerkuliahanMahasiswaModel();
         $item = [
             'status' => true,
-            'data' => $object->paginate($param->count, 'default', $param->page),
+            'data' => $object->orderBy(isset($param->order) && $param->order != "" ? $param->order->field : 'perkuliahan_mahasiswa.created_at', isset($param->order) && $param->order != "" ? $param->order->direction : 'desc')
+            ->paginate($param->count, 'default', $param->page),
             'pager' => $object->pager->getDetails()
         ];
         return $this->respond($item);
