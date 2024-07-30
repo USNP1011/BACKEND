@@ -14,8 +14,6 @@ class DosenPengajarKelasModel extends Model
         'id_aktivitas_mengajar',
         'id_registrasi_dosen',
         'id_dosen', 
-        'nidn',
-        'nama_dosen',
 		'kelas_kuliah_id',
         'nama_kelas_kuliah',
 		'id_substansi',

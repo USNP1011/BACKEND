@@ -326,6 +326,7 @@ $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($
         $routes->get('mahasiswa', 'Dosen\Perwalian::show');
         $routes->get('pengajuan', 'Dosen\Perwalian::pengajuan');
         $routes->get('pengajuan/(:hash)', 'Dosen\Perwalian::pengajuan/$1');
+        $routes->get('jadwal/(:hash)', 'Dosen\Jadwal::show/$1');
         $routes->post('pengajuan', 'Dosen\Perwalian::updatePengajuan');
     });
 
