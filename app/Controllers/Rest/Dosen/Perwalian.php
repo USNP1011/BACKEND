@@ -43,7 +43,7 @@ class Perwalian extends ResourceController
                         ->where('temp_krsm.id_semester', $semester->id_semester)->where('id_tahapan', 1)->findAll()
                 ]);
             } else {
-                $tahapan = new \App\Models\TahapanModel();s
+                $tahapan = new \App\Models\TahapanModel();
                 $itemMhs = $object->select('temp_krsm.*, mahasiswa.nama_mahasiswa, riwayat_pendidikan_mahasiswa.nim,riwayat_pendidikan_mahasiswa.angkatan')
                 ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=temp_krsm.id_riwayat_pendidikan', 'left')
                 ->join('mahasiswa', 'mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa', 'left')
