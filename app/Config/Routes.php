@@ -309,7 +309,7 @@ $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($
         $routes->post('', 'Mahasiswa\Jadwal::show');
     });
 
-    $routes->group('krsm', ['filter' => 'mahasiswa'], function($routes){
+    $routes->group('krsm', ['filter' => 'general'], function($routes){
         $routes->get('', 'Mahasiswa\Krsm::show/$1');
         $routes->post('', 'Mahasiswa\Krsm::create/$1');
         $routes->delete('(:hash)', 'Mahasiswa\Krsm::deleted/$1');
