@@ -25,7 +25,6 @@ class RiwayatPendidikanMahasiswaModel extends Model
 		'id_prodi_asal',
 		'id_pembiayaan',
 		'id_jenis_keluar',
-		'nama_mahasiswa',
 		'nama_jenis_daftar',
 		'nama_periode_masuk',
 		'nama_perguruan_tinggi',

@@ -46,7 +46,7 @@ class AktivitasKuliah extends ResourceController
             return $this->respond([
                 'status' => true,
                 'data' => $model
-            ]); 
+            ]);
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,
@@ -54,7 +54,7 @@ class AktivitasKuliah extends ResourceController
             ]);
         }
     }
-    
+
     public function update($id = null)
     {
         try {
@@ -65,7 +65,7 @@ class AktivitasKuliah extends ResourceController
             return $this->respond([
                 'status' => true,
                 'data' => $model
-            ]); 
+            ]);
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,
@@ -74,7 +74,7 @@ class AktivitasKuliah extends ResourceController
         }
     }
 
-    
+
     public function delete($id = null)
     {
         try {
@@ -83,8 +83,8 @@ class AktivitasKuliah extends ResourceController
             return $this->respondDeleted([
                 'status' => true,
                 'message' => 'successful deleted',
-                'data'=>[]
-            ]); 
+                'data' => []
+            ]);
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,
@@ -99,11 +99,17 @@ class AktivitasKuliah extends ResourceController
         $object = new PerkuliahanMahasiswaModel();
         $item = [
             'status' => true,
-            'data' => $object->orderBy(isset($param->order) && $param->order != "" ? $param->order->field : 'perkuliahan_mahasiswa.created_at', isset($param->order) && $param->order != "" ? $param->order->direction : 'desc')
-            ->paginate($param->count, 'default', $param->page),
+            'data' => $object->select("perkuliahan_mahasiswa.*, mahasiswa.nama_mahasiswa, riwayat_pendidikan_mahasiswa.nim")
+                ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=perkuliahan_mahasiswa.id_riwayat_pendidikan', 'left')
+                ->join('mahasiswa', 'mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa', 'left')
+                ->groupStart()
+                ->like('mahasiswa.nama_mahasiswa', $param->cari)
+                ->orLike('riwayat_pendidikan_mahasiswa.nim', $param->cari)
+                ->groupEnd()
+                ->orderBy(isset($param->order) && $param->order != "" ? $param->order->field : 'perkuliahan_mahasiswa.created_at', isset($param->order) && $param->order != "" ? $param->order->direction : 'desc')
+                ->paginate($param->count, 'default', $param->page),
             'pager' => $object->pager->getDetails()
         ];
         return $this->respond($item);
     }
-    
 }
