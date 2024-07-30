@@ -105,12 +105,15 @@ class Krsm extends ResourceController
     //     ]);
     // }
 
-    function create()
+    function create($id=null)
     {
         $conn = \Config\Database::connect();
         $profile = getProfile();
         $semester = getSemesterAktif();
         $object = new \App\Models\PerkuliahanMahasiswaModel();
+        if(is_null($id)){
+            
+        }
         $sum = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->countAllResults();
         $itemKuliah = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1, $sum > 1 ? 1 : 0)->first();
         $skala = new \App\Models\SkalaSKSModel();
