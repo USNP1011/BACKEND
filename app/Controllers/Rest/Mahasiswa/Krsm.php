@@ -108,66 +108,122 @@ class Krsm extends ResourceController
     function create($id=null)
     {
         $conn = \Config\Database::connect();
-        $profile = getProfile();
-        $semester = getSemesterAktif();
         $object = new \App\Models\PerkuliahanMahasiswaModel();
+        $semester = getSemesterAktif();
         if(is_null($id)){
-            
-        }
-        $sum = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->countAllResults();
-        $itemKuliah = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1, $sum > 1 ? 1 : 0)->first();
-        $skala = new \App\Models\SkalaSKSModel();
-        $itemSkala = $skala->where("ips_min<='" . $itemKuliah->ips . "' AND ips_max>='" . $itemKuliah->ips . "'")->first();
-        try {
-            $conn->transException(true)->transStart();
-            $temKrsm = new \App\Models\TempKrsmModel();
-            $param = $this->request->getJSON();
-            if (array_reduce($param, function ($carry, $product) {
-                return $carry + $product->sks_mata_kuliah;
-            }, 0) > $itemSkala->sks_max) {
-                throw new \Exception('SKS yang dipilih melebihi ' . $itemSkala->sks_max . 'SKS', 1);
-            }
-            $tahapan = new \App\Models\TahapanModel();
-            $itemTahapan = $tahapan->where('id', '1')->first();
-            if ($temKrsm->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->countAllResults() == 0) {
-                $krsm = [
-                    'id' => Uuid::uuid4()->toString(),
-                    'id_riwayat_pendidikan' => $profile->id_riwayat_pendidikan,
-                    'id_tahapan' => '1',
-                    'id_semester' => $semester->id_semester
-                ];
-                $temKrsm->insert($krsm);
-                $krsm['nama_tahapan'] = $itemTahapan->tahapan;
-                $krsm['nama_semester'] = $semester->nama_semester;
-            } else {
-                $krsm = $temKrsm->asArray()->select('temp_krsm.*, semester.nama_semester')
-                    ->join('semester', 'semester.id_semester=temp_krsm.id_semester', 'left')
-                    ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->first();
-            }
-            $temPeserta = new \App\Models\TempPesertaKelasModel();
-            $numInsert = 0;
-            foreach ($param as $key => $value) {
-                if (is_null($value->id)) {
-                    $value->id = Uuid::uuid4()->toString();
-                    $value->temp_krsm_id = $krsm['id'];
-                    $value->id_riwayat_pendidikan = $profile->id_riwayat_pendidikan;
-                    $temPeserta->save($value);
-                    $numInsert += 1;
+            $profile = getProfile();
+            $sum = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->countAllResults();
+            $itemKuliah = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1, $sum > 1 ? 1 : 0)->first();
+            $skala = new \App\Models\SkalaSKSModel();
+            $itemSkala = $skala->where("ips_min<='" . $itemKuliah->ips . "' AND ips_max>='" . $itemKuliah->ips . "'")->first();
+            try {
+                $conn->transException(true)->transStart();
+                $temKrsm = new \App\Models\TempKrsmModel();
+                $param = $this->request->getJSON();
+                if (array_reduce($param, function ($carry, $product) {
+                    return $carry + $product->sks_mata_kuliah;
+                }, 0) > $itemSkala->sks_max) {
+                    throw new \Exception('SKS yang dipilih melebihi ' . $itemSkala->sks_max . 'SKS', 1);
                 }
+                $tahapan = new \App\Models\TahapanModel();
+                $itemTahapan = $tahapan->where('id', '1')->first();
+                if ($temKrsm->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->countAllResults() == 0) {
+                    $krsm = [
+                        'id' => Uuid::uuid4()->toString(),
+                        'id_riwayat_pendidikan' => $profile->id_riwayat_pendidikan,
+                        'id_tahapan' => '1',
+                        'id_semester' => $semester->id_semester
+                    ];
+                    $temKrsm->insert($krsm);
+                    $krsm['nama_tahapan'] = $itemTahapan->tahapan;
+                    $krsm['nama_semester'] = $semester->nama_semester;
+                } else {
+                    $krsm = $temKrsm->asArray()->select('temp_krsm.*, semester.nama_semester')
+                        ->join('semester', 'semester.id_semester=temp_krsm.id_semester', 'left')
+                        ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->first();
+                }
+                $temPeserta = new \App\Models\TempPesertaKelasModel();
+                $numInsert = 0;
+                foreach ($param as $key => $value) {
+                    if (is_null($value->id)) {
+                        $value->id = Uuid::uuid4()->toString();
+                        $value->temp_krsm_id = $krsm['id'];
+                        $value->id_riwayat_pendidikan = $profile->id_riwayat_pendidikan;
+                        $temPeserta->save($value);
+                        $numInsert += 1;
+                    }
+                }
+                $krsm['detail'] = $param;
+                $conn->transComplete();
+                return $this->respond([
+                    'status' => true,
+                    'data' => [
+                        "pengajuan" => $itemTahapan->tahapan,
+                        "matakuliah" => $krsm,
+                        "roles" => ['sks_max' => $itemSkala->sks_max]
+                    ]
+                ]);
+            } catch (\Throwable $th) {
+                $conn->transRollback();
+                return $this->fail(handleErrorDB($th->getCode()));
             }
-            $krsm['detail'] = $param;
-            $conn->transComplete();
-            return $this->respond([
-                'status' => true,
-                'data' => [
-                    "pengajuan" => $itemTahapan->tahapan,
-                    "matakuliah" => $krsm,
-                    "roles" => ['sks_max' => $itemSkala->sks_max]
-                ]
-            ]);
-        } catch (\Throwable $th) {
-            $conn->transRollback();
-            return $this->fail(handleErrorDB($th->getCode()));
+        }else{
+            $sum = $object->where('id_riwayat_pendidikan', $id)->countAllResults();
+            $itemKuliah = $object->where('id_riwayat_pendidikan', $id)->orderBy('id_semester', 'desc')->limit(1, $sum > 1 ? 1 : 0)->first();
+            $skala = new \App\Models\SkalaSKSModel();
+            $itemSkala = $skala->where("ips_min<='" . $itemKuliah->ips . "' AND ips_max>='" . $itemKuliah->ips . "'")->first();
+            try {
+                $conn->transException(true)->transStart();
+                $temKrsm = new \App\Models\TempKrsmModel();
+                $param = $this->request->getJSON();
+                if (array_reduce($param, function ($carry, $product) {
+                    return $carry + $product->sks_mata_kuliah;
+                }, 0) > $itemSkala->sks_max) {
+                    throw new \Exception('SKS yang dipilih melebihi ' . $itemSkala->sks_max . 'SKS', 1);
+                }
+                $tahapan = new \App\Models\TahapanModel();
+                $itemTahapan = $tahapan->where('id', '1')->first();
+                if ($temKrsm->where('id_riwayat_pendidikan', $id)->countAllResults() == 0) {
+                    $krsm = [
+                        'id' => Uuid::uuid4()->toString(),
+                        'id_riwayat_pendidikan' => $id,
+                        'id_tahapan' => '1',
+                        'id_semester' => $semester->id_semester
+                    ];
+                    $temKrsm->insert($krsm);
+                    $krsm['nama_tahapan'] = $itemTahapan->tahapan;
+                    $krsm['nama_semester'] = $semester->nama_semester;
+                } else {
+                    $krsm = $temKrsm->asArray()->select('temp_krsm.*, semester.nama_semester')
+                        ->join('semester', 'semester.id_semester=temp_krsm.id_semester', 'left')
+                        ->where('id_riwayat_pendidikan', $id)->first();
+                }
+                $temPeserta = new \App\Models\TempPesertaKelasModel();
+                $numInsert = 0;
+                foreach ($param as $key => $value) {
+                    if (is_null($value->id)) {
+                        $value->id = Uuid::uuid4()->toString();
+                        $value->temp_krsm_id = $krsm['id'];
+                        $value->id_riwayat_pendidikan = $id;
+                        $temPeserta->save($value);
+                        $numInsert += 1;
+                    }
+                }
+                $krsm['detail'] = $param;
+                $conn->transComplete();
+                return $this->respond([
+                    'status' => true,
+                    'data' => [
+                        "pengajuan" => $itemTahapan->tahapan,
+                        "matakuliah" => $krsm,
+                        "roles" => ['sks_max' => $itemSkala->sks_max]
+                    ]
+                ]);
+            } catch (\Throwable $th) {
+                $conn->transRollback();
+                return $this->fail(handleErrorDB($th->getCode()));
+            }
+
         }
     }
 
