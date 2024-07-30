@@ -92,4 +92,17 @@ class AktivitasKuliah extends ResourceController
             ]);
         }
     }
+
+    public function paginate($page = 1, $count = 10, $cari = null)
+    {
+        $param = $this->request->getJSON();
+        $object = new PerkuliahanMahasiswaModel();
+        $item = [
+            'status' => true,
+            'data' => $object->paginate($param->count, 'default', $param->page),
+            'pager' => $object->pager->getDetails()
+        ];
+        return $this->respond($item);
+    }
+    
 }

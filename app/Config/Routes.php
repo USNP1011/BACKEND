@@ -200,6 +200,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->group('aktivitas_kuliah', ['filter' => 'auth'], function($routes){
         $routes->get('', 'AktivitasKuliah::show');
         $routes->get('(:hash)', 'AktivitasKuliah::show/$1');
+        $routes->post('paginate', 'AktivitasKuliah::paginate');
         $routes->post('', 'AktivitasKuliah::create');
         $routes->put('', 'AktivitasKuliah::update');
         $routes->delete('(:hash)', 'AktivitasKuliah::delete/$1');
