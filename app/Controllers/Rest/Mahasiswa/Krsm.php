@@ -87,6 +87,24 @@ class Krsm extends ResourceController
         }
     }
 
+    // public function getKRSM($id_registrasi, $id_semester)
+    // {
+    //     $object = new \App\Models\PesertaKelasModel();
+    //     return $this->respond([
+    //         'status' => true,
+    //         'data' => $object->select("kelas_kuliah.*, kelas.nama_kelas_kuliah, matakuliah.sks_mata_kuliah, penugasan_dosen.nidn, penugasan_dosen.nama_dosen")
+    //             ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
+    //             ->join('matakuliah', 'kelas_kuliah.matakuliah_id = matakuliah.id', 'left')
+    //             ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id = kelas_kuliah.id', 'left')
+    //             ->join('penugasan_dosen', 'penugasan_dosen.id_registrasi_dosen = dosen_pengajar_kelas.id_registrasi_dosen', 'left')
+    //             ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = peserta_kelas.id_riwayat_pendidikan', 'left')
+    //             ->join('kelas', 'kelas.id = kelas_kuliah.kelas_id', 'left')
+    //             ->where('id_riwayat_pendidikan', $id_registrasi)
+    //             ->where('kelas_kuliah.id_semester', $id_semester)
+    //             ->findAll()
+    //     ]);
+    // }
+
     function create()
     {
         $conn = \Config\Database::connect();
@@ -120,8 +138,8 @@ class Krsm extends ResourceController
                 $krsm['nama_semester'] = $semester->nama_semester;
             } else {
                 $krsm = $temKrsm->asArray()->select('temp_krsm.*, semester.nama_semester')
-                ->join('semester', 'semester.id_semester=temp_krsm.id_semester', 'left')
-                ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->first();
+                    ->join('semester', 'semester.id_semester=temp_krsm.id_semester', 'left')
+                    ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->first();
             }
             $temPeserta = new \App\Models\TempPesertaKelasModel();
             $numInsert = 0;

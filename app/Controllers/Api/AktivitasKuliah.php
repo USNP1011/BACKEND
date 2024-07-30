@@ -99,7 +99,7 @@ class AktivitasKuliah extends ResourceController
         $object = new PerkuliahanMahasiswaModel();
         $item = [
             'status' => true,
-            'data' => $object->select("perkuliahan_mahasiswa.*, mahasiswa.nama_mahasiswa, riwayat_pendidikan_mahasiswa.nim")
+            'data' => $object->select("perkuliahan_mahasiswa.*, mahasiswa.nama_mahasiswa, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.id_mahasiswa as mahasiswa_id")
                 ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=perkuliahan_mahasiswa.id_riwayat_pendidikan', 'left')
                 ->join('mahasiswa', 'mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa', 'left')
                 ->groupStart()

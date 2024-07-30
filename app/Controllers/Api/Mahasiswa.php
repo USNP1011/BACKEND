@@ -75,7 +75,8 @@ class Mahasiswa extends ResourceController
             'status' => true,
             'data' => $object->select("kelas_kuliah.*")
                 ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
-                ->where('peserta_kelas.mahasiswa_id', $id)
+                ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = peserta_kelas.id_riwayat_pendidikan', 'left')
+                ->where('riwayat_pendidikan_mahasiswa.id_mahasiswa', $id)
                 ->where('kelas_kuliah.id_semester', $semester->id_semester)
                 ->findAll()
         ]);
