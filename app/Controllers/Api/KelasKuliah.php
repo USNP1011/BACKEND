@@ -375,9 +375,10 @@ class KelasKuliah extends ResourceController
         $item = [
             'status' => true,
             'data' => $object
-                ->select("kelas_kuliah.id, kelas_kuliah.status_sync, kelas.nama_kelas_kuliah, semester.nama_semester, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, prodi.nama_program_studi, dosen_pengajar_kelas.nama_dosen, matakuliah.sks_mata_kuliah, (SELECT COUNT(*) FROM peserta_kelas WHERE peserta_kelas.kelas_kuliah_id=kelas_kuliah.id)as peserta_kelas")
+                ->select("kelas_kuliah.id, kelas_kuliah.status_sync, kelas.nama_kelas_kuliah, semester.nama_semester, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, prodi.nama_program_studi, dosen.nama_dosen, matakuliah.sks_mata_kuliah, (SELECT COUNT(*) FROM peserta_kelas WHERE peserta_kelas.kelas_kuliah_id=kelas_kuliah.id)as peserta_kelas")
                 ->join('semester', 'semester.id_semester=kelas_kuliah.id_semester', 'left')
                 ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id', 'left')
+                ->join('penugasan_dosen', 'dosen_pengajar_kelas.id_registrasi_dosen=penugasan_dosen.id_registrasi_dosen', 'left')
                 ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
                 ->join('prodi', 'prodi.id_prodi=kelas_kuliah.id_prodi', 'left')
                 ->join('kelas', 'kelas_kuliah.kelas_id=kelas.id', 'left')
