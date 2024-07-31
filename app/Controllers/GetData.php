@@ -63,21 +63,21 @@ class GetData extends BaseController
         // $this->mahasiswa();
         // $this->riwayat_pendidikan();
         // $this->prestasiMahasiswa();
-        $this->kurikulum();
-        $this->matakuliah();
-        $this->kurikulum_detail();
-        $this->kelas_kuliah();
-        $this->dosen();
-        $this->penugasan_dosen();
-        $this->pengajar_kelas();
-        $this->peserta_kelas();
-        $this->status_mahasiswa();
-        $this->aktivitas_kuliah();
-        // $this->nilai_transfer();
-        // $this->aktivitas_mahasiswa();
-        // $this->anggota_aktivitas_mahasiswa();
-        // $this->bimbing_mahasiswa();
-        // $this->ujiMahasiswa();
+        // $this->kurikulum();
+        // $this->matakuliah();
+        // $this->kurikulum_detail();
+        // $this->kelas_kuliah();
+        // $this->dosen();
+        // $this->penugasan_dosen();
+        // $this->pengajar_kelas();
+        // $this->peserta_kelas();
+        // $this->status_mahasiswa();
+        // $this->aktivitas_kuliah();
+        $this->nilai_transfer();
+        $this->aktivitas_mahasiswa();
+        $this->anggota_aktivitas_mahasiswa();
+        $this->bimbing_mahasiswa();
+        $this->ujiMahasiswa();
     }
 
 
