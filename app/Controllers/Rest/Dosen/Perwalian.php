@@ -17,6 +17,7 @@ class Perwalian extends ResourceController
                 ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=dosen_wali.id_riwayat_pendidikan')
                 ->join('mahasiswa', 'mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa', 'left')
                 ->join('prodi', 'prodi.id_prodi=riwayat_pendidikan_mahasiswa.id_prodi', 'left')
+                ->orderBy('prodi.nama_program_studi', 'asc')
                 ->where('dosen.id_user', $profile->id_user)->findAll()
         ]);
         try {
