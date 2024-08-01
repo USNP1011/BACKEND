@@ -73,11 +73,11 @@ class GetData extends BaseController
         // $this->peserta_kelas();
         // $this->status_mahasiswa();
         // $this->aktivitas_kuliah();
-        $this->nilai_transfer();
-        $this->aktivitas_mahasiswa();
-        $this->anggota_aktivitas_mahasiswa();
-        $this->bimbing_mahasiswa();
-        $this->ujiMahasiswa();
+        // $this->nilai_transfer();
+        // $this->aktivitas_mahasiswa();
+        // $this->anggota_aktivitas_mahasiswa();
+        // $this->bimbing_mahasiswa();
+        // $this->ujiMahasiswa();
     }
 
 
@@ -890,5 +890,72 @@ class GetData extends BaseController
             }
         }
         return null;
+    }
+
+    public function konversiKampusMerdeka()
+    {
+        $object = new \App\Models\KonversiKampusMerdekaModel();
+        $model = new \App\Entities\KonversiKampusMerdekaEntity();
+        $conn = \Config\Database::connect();
+        try {
+            $data = $this->api->getData('GetListKonversiKampusMerdeka', $this->token, "");
+            $conn->transException(true)->transStart();
+            $dataUpdate = [];
+            $anggotaAktivitas = new \App\Models\AnggotaAktivitasModel();
+            $matakuliah = new \App\Models\MatakuliahModel();
+            foreach ($data->data as $key => $value) {
+                $itemAktivitas = $anggotaAktivitas->select("anggota_aktivitas.id as anggota_aktivitas_id, aktivitas_mahasiswa.id as aktivitas_mahasiswa_id")->join('aktivitas_mahasiswa', 'aktivitas_mahasiswa.id=anggota_aktivitas.aktivitas_mahasiswa_id', 'left')
+                ->where('anggota_aktivitas.id_anggota', $value->id_anggota)->first();
+                $itemMatakuliah = $matakuliah->where('id_matkul', $value->id_matkul)->first();
+                $itemUpdate = [
+                    'id' => Uuid::uuid4()->toString(),
+                    'id_semester' => $value->id_semester,
+                    'matakuliah_id' => $itemMatakuliah->id,
+                    'anggota_aktivitas_id' => $itemAktivitas->anggota_aktivitas_id,
+                    'aktivitas_mahasiswa_id' => $itemAktivitas->aktivitas_mahasiswa_id,
+                    'nilai_angka' => $value->nilai_angka,
+                    'nilai_huruf' => $value->nilai_huruf,
+                    'nilai_indeks' => $value->nilai_indeks,
+                ];
+                $dataUpdate[] = $itemUpdate;
+
+                if (!is_null($itemKelas)) {
+                }
+            }
+            $pesertaKelas->updateBatch($dataUpdate, 'id');
+            $conn->transComplete();
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage());
+        }
+    }
+
+    public function transkrip()
+    {
+        $pesertaKelas = new \App\Models\TranskripModel();
+        $conn = \Config\Database::connect();
+        try {
+            $data = $this->api->getData('GetTranskripMahasiswa', $this->token, "");
+            $conn->transException(true)->transStart();
+            $dataUpdate = [];
+            foreach ($data->data as $key => $value) {
+                $itemKelas = $pesertaKelas->select('peserta_kelas.id')
+                    ->join('kelas_kuliah', 'kelas_kuliah.id=peserta_kelas.kelas_kuliah_id', 'left')
+                    ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=peserta_kelas.id_riwayat_pendidikan', 'left')
+                    ->where('kelas_kuliah.id_kelas_kuliah', $value->id_kelas_kuliah)->where('riwayat_pendidikan_mahasiswa.id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
+                if (!is_null($itemKelas)) {
+                    $itemUpdate = [
+                        'id' => $itemKelas->id,
+                        'nilai_angka' => $value->nilai_angka,
+                        'nilai_huruf' => $value->nilai_huruf,
+                        'nilai_indeks' => $value->nilai_indeks,
+                    ];
+                    $dataUpdate[] = $itemUpdate;
+                }
+            }
+            $pesertaKelas->updateBatch($dataUpdate, 'id');
+            $conn->transComplete();
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage());
+        }
     }
 }
