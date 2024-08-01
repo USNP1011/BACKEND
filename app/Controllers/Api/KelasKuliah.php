@@ -295,6 +295,32 @@ class KelasKuliah extends ResourceController
         }
     }
 
+    public function updateNilai()
+    {
+        $conn = \Config\Database::connect();
+        $itemNilai = [];
+        $param = $this->request->getJSON();
+        try {
+            $conn->transException(true)->transStart();
+            foreach ($param as $key => $value) {
+                $object = new \App\Models\PesertaKelasModel();
+                $model = new \App\Entities\PesertaKelasEntity();
+                $model->fill((array)$value);
+                $itemNilai[]=$model;
+            }
+            $object->updateBatch($itemNilai);
+            $conn->transComplete();
+            return $this->respond([
+                'status' => true
+            ]);
+        } catch (\Throwable $th) {
+            return $this->fail([
+                'status' => false,
+                'message' => $th->getMessage()
+            ]);
+        }
+    }
+
     public function updateDosen($id = null)
     {
         try {
