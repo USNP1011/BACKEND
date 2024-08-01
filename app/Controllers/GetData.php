@@ -78,6 +78,7 @@ class GetData extends BaseController
         // $this->anggota_aktivitas_mahasiswa();
         // $this->bimbing_mahasiswa();
         // $this->ujiMahasiswa();
+        $this->konversiKampusMerdeka();
     }
 
 
