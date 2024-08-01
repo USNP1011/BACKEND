@@ -244,12 +244,13 @@ class GetData extends BaseController
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetNilaiTransferPendidikanMahasiswa', $this->token);
         }
+        $itemUpdate = [];
         foreach ($data->data as $key => $value) {
             $value->id = Uuid::uuid4()->toString();
             $value->id_riwayat_pendidikan = $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first()->id;
-            $nilaiTransfer->insert($value);
+            $itemUpdate[] = $value;
         }
-        // return response()->setJSON($data);
+        $nilaiTransfer->insertBatch($itemUpdate);
     }
 
     public function transportasi()
@@ -906,7 +907,7 @@ class GetData extends BaseController
             $matakuliah = new \App\Models\MatakuliahModel();
             foreach ($data->data as $key => $value) {
                 $itemAktivitas = $anggotaAktivitas->select("anggota_aktivitas.id as anggota_aktivitas_id, aktivitas_mahasiswa.id as aktivitas_mahasiswa_id")->join('aktivitas_mahasiswa', 'aktivitas_mahasiswa.id=anggota_aktivitas.aktivitas_mahasiswa_id', 'left')
-                ->where('anggota_aktivitas.id_anggota', $value->id_anggota)->first();
+                    ->where('anggota_aktivitas.id_anggota', $value->id_anggota)->first();
                 $itemMatakuliah = $matakuliah->where('id_matkul', $value->id_matkul)->first();
                 $itemUpdate = [
                     'id' => Uuid::uuid4()->toString(),
@@ -947,24 +948,30 @@ class GetData extends BaseController
                 $itemMatakuliah = $matakuliah->where('id_matkul', $value->id_matkul)->first();
                 $itemRiwayat = $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
                 $itemUpdate = [
-                    'id'=>Uuid::uuid4()->toString(),
-                    'id_riwayat_pendidikan'=>$itemRiwayat->id,
-                    'matakuliah_id'=>$itemMatakuliah->id,
-                    'nilai_angka'=>$value->nilai_angka,
-                    'nilai_indeks'=>$value->nilai_indeks,
-                    'nilai_huruf'=>$value->nilai_huruf,
+                    'id' => Uuid::uuid4()->toString(),
+                    'id_riwayat_pendidikan' => $itemRiwayat->id,
+                    'matakuliah_id' => $itemMatakuliah->id,
+                    'nilai_angka' => $value->nilai_angka,
+                    'nilai_indeks' => $value->nilai_indeks,
+                    'nilai_huruf' => $value->nilai_huruf,
                 ];
-                if(!is_null($value->id_kelas_kuliah)){
+                if (!is_null($value->id_kelas_kuliah)) {
                     $item = $kelas->where('id_kelas_kuliah', $value->id_kelas_kuliah)->first();
-                    $itemUpdate['kelas_kuliah_id'] = $item->id;
-                }else if(!is_null($value->id_konversi_aktivitas)){
+                    if (!is_null($item)) {
+                        $itemUpdate['kelas_kuliah_id'] = $item->id;
+                    }
+                } else if (!is_null($value->id_konversi_aktivitas)) {
                     $item = $konversi->where('id_konversi_aktivitas', $value->id_konversi_aktivitas)->first();
-                    $itemUpdate['konversi_kampus_merdeka_id'] = $item->id;
-                }else if(!is_null($value->id_nilai_transfer)){
+                    if (!is_null($item)) {
+                        $itemUpdate['konversi_kampus_merdeka_id'] = $item->id;
+                    }
+                } else if (!is_null($value->id_nilai_transfer)) {
                     $item = $transfer->where('id_transfer', $value->id_nilai_transfer)->first();
-                    $itemUpdate['nilai_transfer_id'] = $item->id;
+                    if (!is_null($item)) {
+                        $itemUpdate['nilai_transfer_id'] = $item->id;
+                    }
                 }
-                $dataUpdate[]=$itemUpdate;
+                $dataUpdate[] = $itemUpdate;
             }
             $object->insert($dataUpdate);
             $conn->transComplete();
