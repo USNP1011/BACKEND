@@ -62,6 +62,7 @@ $routes->group('get_data', static function($routes){
     $routes->get('aktivitas_mahasiswa', 'GetData::aktivitas_mahasiswa');
     $routes->get('anggota_aktivitas_mahasiswa', 'GetData::anggota_aktivitas_mahasiswa');
     $routes->get('bimbing_mahasiswa', 'GetData::bimbing_mahasiswa');
+    $routes->get('uji_mahasiswa', 'GetData::ujiMahasiswa');
     $routes->get('peserta_kelas', 'GetData::peserta_kelas');
     $routes->get('nilai_kelas', 'GetData::nilai_kelas');
     $routes->get('dosen_wali', 'GetData::dosenWali');
