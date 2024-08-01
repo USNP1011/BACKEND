@@ -27,22 +27,25 @@ class KelasKuliah extends ResourceController
         return $this->respond([
             'status' => true,
             'data' => $id == null ? $object
-                ->select("kelas_kuliah.*, semester.nama_semester, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, prodi.nama_program_studi, penugasan_dosen.nama_dosen, matakuliah.sks_mata_kuliah, (SELECT COUNT(*) FROM peserta_kelas WHERE peserta_kelas.kelas_kuliah_id=kelas_kuliah.id)as peserta_kelas")
+                ->select("kelas_kuliah.*, semester.nama_semester, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, prodi.nama_program_studi, penugasan_dosen.nama_dosen, ruangan.nama_ruangan, kelas.nama_kelas_kuliah, matakuliah.sks_mata_kuliah, (SELECT COUNT(*) FROM peserta_kelas WHERE peserta_kelas.kelas_kuliah_id=kelas_kuliah.id)as peserta_kelas")
                 ->join('semester', 'semester.id_semester=kelas_kuliah.id_semester', 'left')
                 ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id', 'left')
                 ->join('penugasan_dosen', 'penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen', 'left')
                 ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
                 ->join('prodi', 'prodi.id_prodi=kelas_kuliah.id_prodi', 'left')
+                ->join('ruangan', 'ruangan.id=kelas_kuliah.ruangan_id', 'left')
+                ->join('kelas', 'kelas.id=kelas_kuliah.kelas_id', 'left')
                 ->where('a_periode_aktif', '1')
                 ->findAll() :
                 $object
-                ->select("kelas_kuliah.*, kelas.nama_kelas_kuliah, semester.nama_semester, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, prodi.nama_program_studi, penugasan_dosen.nama_dosen, matakuliah.sks_mata_kuliah, (SELECT COUNT(*) FROM peserta_kelas WHERE peserta_kelas.kelas_kuliah_id=kelas_kuliah.id)as peserta_kelas")
+                ->select("kelas_kuliah.*, kelas.nama_kelas_kuliah, ruangan.nama_ruangan, semester.nama_semester, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, prodi.nama_program_studi, penugasan_dosen.nama_dosen, matakuliah.sks_mata_kuliah, (SELECT COUNT(*) FROM peserta_kelas WHERE peserta_kelas.kelas_kuliah_id=kelas_kuliah.id)as peserta_kelas")
                 ->join('semester', 'semester.id_semester=kelas_kuliah.id_semester', 'left')
                 ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id', 'left')
                 ->join('penugasan_dosen', 'penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen', 'left')
                 ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
                 ->join('prodi', 'prodi.id_prodi=kelas_kuliah.id_prodi', 'left')
-                ->join('kelas', 'kelas_kuliah.kelas_id=kelas.id', 'left')
+                ->join('ruangan', 'ruangan.id=kelas_kuliah.ruangan_id', 'left')
+                ->join('kelas', 'kelas.id=kelas_kuliah.kelas_id', 'left')
                 ->where('kelas_kuliah.id', $id)->first()
         ]);
     }
