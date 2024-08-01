@@ -923,7 +923,7 @@ class GetData extends BaseController
                 $model->fill($itemUpdate);
                 $dataUpdate[] = $model;
             }
-            $object->updateBatch($dataUpdate, 'id');
+            $object->insertBatch($dataUpdate);
             $conn->transComplete();
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage());
@@ -932,28 +932,41 @@ class GetData extends BaseController
 
     public function transkrip()
     {
-        $pesertaKelas = new \App\Models\TranskripModel();
+        $object = new \App\Models\TranskripModel();
+        $matakuliah = new \App\Models\MatakuliahModel();
+        $transfer = new \App\Models\NilaiTransferModel();
+        $kelas = new \App\Models\KelasKuliahModel();
+        $konversi = new \App\Models\KonversiKampusMerdekaModel();
+        $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
         $conn = \Config\Database::connect();
         try {
             $data = $this->api->getData('GetTranskripMahasiswa', $this->token, "");
             $conn->transException(true)->transStart();
             $dataUpdate = [];
             foreach ($data->data as $key => $value) {
-                $itemKelas = $pesertaKelas->select('peserta_kelas.id')
-                    ->join('kelas_kuliah', 'kelas_kuliah.id=peserta_kelas.kelas_kuliah_id', 'left')
-                    ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=peserta_kelas.id_riwayat_pendidikan', 'left')
-                    ->where('kelas_kuliah.id_kelas_kuliah', $value->id_kelas_kuliah)->where('riwayat_pendidikan_mahasiswa.id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
-                if (!is_null($itemKelas)) {
-                    $itemUpdate = [
-                        'id' => $itemKelas->id,
-                        'nilai_angka' => $value->nilai_angka,
-                        'nilai_huruf' => $value->nilai_huruf,
-                        'nilai_indeks' => $value->nilai_indeks,
-                    ];
-                    $dataUpdate[] = $itemUpdate;
+                $itemMatakuliah = $matakuliah->where('id_matkul', $value->id_matkul)->first();
+                $itemRiwayat = $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
+                $itemUpdate = [
+                    'id'=>Uuid::uuid4()->toString(),
+                    'id_riwayat_pendidikan'=>$itemRiwayat->id,
+                    'matakuliah_id'=>$itemMatakuliah->id,
+                    'nilai_angka'=>$value->nilai_angka,
+                    'nilai_indeks'=>$value->nilai_indeks,
+                    'nilai_huruf'=>$value->nilai_huruf,
+                ];
+                if(!is_null($value->id_kelas_kuliah)){
+                    $item = $kelas->where('id_kelas_kuliah', $value->id_kelas_kuliah)->first();
+                    $itemUpdate['kelas_kuliah_id'] = $item->id;
+                }else if(!is_null($value->id_konversi_aktivitas)){
+                    $item = $konversi->where('id_konversi_aktivitas', $value->id_konversi_aktivitas)->first();
+                    $itemUpdate['konversi_kampus_merdeka_id'] = $item->id;
+                }else if(!is_null($value->id_nilai_transfer)){
+                    $item = $transfer->where('id_transfer', $value->id_nilai_transfer)->first();
+                    $itemUpdate['nilai_transfer_id'] = $item->id;
                 }
+                $dataUpdate[]=$itemUpdate;
             }
-            $pesertaKelas->updateBatch($dataUpdate, 'id');
+            $object->insert($dataUpdate);
             $conn->transComplete();
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage());
