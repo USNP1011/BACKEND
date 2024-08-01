@@ -39,7 +39,7 @@ class Perwalian extends ResourceController
                     ->join("riwayat_pendidikan_mahasiswa", "riwayat_pendidikan_mahasiswa.id=temp_krsm.id_riwayat_pendidikan", "left")
                     ->join("mahasiswa", "mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa", "left")
                     ->join('prodi', 'prodi.id_prodi=riwayat_pendidikan_mahasiswa.id_prodi', 'left')
-                    ->where('temp_krsm.id_semester', $semester->id_semester)->where('id_tahapan', 1)->findAll() :
+                    ->where('temp_krsm.id_semester', $semester->id_semester)->where('id_tahapan', 2)->findAll() :
                     $detail->select('temp_peserta_kelas.id, temp_peserta_kelas.kelas_kuliah_id, temp_peserta_kelas.id_riwayat_pendidikan, temp_peserta_kelas.temp_krsm_id, matakuliah.nama_mata_kuliah, matakuliah.kode_mata_kuliah, kelas_kuliah.hari, kelas_kuliah.jam_mulai, kelas_kuliah.jam_selesai')
                     ->join('kelas_kuliah', 'kelas_kuliah.id=temp_peserta_kelas.kelas_kuliah_id', 'left')
                     ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
