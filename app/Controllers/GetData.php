@@ -78,7 +78,8 @@ class GetData extends BaseController
         // $this->anggota_aktivitas_mahasiswa();
         // $this->bimbing_mahasiswa();
         // $this->ujiMahasiswa();
-        $this->konversiKampusMerdeka();
+        // $this->konversiKampusMerdeka();
+        $this->transkrip();
     }
 
 
@@ -941,7 +942,7 @@ class GetData extends BaseController
         $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
         $conn = \Config\Database::connect();
         try {
-            $data = $this->api->getData('GetTranskripMahasiswa', $this->token, "");
+            $data = $this->api->getData('GetTranskripMahasiswa', $this->token, "", "id_registrasi_mahasiswa", 100,0);
             $conn->transException(true)->transStart();
             $dataUpdate = [];
             foreach ($data->data as $key => $value) {
@@ -959,21 +960,29 @@ class GetData extends BaseController
                     $item = $kelas->where('id_kelas_kuliah', $value->id_kelas_kuliah)->first();
                     if (!is_null($item)) {
                         $itemUpdate['kelas_kuliah_id'] = $item->id;
+                        $itemUpdate['konversi_kampus_merdeka_id'] = null;
+                        $itemUpdate['nilai_transfer_id'] = null;
                     }
                 } else if (!is_null($value->id_konversi_aktivitas)) {
                     $item = $konversi->where('id_konversi_aktivitas', $value->id_konversi_aktivitas)->first();
                     if (!is_null($item)) {
                         $itemUpdate['konversi_kampus_merdeka_id'] = $item->id;
+                        $itemUpdate['kelas_kuliah_id'] = null;
+                        $itemUpdate['nilai_transfer_id'] = null;
                     }
                 } else if (!is_null($value->id_nilai_transfer)) {
                     $item = $transfer->where('id_transfer', $value->id_nilai_transfer)->first();
                     if (!is_null($item)) {
                         $itemUpdate['nilai_transfer_id'] = $item->id;
+                        $itemUpdate['konversi_kampus_merdeka_id'] = null;
+                        $itemUpdate['kelas_kuliah_id'] = null;
                     }
                 }
-                $dataUpdate[] = $itemUpdate;
+                $model = new \App\Entities\TranskripEntity();
+                $model->fill($itemUpdate);
+                $dataUpdate[] = $model;
             }
-            $object->insert($dataUpdate);
+            $object->insertBatch($dataUpdate);
             $conn->transComplete();
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage());

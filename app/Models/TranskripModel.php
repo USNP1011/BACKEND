@@ -16,6 +16,9 @@ class TranskripModel extends Model
         'kelas_kuliah_id',
         'nilai_transfer_id',
         'konversi_kampus_merdeka_id',
+        'nilai_angka',
+        'nilai_huruf',
+        'nilai_indeks',
 		'sync_at',
 		'status_sync'
     ];

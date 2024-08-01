@@ -4,7 +4,7 @@ namespace App\Libraries;
 
 class Rest
 {
-    function getData($act, $token, $filter="")
+    function getData($act, $token, $filter="", $order="", $limit="", $offset="")
     {
         $curl = curl_init();
         curl_setopt_array($curl, array(
@@ -22,9 +22,9 @@ class Rest
                 "act": "' . $act . '",
                 "token": "'.$token.'",
                 "filter": "'.$filter.'",
-                "order": "",
-                "limit": "",
-                "offset": ""
+                "order": "'.$order.'",
+                "limit": "'.$limit.'",
+                "offset": "'.$offset.'"
             }',
             CURLOPT_HTTPHEADER => array(
                 'Content-Type: application/json'
