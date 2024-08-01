@@ -66,6 +66,7 @@ $routes->group('get_data', static function($routes){
     $routes->get('nilai_kelas', 'GetData::nilai_kelas');
     $routes->get('dosen_wali', 'GetData::dosenWali');
     $routes->get('mahasiswa_lulus_do', 'GetData::mahasiswaLulusDO');
+    $routes->get('kampus_merdeka', 'GetData::konversiKampusMerdeka');
 });
 
 $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($routes){

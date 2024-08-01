@@ -909,6 +909,7 @@ class GetData extends BaseController
                 $itemMatakuliah = $matakuliah->where('id_matkul', $value->id_matkul)->first();
                 $itemUpdate = [
                     'id' => Uuid::uuid4()->toString(),
+                    'id_konversi_aktivitas' => $value->id_konversi_aktivitas,
                     'id_semester' => $value->id_semester,
                     'matakuliah_id' => $itemMatakuliah->id,
                     'anggota_aktivitas_id' => $itemAktivitas->anggota_aktivitas_id,
@@ -917,12 +918,11 @@ class GetData extends BaseController
                     'nilai_huruf' => $value->nilai_huruf,
                     'nilai_indeks' => $value->nilai_indeks,
                 ];
-                $dataUpdate[] = $itemUpdate;
-
-                if (!is_null($itemKelas)) {
-                }
+                $model = new \App\Entities\KonversiKampusMerdekaEntity();
+                $model->fill($itemUpdate);
+                $dataUpdate[] = $model;
             }
-            $pesertaKelas->updateBatch($dataUpdate, 'id');
+            $object->updateBatch($dataUpdate, 'id');
             $conn->transComplete();
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage());
