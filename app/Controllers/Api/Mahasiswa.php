@@ -51,7 +51,7 @@ class Mahasiswa extends ResourceController
         $object = new RiwayatPendidikanMahasiswaModel();
         return $this->respond([
             'status' => true,
-            'data' => $object->where('id_mahasiswa, kelas.nama_kelas_kuliah', $id)->join('kelas', 'kelas.id=riwayat_pendidikan_mahasiswa.kelas_id', 'left')->findAll()
+            'data' => $object->select('riwayat_pendidikan_mahasiswa.*, kelas.nama_kelas_kuliah')->where('id_mahasiswa', $id)->join('kelas', 'kelas.id=riwayat_pendidikan_mahasiswa.kelas_id', 'left')->findAll()
         ]);
     }
 
