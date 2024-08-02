@@ -76,6 +76,7 @@ class RiwayatPendidikanMahasiswa extends ResourceController
             $userRole->insert($role);
 
             $item->id = Uuid::uuid4()->toString();
+            $item->angkatan = substr($item->nim,0,4);
             $object = new \App\Models\RiwayatPendidikanMahasiswaModel();
             $model = new \App\Entities\RiwayatPendidikanMahasiswa();
             $model->fill((array)$item);
