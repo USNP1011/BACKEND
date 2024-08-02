@@ -942,7 +942,7 @@ class GetData extends BaseController
         $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
         $conn = \Config\Database::connect();
         try {
-            $data = $this->api->getData('GetTranskripMahasiswa', $this->token, "", "id_registrasi_mahasiswa", 100,0);
+            $data = $this->api->getData('GetTranskripMahasiswa', $this->token, "", "id_registrasi_mahasiswa", "",0);
             $conn->transException(true)->transStart();
             $dataUpdate = [];
             foreach ($data->data as $key => $value) {
@@ -955,6 +955,8 @@ class GetData extends BaseController
                     'nilai_angka' => $value->nilai_angka,
                     'nilai_indeks' => $value->nilai_indeks,
                     'nilai_huruf' => $value->nilai_huruf,
+		            'status_sync'=>'sudah sync'
+                    
                 ];
                 if (!is_null($value->id_kelas_kuliah)) {
                     $item = $kelas->where('id_kelas_kuliah', $value->id_kelas_kuliah)->first();
@@ -980,9 +982,8 @@ class GetData extends BaseController
                 }
                 $model = new \App\Entities\TranskripEntity();
                 $model->fill($itemUpdate);
-                $dataUpdate[] = $model;
+                $object->insert($model);
             }
-            $object->insertBatch($dataUpdate);
             $conn->transComplete();
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage());
