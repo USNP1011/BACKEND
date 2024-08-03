@@ -76,14 +76,36 @@ class Mahasiswa extends ResourceController
     {
         $profile = getProfile();
         $object = new MatakuliahKurikulumModel();
-        $data = $object->select("matakuliah.nama_mata_kuliah, matakuliah.kode_mata_kuliah, matakuliah.sks_mata_kuliah, transkrip.nilai_angka, transkrip.nilai_huruf, transkrip.nilai_indeks")
+        $itemKurikulum = $object->select('matakuliah_kurikulum.id, matakuliah_kurikulum.kurikulum_id, matakuliah_kurikulum.matakuliah_id, matakuliah_kurikulum.semester, matakuliah.nama_mata_kuliah, matakuliah.kode_mata_kuliah, matakuliah.sks_mata_kuliah')
+            ->join('kurikulum', 'kurikulum.id=matakuliah_kurikulum.kurikulum_id', 'left')
             ->join('matakuliah', 'matakuliah.id=matakuliah_kurikulum.matakuliah_id', 'left')
-            ->join('transkrip', 'transkrip.matakuliah_id=matakuliah_kurikulum.matakuliah_id', 'left')
-            ->where('transkrip.id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)
-            ->findAll();
+            ->orderBy('semester', 'asc')
+            ->where('kurikulum.id_prodi', $profile->id_prodi)->findAll();
+        $object = new \App\Models\TranskripModel();
+        $itemTranskrip = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->findAll();
+        foreach ($itemKurikulum as $key => $kuri) {
+            $item = null;
+            foreach ($itemTranskrip as $key1 => $value) {
+                if($kuri->matakuliah_id == $value->matakuliah_id){
+                    if(is_null($item)) $item=$value;
+                    else if(!is_null($item) && $item->nilai_indeks < $value->nilai_indeks){
+                        $item = $value;
+                    }
+                }
+            }
+            if(!is_null($item)){
+                $kuri->nilai_angka = $value->nilai_angka;
+                $kuri->nilai_huruf = $value->nilai_huruf;
+                $kuri->nilai_indeks = $value->nilai_indeks;
+            }else{
+                $kuri->nilai_angka = null;
+                $kuri->nilai_huruf = null;
+                $kuri->nilai_indeks = null;
+            }
+        }
         return $this->respond([
             'status' => true,
-            'data' => $data
+            'data' => $itemKurikulum
         ]);
     }
 

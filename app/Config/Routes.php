@@ -351,4 +351,15 @@ $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($
     $routes->group('prodi', ['filter' => 'dosen'], function($routes){
         $routes->get('profile', 'Prodi\Prodi::profile');
     });
+
+    
+    $routes->group('keuangan', ['filter' => 'prodi'], function($routes){
+        $routes->get('pengajuan', 'Prodi\Perwalian::pengajuan');
+        $routes->get('pengajuan/(:hash)', 'Prodi\Perwalian::pengajuan/$1');
+        $routes->post('pengajuan', 'Prodi\Perwalian::updatePengajuan');
+    });
+
+    $routes->group('prodi', ['filter' => 'dosen'], function($routes){
+        $routes->get('profile', 'Prodi\Prodi::profile');
+    });
 });

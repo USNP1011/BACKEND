@@ -8,19 +8,19 @@ class Perwalian extends ResourceController
 {
     public function show($id = null)
     {
-        $profile = getProfile();
-        $object = new \App\Models\DosenWaliModel();
-        return $this->respond([
-            'status' => true,
-            'data' => $object->select("dosen_wali.id, dosen_wali.id_dosen, dosen_wali.id_riwayat_pendidikan, riwayat_pendidikan_mahasiswa.nim, mahasiswa.nama_mahasiswa, prodi.nama_program_studi, prodi.id_prodi, prodi.kode_program_studi, (SELECT perkuliahan_mahasiswa.sks_total from perkuliahan_mahasiswa where id_riwayat_pendidikan = riwayat_pendidikan_mahasiswa.id AND sks_total != '0' order by id_semester desc limit 1) as sks_total, (SELECT jenis_keluar.jenis_keluar FROM mahasiswa_lulus_do LEFT JOIN jenis_keluar on jenis_keluar.id_jenis_keluar = mahasiswa_lulus_do.id_jenis_keluar WHERE mahasiswa_lulus_do.id_riwayat_pendidikan = riwayat_pendidikan_mahasiswa.id  limit 1) as nama_jenis_keluar, (SELECT status_mahasiswa.nama_status_mahasiswa FROM perkuliahan_mahasiswa LEFT JOIN status_mahasiswa ON status_mahasiswa.id_status_mahasiswa=perkuliahan_mahasiswa.id_status_mahasiswa order by perkuliahan_mahasiswa.created_at desc limit 1) as nama_status_mahasiswa, (SELECT ips from perkuliahan_mahasiswa where perkuliahan_mahasiswa.id_riwayat_pendidikan = dosen_wali.id_riwayat_pendidikan order by id_semester desc limit 1,1) as ips, (SELECT ipk from perkuliahan_mahasiswa where perkuliahan_mahasiswa.id_riwayat_pendidikan = dosen_wali.id_riwayat_pendidikan order by id_semester desc limit 1,1) as ipk")
-                ->join('dosen', 'dosen.id_dosen=dosen_wali.id_dosen', 'left')
-                ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=dosen_wali.id_riwayat_pendidikan')
-                ->join('mahasiswa', 'mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa', 'left')
-                ->join('prodi', 'prodi.id_prodi=riwayat_pendidikan_mahasiswa.id_prodi', 'left')
-                ->orderBy('prodi.nama_program_studi', 'asc')
-                ->where('dosen.id_user', $profile->id_user)->findAll()
-        ]);
         try {
+            $profile = getProfile();
+            $object = new \App\Models\DosenWaliModel();
+            return $this->respond([
+                'status' => true,
+                'data' => $object->select("mahasiswa.id, dosen_wali.id_dosen, dosen_wali.id_riwayat_pendidikan, riwayat_pendidikan_mahasiswa.nim, mahasiswa.nama_mahasiswa, prodi.nama_program_studi, prodi.id_prodi, prodi.kode_program_studi, (SELECT perkuliahan_mahasiswa.sks_total from perkuliahan_mahasiswa where id_riwayat_pendidikan = riwayat_pendidikan_mahasiswa.id AND sks_total != '0' order by id_semester desc limit 1) as sks_total, (SELECT jenis_keluar.jenis_keluar FROM mahasiswa_lulus_do LEFT JOIN jenis_keluar on jenis_keluar.id_jenis_keluar = mahasiswa_lulus_do.id_jenis_keluar WHERE mahasiswa_lulus_do.id_riwayat_pendidikan = riwayat_pendidikan_mahasiswa.id  limit 1) as nama_jenis_keluar, (SELECT status_mahasiswa.nama_status_mahasiswa FROM perkuliahan_mahasiswa LEFT JOIN status_mahasiswa ON status_mahasiswa.id_status_mahasiswa=perkuliahan_mahasiswa.id_status_mahasiswa order by perkuliahan_mahasiswa.created_at desc limit 1) as nama_status_mahasiswa, (SELECT ips from perkuliahan_mahasiswa where perkuliahan_mahasiswa.id_riwayat_pendidikan = dosen_wali.id_riwayat_pendidikan order by id_semester desc limit 1,1) as ips, (SELECT ipk from perkuliahan_mahasiswa where perkuliahan_mahasiswa.id_riwayat_pendidikan = dosen_wali.id_riwayat_pendidikan order by id_semester desc limit 1,1) as ipk")
+                    ->join('dosen', 'dosen.id_dosen=dosen_wali.id_dosen', 'left')
+                    ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=dosen_wali.id_riwayat_pendidikan')
+                    ->join('mahasiswa', 'mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa', 'left')
+                    ->join('prodi', 'prodi.id_prodi=riwayat_pendidikan_mahasiswa.id_prodi', 'left')
+                    ->orderBy('prodi.nama_program_studi', 'asc')
+                    ->where('dosen.id_user', $profile->id_user)->findAll()
+            ]);
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage());
             // return $this->fail(handleErrorDB($th->getCode()));
