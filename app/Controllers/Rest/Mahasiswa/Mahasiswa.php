@@ -72,7 +72,7 @@ class Mahasiswa extends ResourceController
         ]);
     }
 
-    public function transkrip()
+    public function transkripSementara()
     {
         $profile = getProfile();
         $object = new MatakuliahKurikulumModel();
@@ -106,6 +106,16 @@ class Mahasiswa extends ResourceController
         return $this->respond([
             'status' => true,
             'data' => $itemKurikulum
+        ]);
+    }
+
+    public function transkrip()
+    {
+        $profile = getProfile();
+        $object = new TranskripModel();
+        return $this->respond([
+            'status' => true,
+            'data' => $object->select('matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, transkrip.nilai_angka, transkrip.nilai_huruf, transkrip.nilai_indeks')->join('matakuliah', 'matakuliah.id=transkrip.matakuliah_id', 'left')->findAll()
         ]);
     }
 

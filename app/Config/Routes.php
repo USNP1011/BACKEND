@@ -307,6 +307,7 @@ $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($
         $routes->get('krsm', 'Mahasiswa\Mahasiswa::krsm');
         $routes->get('aktivitas_kuliah', 'Mahasiswa\Mahasiswa::aktivitasKuliah');
         $routes->get('riwayat_perkuliahan', 'Mahasiswa\Mahasiswa::transkripSementara');
+        $routes->get('transkrip', 'Mahasiswa\Mahasiswa::transkrip');
         $routes->put('', 'Mahasiswa\Mahasiswa::update');
     });
 
