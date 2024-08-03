@@ -452,6 +452,7 @@ class GetData extends BaseController
         }
         foreach ($data->data as $key => $value) {
             $value->id = Uuid::uuid4()->toString();
+            $value->id_jenis_aktivitas_mahasiswa = $value->id_jenis_aktivitas;
             $tanggal = explode('-', $value->tanggal_sk_tugas);
             $value->tanggal_sk_tugas = $value->tanggal_sk_tugas != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
             $aktivitasMahasiswa->insert($value);
