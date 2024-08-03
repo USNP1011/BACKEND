@@ -115,7 +115,7 @@ class Mahasiswa extends ResourceController
         $object = new TranskripModel();
         return $this->respond([
             'status' => true,
-            'data' => $object->select('matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, transkrip.nilai_angka, transkrip.nilai_huruf, transkrip.nilai_indeks')->join('matakuliah', 'matakuliah.id=transkrip.matakuliah_id', 'left')->findAll()
+            'data' => $object->select('matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, transkrip.nilai_angka, transkrip.nilai_huruf, transkrip.nilai_indeks')->join('matakuliah', 'matakuliah.id=transkrip.matakuliah_id', 'left')->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->findAll()
         ]);
     }
 
