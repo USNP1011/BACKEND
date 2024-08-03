@@ -332,10 +332,10 @@ $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($
         $routes->delete('(:hash)', 'Mahasiswa\Krsm::deleted/$1');
     });
 
-    $routes->group('khsm', ['filter' => 'mahasiswa'], function($routes){
-        $routes->get('(:hash)', 'Mahasiswa\Khsm::show/$1');
-        $routes->post('', 'Mahasiswa\Khsm::create/$1');
-        $routes->delete('(:hash)', 'Mahasiswa\Khsm::deleted/$1');
+    $routes->group('khsm', function($routes){
+        $routes->get('(:hash)', 'Mahasiswa\Khsm::show/$1', ['filter' => 'mahasiswa']);
+        $routes->post('', 'Mahasiswa\Khsm::create/$1', ['filter' => 'mahasiswa']);
+        $routes->delete('(:hash)', 'Mahasiswa\Khsm::deleted/$1', ['filter' => 'mahasiswa']);
     });
     
     //Dosen
