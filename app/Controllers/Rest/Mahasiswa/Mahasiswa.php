@@ -72,9 +72,10 @@ class Mahasiswa extends ResourceController
         ]);
     }
 
-    public function transkripSementara()
+    public function transkripSementara($id = null)
     {
-        $profile = getProfile();
+        if (is_null($id)) $profile = getProfile();
+        else $profile = getProfileByMahasiswa($id);
         $object = new MatakuliahKurikulumModel();
         $itemKurikulum = $object->select('matakuliah_kurikulum.id, matakuliah_kurikulum.kurikulum_id, matakuliah_kurikulum.matakuliah_id, matakuliah_kurikulum.semester, matakuliah.nama_mata_kuliah, matakuliah.kode_mata_kuliah, matakuliah.sks_mata_kuliah')
             ->join('kurikulum', 'kurikulum.id=matakuliah_kurikulum.kurikulum_id', 'left')
@@ -86,18 +87,18 @@ class Mahasiswa extends ResourceController
         foreach ($itemKurikulum as $key => $kuri) {
             $item = null;
             foreach ($itemTranskrip as $key1 => $value) {
-                if($kuri->matakuliah_id == $value->matakuliah_id){
-                    if(is_null($item)) $item=$value;
-                    else if(!is_null($item) && $item->nilai_indeks < $value->nilai_indeks){
+                if ($kuri->matakuliah_id == $value->matakuliah_id) {
+                    if (is_null($item)) $item = $value;
+                    else if (!is_null($item) && $item->nilai_indeks < $value->nilai_indeks) {
                         $item = $value;
                     }
                 }
             }
-            if(!is_null($item)){
+            if (!is_null($item)) {
                 $kuri->nilai_angka = $value->nilai_angka;
                 $kuri->nilai_huruf = $value->nilai_huruf;
                 $kuri->nilai_indeks = $value->nilai_indeks;
-            }else{
+            } else {
                 $kuri->nilai_angka = null;
                 $kuri->nilai_huruf = null;
                 $kuri->nilai_indeks = null;
@@ -115,7 +116,7 @@ class Mahasiswa extends ResourceController
         $object = new TranskripModel();
         return $this->respond([
             'status' => true,
-            'data' => $object->select('matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, transkrip.nilai_angka, transkrip.nilai_huruf, transkrip.nilai_indeks')->join('matakuliah', 'matakuliah.id=transkrip.matakuliah_id', 'left')->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->findAll()
+            'data' => $object->select('matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, transkrip.nilai_angka, transkrip.nilai_huruf, transkrip.nilai_indeks, (matakuliah.sks_mata_kuliah*transkrip.nilai_indeks) as nxsks')->join('matakuliah', 'matakuliah.id=transkrip.matakuliah_id', 'left')->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->findAll()
         ]);
     }
 

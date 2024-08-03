@@ -308,15 +308,17 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
 
 $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($routes){
     //Mahasiswa 
-    $routes->group('mahasiswa', ['filter' => 'mahasiswa'], function($routes){
-        $routes->get('profile', 'Mahasiswa\Mahasiswa::byUserId');
-        $routes->get('riwayat_pendidikan', 'Mahasiswa\Mahasiswa::riwayatPendidikan');
-        $routes->get('nilai_transfer', 'Mahasiswa\Mahasiswa::nilaiTransfer');
-        $routes->get('krsm', 'Mahasiswa\Mahasiswa::krsm');
-        $routes->get('aktivitas_kuliah', 'Mahasiswa\Mahasiswa::aktivitasKuliah');
-        $routes->get('riwayat_perkuliahan', 'Mahasiswa\Mahasiswa::transkripSementara');
-        $routes->get('transkrip', 'Mahasiswa\Mahasiswa::transkrip');
-        $routes->put('', 'Mahasiswa\Mahasiswa::update');
+    $routes->group('mahasiswa', function($routes){
+        $routes->get('profile', 'Mahasiswa\Mahasiswa::byUserId', ['filter' => 'mahasiswa']);
+        $routes->get('riwayat_pendidikan', 'Mahasiswa\Mahasiswa::riwayatPendidikan', ['filter' => 'mahasiswa']);
+        $routes->get('nilai_transfer', 'Mahasiswa\Mahasiswa::nilaiTransfer', ['filter' => 'mahasiswa']);
+        $routes->get('krsm', 'Mahasiswa\Mahasiswa::krsm', ['filter' => 'mahasiswa']);
+        $routes->get('aktivitas_kuliah', 'Mahasiswa\Mahasiswa::aktivitasKuliah', ['filter' => 'mahasiswa']);
+        $routes->get('riwayat_perkuliahan', 'Mahasiswa\Mahasiswa::transkripSementara', ['filter' => 'mahasiswa']);
+        $routes->get('riwayat_perkuliahan/(:hash)', 'Mahasiswa\Mahasiswa::transkripSementara/$1', ['filter' => 'mahasiswa']);
+        $routes->get('transkrip', 'Mahasiswa\Mahasiswa::transkrip', ['filter' => 'mahasiswa']);
+        $routes->get('transkrip/(:hash)', 'Mahasiswa\Mahasiswa::transkrip/$1', ['filter' => 'general']);
+        $routes->put('', 'Mahasiswa\Mahasiswa::update', ['filter' => 'mahasiswa']);
     });
 
     $routes->group('jadwal', ['filter' => 'mahasiswa'], function($routes){

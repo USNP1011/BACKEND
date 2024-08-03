@@ -40,3 +40,8 @@ function getProfile() {
     }
     return $profile;
 }
+
+function getProfileByMahasiswa($id) {
+    $object = new \App\Models\RiwayatPendidikanMahasiswaModel();
+    return $object->select("riwayat_pendidikan_mahasiswa.*, riwayat_pendidikan_mahasiswa.id as id_riwayat_pendidikan")->where('id_mahasiswa', $id)->first();
+}

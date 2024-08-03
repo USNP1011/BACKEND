@@ -55,16 +55,21 @@ class Perwalian extends ResourceController
                 ]);
             }else{
                 $pesertaTemp = new \App\Models\TempPesertaKelasModel();
-                $itemPesertaTemp = $pesertaTemp->where('temp_krsm_id', $param->id)->findAll();
+                $itemPesertaTemp = $pesertaTemp->select("temp_peserta_kelas.*, matakuliah.sks_mata_kuliah")
+                ->join('kelas_kuliah', 'kelas_kuliah.id=temp_peserta_kelas.kelas_kuliah_id', 'left')
+                ->join('matakuliah', 'kelas_kuliah.matakuliah_id=matakuliah.id', 'left')
+                ->where('temp_krsm_id', $param->id)->findAll();
                 $peserta = new \App\Models\PesertaKelasModel();
+                $sks = 0;
                 foreach ($itemPesertaTemp as $key => $value) {
                     $model = new \App\Entities\PesertaKelasEntity();
                     $model->fill((array)$value);
                     $peserta->insert($model);
+                    $sks += $value->sks_mata_kuliah;
                 }
                 $object->delete($param->id);
                 $object = new \App\Models\PerkuliahanMahasiswaModel();
-                $object->where('id_riwayat_pendidikan', $pengajuan->id_riwayat_pendidikan)->where('id_semester', $pengajuan->id_semester)->set('id_status_mahasiswa','A')->update();
+                $object->where('id_riwayat_pendidikan', $pengajuan->id_riwayat_pendidikan)->where('id_semester', $pengajuan->id_semester)->set('id_status_mahasiswa','A')->set('sks_total', $sks)->update();
                 $conn->transComplete();
                 return $this->respond([
                     'status' => true
