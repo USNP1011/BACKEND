@@ -334,7 +334,7 @@ $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($
 
     $routes->group('khsm', function($routes){
         $routes->get('(:hash)', 'Mahasiswa\Khsm::show/$1', ['filter' => 'mahasiswa']);
-        $routes->get('(:hash)/(:hash)', 'Mahasiswa\Khsm::show/$1/$2', ['filter' => 'mahasiswa']); //$1:id_semester, $2: id_riwayat_pendidikan
+        $routes->get('(:hash)/(:hash)', 'Mahasiswa\Khsm::show/$1/$2', ['filter' => 'general']); //$1:id_semester, $2: id_riwayat_pendidikan
         $routes->post('', 'Mahasiswa\Khsm::create/$1', ['filter' => 'mahasiswa']);
         $routes->delete('(:hash)', 'Mahasiswa\Khsm::deleted/$1', ['filter' => 'mahasiswa']);
     });
