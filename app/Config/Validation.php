@@ -487,6 +487,30 @@ class Validation extends BaseConfig
         ]
     ];
 
+    public array $settingPembiayaan = [
+        "id_prodi" => [
+            "label" => "id_prodi",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_prodi Tidak Boleh Kosong"
+            ]
+        ],
+        "angkatan" => [
+            "label" => "angkatan",
+            "rules" => "required",
+            "errors" => [
+                "required" => "angkatan Tidak Boleh Kosong"
+            ]
+        ],
+        "biaya" => [
+            "label" => "biaya",
+            "rules" => "required",
+            "errors" => [
+                "required" => "biaya Tidak Boleh Kosong"
+            ]
+        ]
+    ];
+
     public $resetPassword = [
         'password' => [
             'label' => 'Auth.password',

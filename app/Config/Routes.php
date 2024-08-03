@@ -159,6 +159,14 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
         $routes->put('', 'Settings::updateSkalaSKS', ['filter' => 'auth']);
         $routes->delete('(:hash)', 'Settings::deleteSkalaSKS/$1', ['filter' => 'auth']);
     });
+
+    $routes->group('pembiayaan', function($routes){
+        $routes->get('', 'Settings::pembiayaan', ['filter' => 'general']);
+        $routes->get('(:hash)', 'Settings::pembiayaan/$1', ['filter' => 'general']);
+        $routes->post('', 'Settings::createPembiayaan', ['filter' => 'auth']);
+        $routes->put('', 'Settings::updatePembiayaan', ['filter' => 'auth']);
+        $routes->delete('(:hash)', 'Settings::deletePembiayaan/$1', ['filter' => 'auth']);
+    });
     
     $routes->group('mahasiswa', ['filter' => 'auth'], function($routes){
         $routes->get('', 'Mahasiswa::show', ['filter' => 'auth']);
@@ -354,10 +362,10 @@ $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($
     });
 
     
-    $routes->group('keuangan', ['filter' => 'prodi'], function($routes){
-        $routes->get('pengajuan', 'Prodi\Perwalian::pengajuan');
-        $routes->get('pengajuan/(:hash)', 'Prodi\Perwalian::pengajuan/$1');
-        $routes->post('pengajuan', 'Prodi\Perwalian::updatePengajuan');
+    $routes->group('keuangan', ['filter' => 'keuangan'], function($routes){
+        $routes->get('pengajuan', 'Keuangan\Perwalian::pengajuan');
+        $routes->get('pengajuan/(:hash)', 'Keuangan\Perwalian::pengajuan/$1');
+        $routes->post('pengajuan', 'Keuangan\Perwalian::updatePengajuan');
     });
 
     $routes->group('prodi', ['filter' => 'dosen'], function($routes){

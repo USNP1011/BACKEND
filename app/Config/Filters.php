@@ -16,6 +16,7 @@ use CodeIgniter\Filters\SecureHeaders;
 use App\Filters\AdminAuth;
 use App\Filters\DosenAuth;
 use App\Filters\GeneralAuth;
+use App\Filters\KeuanganAuth;
 use App\Filters\MahasiswaAuth;
 use App\Filters\ProdiAuth;
 
@@ -46,6 +47,7 @@ class Filters extends BaseFilters
         'dosen'         => DosenAuth::class,
         'general'       => GeneralAuth::class,
         'prodi'         => ProdiAuth::class,
+        'keuangan'      => KeuanganAuth::class
     ];
 
     /**
