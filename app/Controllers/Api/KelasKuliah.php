@@ -63,7 +63,7 @@ class KelasKuliah extends ResourceController
                 ->join('prodi', 'prodi.id_prodi=riwayat_pendidikan_mahasiswa.id_prodi', 'left')
                 ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
                 ->join('kelas', 'kelas_kuliah.kelas_id=kelas.id', 'left')
-                ->orderBy('sync_at', 'desc')
+                ->orderBy('peserta_kelas.created_at', 'desc')
                 ->where('kelas_kuliah_id', $id)->findAll()
         ]);
     }
