@@ -101,12 +101,14 @@ class AktivitasKuliah extends ResourceController
     public function paginate($page = 1, $count = 10, $cari = null)
     {
         $param = $this->request->getJSON();
+        $semester = getSemesterAktif();
         $object = new PerkuliahanMahasiswaModel();
         $item = [
             'status' => true,
             'data' => $object->select("perkuliahan_mahasiswa.*, mahasiswa.nama_mahasiswa, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.id_mahasiswa as mahasiswa_id")
                 ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=perkuliahan_mahasiswa.id_riwayat_pendidikan', 'left')
                 ->join('mahasiswa', 'mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa', 'left')
+                ->where('perkuliahan_mahasiswa.id_semester', $semester->id_semester)
                 ->groupStart()
                 ->like('mahasiswa.nama_mahasiswa', $param->cari)
                 ->orLike('riwayat_pendidikan_mahasiswa.nim', $param->cari)
