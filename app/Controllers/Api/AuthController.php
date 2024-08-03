@@ -145,29 +145,17 @@ class AuthController extends ResourceController
 
         $result = $authenticator->check($credentials);
         if (!$result->isOK()) {
-
             return $this->failUnauthorized($result->reason());
         }
-        // $request = $this->request->getJSON();
-        // if ($request->role == "Dosen") {
-        //     $dsn = new \App\Models\DosenModel();
-        //     $itemDosen = $dsn->where('id_user', $request->id)->first();
-        //     $newPassword = $itemDosen->nidn;
-        // } else if ($request->role == "Mahasiswa") {
-        //     $mhs = new \App\Models\MahasiswaModel();
-        //     $itemMahasiswa = $mhs->select("nim")->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id')->where('id_user', $request->id)->first();
-        //     $newPassword = $itemMahasiswa->nim;
-        // } else {
-        //     return $this->fail("Role tidak ditemukan");
-        // }
-        // $users = auth()->getProvider();
-        // $user = $users->findById($request->id);
-        // $user->activate();
-        // $user->fill(['password' => $newPassword]);
-        // $cek = $users->save($user);
-        // return $this->respond([
-        //     'status' => true
-        // ]);
+        $users = auth()->getProvider();
+        $user = $users->findById($this->request->getJsonVar('id'));
+        $user->activate();
+        $user->fill(['password' => $this->request->getJsonVar('newPassword')]);
+        $cek = $users->save($user);
+        return $this->respond([
+            'status' => true
+        ]);
+       
     }
 
     function createUser(): ResponseInterface

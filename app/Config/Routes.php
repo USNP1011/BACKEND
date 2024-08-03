@@ -295,6 +295,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
 
     $routes->post('reset_password', 'AuthController::resetPassword', ['filter'=>'general']);
     $routes->post('create_user', 'AuthController::createUser', ['filter'=>'general']);
+    $routes->post('change_user', 'AuthController::changePassword', ['filter'=>'general']);
 });
 
 $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($routes){
@@ -305,6 +306,7 @@ $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($
         $routes->get('nilai_transfer', 'Mahasiswa\Mahasiswa::nilaiTransfer');
         $routes->get('krsm', 'Mahasiswa\Mahasiswa::krsm');
         $routes->get('aktivitas_kuliah', 'Mahasiswa\Mahasiswa::aktivitasKuliah');
+        $routes->get('transkrip', 'Mahasiswa\Mahasiswa::transkrip');
         $routes->put('', 'Mahasiswa\Mahasiswa::update');
     });
 

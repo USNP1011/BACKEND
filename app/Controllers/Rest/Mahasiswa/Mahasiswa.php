@@ -4,10 +4,12 @@ namespace App\Controllers\Rest\Mahasiswa;
 
 use App\Entities\Mahasiswa as EntitiesMahasiswa;
 use App\Models\MahasiswaModel;
+use App\Models\MatakuliahKurikulumModel;
 use App\Models\NilaiTransferModel;
 use App\Models\PerkuliahanMahasiswaModel;
 use App\Models\PesertaKelasModel;
 use App\Models\RiwayatPendidikanMahasiswaModel;
+use App\Models\TranskripModel;
 use CodeIgniter\RESTful\ResourceController;
 
 class Mahasiswa extends ResourceController
@@ -67,6 +69,21 @@ class Mahasiswa extends ResourceController
         return $this->respond([
             'status' => true,
             'data' => $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'asc')->findAll()
+        ]);
+    }
+
+    public function transkrip()
+    {
+        $profile = getProfile();
+        $object = new MatakuliahKurikulumModel();
+        $data = $object->select("matakuliah.nama_mata_kuliah, matakuliah.kode_mata_kuliah, matakuliah.sks_mata_kuliah, transkrip.nilai_angka, transkrip.nilai_huruf, transkrip.nilai_indeks")
+            ->join('matakuliah', 'matakuliah.id=matakuliah_kurikulum.matakuliah_id', 'left')
+            ->join('transkrip', 'transkrip.matakuliah_id=matakuliah_kurikulum.matakuliah_id', 'left')
+            ->where('transkrip.id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)
+            ->findAll();
+        return $this->respond([
+            'status' => true,
+            'data' => $data
         ]);
     }
 
