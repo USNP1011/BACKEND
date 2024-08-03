@@ -110,9 +110,10 @@ class Mahasiswa extends ResourceController
         ]);
     }
 
-    public function transkrip()
+    public function transkrip($id=null)
     {
-        $profile = getProfile();
+        if (is_null($id)) $profile = getProfile();
+        else $profile = getProfileByMahasiswa($id);
         $object = new TranskripModel();
         return $this->respond([
             'status' => true,
