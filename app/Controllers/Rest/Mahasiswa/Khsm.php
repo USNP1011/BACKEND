@@ -7,19 +7,32 @@ use Ramsey\Uuid\Uuid;
 
 class Khsm extends ResourceController
 {
-    public function show($id = null)
+    public function show($id = null, $id_riwayat_pendidikan=null)
     {
-        $profile = getProfile();
-        $object = new \App\Models\PesertaKelasModel();
-        return $this->respond([
-            'status' => true,
-            'data' => $object->select("peserta_kelas.*, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, (matakuliah.sks_mata_kuliah*peserta_kelas.nilai_indeks) as nxsks")
-                ->join('kelas_kuliah', 'kelas_kuliah.id=peserta_kelas.kelas_kuliah_id', 'left')
-                ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id')
-                ->where('kelas_kuliah.id_semester', $id)
-                ->where('peserta_kelas.id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->findAll()
-        ]);
         try {
+            if(is_null($id_riwayat_pendidikan)){
+                $profile = getProfile();
+                $object = new \App\Models\PesertaKelasModel();
+                return $this->respond([
+                    'status' => true,
+                    'data' => $object->select("peserta_kelas.*, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, (matakuliah.sks_mata_kuliah*peserta_kelas.nilai_indeks) as nxsks")
+                        ->join('kelas_kuliah', 'kelas_kuliah.id=peserta_kelas.kelas_kuliah_id', 'left')
+                        ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id')
+                        ->where('kelas_kuliah.id_semester', $id)
+                        ->where('peserta_kelas.id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->findAll()
+                ]);
+            }else{
+                $object = new \App\Models\PesertaKelasModel();
+                return $this->respond([
+                    'status' => true,
+                    'data' => $object->select("peserta_kelas.*, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, (matakuliah.sks_mata_kuliah*peserta_kelas.nilai_indeks) as nxsks")
+                        ->join('kelas_kuliah', 'kelas_kuliah.id=peserta_kelas.kelas_kuliah_id', 'left')
+                        ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id')
+                        ->where('kelas_kuliah.id_semester', $id)
+                        ->where('peserta_kelas.id_riwayat_pendidikan', $id_riwayat_pendidikan)->findAll()
+                ]);
+    
+            }
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage());
             // return $this->fail(handleErrorDB($th->getCode()));
