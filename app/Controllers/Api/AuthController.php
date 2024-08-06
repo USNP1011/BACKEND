@@ -58,10 +58,7 @@ class AuthController extends ResourceController
                 'password' => 'required'
             ];
             if (!$this->validateData($this->request->getJSON(true), $itemRules, [], null)) {
-                return $this->fail(
-                    ['error' => $this->validator->getErrors()],
-                    $this->codes['unauthorized']
-                );
+                return $this->fail($this->validator->getErrors());
             }
 
             $credentials             = $this->request->getJsonVar(setting('Auth.validFields'));
