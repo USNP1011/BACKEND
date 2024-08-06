@@ -13,78 +13,81 @@ class Krsm extends ResourceController
             $profile = getProfile();
             $semester = getSemesterAktif();
             $object = new \App\Models\PerkuliahanMahasiswaModel();
-            if ($object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->where('id_semester', $semester->id_semester)->orderBy('id_semester', 'desc')->first()->sks_total == 0) {
-                $sum = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->countAllResults();
-                $smt = new \App\Models\SemesterModel();
-                $itemKuliah = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1, $sum > 1 ? 1 : 0)->first();
-                $skala = new \App\Models\SkalaSKSModel();
-                $itemSkala = $skala->where("ips_min<='" . $itemKuliah->ips . "' AND ips_max>='" . $itemKuliah->ips . "'")->first();
-                if ($smt->where('a_periode_aktif', 1)->where("DATE(batas_pengisian_krsm)>=CURDATE()")->countAllResults() > 0) {
-                    $object = new \App\Models\TempKrsmModel();
-                    $data = $object->select('temp_krsm.*, semester.nama_semester')->join('semester', 'semester.id_semester=temp_krsm.id_semester')
-                        ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->first();
-                    if (!is_null($data)) {
-                        $object = new \App\Models\TempPesertaKelasModel();
-                        $data->detail = $object->select('temp_peserta_kelas.*, matakuliah.nama_mata_kuliah, matakuliah.kode_mata_kuliah, matakuliah.sks_mata_kuliah, kelas.nama_kelas_kuliah, dosen.nidn, dosen.nama_dosen')
-                            ->join('kelas_kuliah', 'kelas_kuliah.id=temp_peserta_kelas.kelas_kuliah_id')
-                            ->join('matakuliah', 'kelas_kuliah.matakuliah_id=matakuliah.id')
-                            ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id')
-                            ->join('dosen', 'dosen_pengajar_kelas.id_dosen=dosen.id_dosen')
-                            ->join('kelas', 'kelas_kuliah.kelas_id=kelas.id')
-                            ->where('temp_krsm_id', $data->id)->findAll();
-                        $object = new \App\Models\TahapanModel();
-                        return $this->respond([
-                            'status' => true,
-                            'data' => ["pengajuan" => $object->where('id', $data->id_tahapan)->first()->tahapan, "matakuliah" => $data, 'roles' => ['sks_max' => $sum <= 2 ? 20 : (int)$itemSkala->sks_max]],
-                        ]);
+            $perkuliahan = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->where('id_semester', $semester->id_semester)->orderBy('id_semester', 'desc')->first();
+            if(!is_null($perkuliahan)){
+                if ($perkuliahan->sks_semester == 0) {
+                    $sum = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->countAllResults();
+                    $smt = new \App\Models\SemesterModel();
+                    $itemKuliah = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1, $sum > 1 ? 1 : 0)->first();
+                    $skala = new \App\Models\SkalaSKSModel();
+                    $itemSkala = $skala->where("ips_min<='" . $itemKuliah->ips . "' AND ips_max>='" . $itemKuliah->ips . "'")->first();
+                    if ($smt->where('a_periode_aktif', 1)->where("DATE(batas_pengisian_krsm)>=CURDATE()")->countAllResults() > 0) {
+                        $object = new \App\Models\TempKrsmModel();
+                        $data = $object->select('temp_krsm.*, semester.nama_semester')->join('semester', 'semester.id_semester=temp_krsm.id_semester')
+                            ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->first();
+                        if (!is_null($data)) {
+                            $object = new \App\Models\TempPesertaKelasModel();
+                            $data->detail = $object->select('temp_peserta_kelas.*, matakuliah.nama_mata_kuliah, matakuliah.kode_mata_kuliah, matakuliah.sks_mata_kuliah, kelas.nama_kelas_kuliah, dosen.nidn, dosen.nama_dosen')
+                                ->join('kelas_kuliah', 'kelas_kuliah.id=temp_peserta_kelas.kelas_kuliah_id')
+                                ->join('matakuliah', 'kelas_kuliah.matakuliah_id=matakuliah.id')
+                                ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id')
+                                ->join('dosen', 'dosen_pengajar_kelas.id_dosen=dosen.id_dosen')
+                                ->join('kelas', 'kelas_kuliah.kelas_id=kelas.id')
+                                ->where('temp_krsm_id', $data->id)->findAll();
+                            $object = new \App\Models\TahapanModel();
+                            return $this->respond([
+                                'status' => true,
+                                'data' => ["pengajuan" => $object->where('id', $data->id_tahapan)->first()->tahapan, "matakuliah" => $data, 'roles' => ['sks_max' => $sum <= 2 ? 20 : (int)$itemSkala->sks_max]],
+                            ]);
+                        } else {
+                            return $this->respond([
+                                'status' => true,
+                                'data' => [
+                                    "pengajuan" => "belum pengajuan",
+                                    "matakuliah" => [
+                                        'id_riwayat_pendidikan' => $profile->id_riwayat_pendidikan,
+                                        'id_semester' => $semester->id_semester,
+                                        'nama_semester' => $semester->nama_semester,
+                                        'detail' => []
+                                    ],
+                                    'roles' => ['sks_max' => $sum <= 2 ? 20 : (int)$itemSkala->sks_max]
+                                ]
+                            ]);
+                        }
                     } else {
-                        return $this->respond([
-                            'status' => true,
-                            'data' => [
-                                "pengajuan" => "belum pengajuan",
-                                "matakuliah" => [
-                                    'id_riwayat_pendidikan' => $profile->id_riwayat_pendidikan,
-                                    'id_semester' => $semester->id_semester,
-                                    'nama_semester' => $semester->nama_semester,
-                                    'detail' => []
-                                ],
-                                'roles' => ['sks_max' => $sum <= 2 ? 20 : (int)$itemSkala->sks_max]
-                            ]
-                        ]);
+                        return $this->fail('Pengisian KRSM telah ditutup, silahkan hubungi bagian BAAK');
                     }
                 } else {
-                    return $this->fail('Pengisian KRSM telah ditutup, silahkan hubungi bagian BAAK');
+                    $object = new \App\Models\PesertaKelasModel();
+                    $items = $object->select("kelas_kuliah.*, kelas.nama_kelas_kuliah, matakuliah.sks_mata_kuliah, penugasan_dosen.nidn, penugasan_dosen.nama_dosen, ruangan.nama_ruangan")
+                        ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
+                        ->join('matakuliah', 'kelas_kuliah.matakuliah_id = matakuliah.id', 'left')
+                        ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id = kelas_kuliah.id', 'left')
+                        ->join('penugasan_dosen', 'penugasan_dosen.id_registrasi_dosen = dosen_pengajar_kelas.id_registrasi_dosen', 'left')
+                        ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = peserta_kelas.id_riwayat_pendidikan', 'left')
+                        ->join('ruangan', 'ruangan.id = kelas_kuliah.ruangan_id', 'left')
+                        ->join('kelas', 'kelas.id = kelas_kuliah.kelas_id', 'left')
+                        ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)
+                        ->where('kelas_kuliah.id_semester', $semester->id_semester)
+                        ->findAll();
+                    $matakuliah = [
+                        'id_riwayat_pendidikan' => $profile->id_riwayat_pendidikan,
+                        'id_semester' => $semester->id_semester,
+                        'nama_semester' => $semester->nama_semester,
+                        'detail' => $items
+                    ];
+                    return $this->respond([
+                        'status' => true,
+                        'data' => [
+                            "pengajuan" => "Aktif",
+                            "matakuliah" => $matakuliah,
+                            "roles" => ['sks_max' => 0]
+                        ]
+                    ]);
                 }
-            } else {
-                $object = new \App\Models\PesertaKelasModel();
-                $items = $object->select("kelas_kuliah.*, kelas.nama_kelas_kuliah, matakuliah.sks_mata_kuliah, penugasan_dosen.nidn, penugasan_dosen.nama_dosen, ruangan.nama_ruangan")
-                    ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
-                    ->join('matakuliah', 'kelas_kuliah.matakuliah_id = matakuliah.id', 'left')
-                    ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id = kelas_kuliah.id', 'left')
-                    ->join('penugasan_dosen', 'penugasan_dosen.id_registrasi_dosen = dosen_pengajar_kelas.id_registrasi_dosen', 'left')
-                    ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = peserta_kelas.id_riwayat_pendidikan', 'left')
-                    ->join('ruangan', 'ruangan.id = kelas_kuliah.ruangan_id', 'left')
-                    ->join('kelas', 'kelas.id = kelas_kuliah.kelas_id', 'left')
-                    ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)
-                    ->where('kelas_kuliah.id_semester', $semester->id_semester)
-                    ->findAll();
-                $matakuliah = [
-                    'id_riwayat_pendidikan' => $profile->id_riwayat_pendidikan,
-                    'id_semester' => $semester->id_semester,
-                    'nama_semester' => $semester->nama_semester,
-                    'detail' => $items
-                ];
-                return $this->respond([
-                    'status' => true,
-                    'data' => [
-                        "pengajuan" => "Aktif",
-                        "matakuliah" => $matakuliah,
-                        "roles" => ['sks_max' => 0]
-                    ]
-                ]);
-            }
+            }else throw new \Exception("Belum ada aktivitas kuliah", 1);
         } catch (\Throwable $th) {
-            return $this->fail(handleErrorDB($th->getCode()));
+            return $this->fail($th->getMessage());
         }
     }
 

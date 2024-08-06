@@ -64,6 +64,8 @@ class RiwayatPendidikanMahasiswa extends ResourceController
             $itemData = $userObject->findById($userObject->getInsertID());
             $item->id_user = $userObject->getInsertID();
             $userObject->addToDefaultGroup($itemData);
+            $itemData->forcePasswordReset();
+            $itemData->activate();
 
             $mhs = new \App\Models\MahasiswaModel();
             $mhs->update($item->id_mahasiswa, ['id_user'=>$item->id_user]);
