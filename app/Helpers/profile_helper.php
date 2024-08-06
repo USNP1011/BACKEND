@@ -55,3 +55,21 @@ function getProfileByMahasiswa($id)
         ->where('mahasiswa.id', $id)->first();
     return $profile;
 }
+
+function getProfileProdi()
+{
+    helper('request');
+    $authenticationHeader = request()->getServer('HTTP_AUTHORIZATION');
+    $encodedToken = getJWTFromRequest($authenticationHeader);
+    $data = encodeJWTFromRequest($encodedToken);
+    $object = new \App\Models\DosenModel();
+    $profile = $object->where('id_user', $data->uid)->first();
+    $kaprodi = new \App\Models\KaprodiModel();
+    $profile->kaprodi = $kaprodi->select('kaprodi.id, kaprodi.id_prodi, prodi.nama_program_studi, prodi.kode_program_studi, kaprodi.no_sk, kaprodi.tanggal_sk')
+        ->join('prodi', 'prodi.id_prodi=kaprodi.id_prodi', 'left')
+        ->where('id_dosen', $profile->id_dosen)->first();
+    $profile->nama_program_studi = $profile->kaprodi->nama_program_studi;
+    $profile->kode_program_studi = $profile->kaprodi->kode_program_studi;
+    $profile->id_prodi = $profile->kaprodi->id_prodi;
+    return $profile;
+}
