@@ -14,8 +14,8 @@ class Khsm extends ResourceController
                 $profile = getProfile();
             } else $profile = getProfileByMahasiswa($id_mahasiswa);
             $perkuliahan = new \App\Models\PerkuliahanMahasiswaModel();
-            $itemPerkuliahan = $perkuliahan->select('perkuliahan_mahasiswa.ips,perkuliahan_mahasiswa.ipk, perkuliahan_mahasiswa.sks_semester, perkuliahan_mahasiswa.sks_total')
-                ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->where('id_semester', $id)->first();
+            $itemPerkuliahan = $perkuliahan->select('perkuliahan_mahasiswa.ips,perkuliahan_mahasiswa.ipk, perkuliahan_mahasiswa.sks_semester, perkuliahan_mahasiswa.sks_total, semester.nama_semester')
+                ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->join('semester', 'semester.id_semester=perkuliahan_mahasiswa.id_semester', 'left')->where('perkuliahan_mahasiswa.id_semester', $id)->first();
             $itemPerkuliahan->nim = $profile->nim;
             $itemPerkuliahan->nama_mahasiswa = $profile->nama_mahasiswa;
             $itemPerkuliahan->nama_program_studi = $profile->nama_program_studi;
