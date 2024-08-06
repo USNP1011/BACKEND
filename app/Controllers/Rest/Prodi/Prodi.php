@@ -15,8 +15,8 @@ class Prodi extends ResourceController
         $profile = getProfileProdi();
         $prodi = new \App\Models\ProdiModel();
         $itemProdi = $prodi->where('id_prodi', $profile->id_prodi)->first();
-        $itemProdi->nama_dosen = $profile->nama_dosen;
         $itemProdi->kaprodi = $profile->kaprodi;
+        $itemProdi->kaprodi->nama_kaprodi = $profile->nama_dosen;
         return $this->respond([
             'status' => true,
             'data' => $itemProdi
