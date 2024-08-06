@@ -85,7 +85,7 @@ class Krsm extends ResourceController
                         ]
                     ]);
                 }
-            }else throw new \Exception("Belum ada aktivitas kuliah", 1);
+            }else throw new \Exception("Belum ada aktivitas kuliah, Segera melapor ke bagian BAAK", 1);
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage());
         }
