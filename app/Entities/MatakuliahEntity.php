@@ -15,4 +15,9 @@ class MatakuliahEntity extends Entity
         $this->attributes['nama_mata_kuliah'] = strtoupper($nama_mata_kuliah);
         return $this;
     }
+
+    public function getNamaMataKuliah() {
+        $this->attributes['nama_mata_kuliah'] = strtoupper($this->attributes['nama_mata_kuliah']);
+        return $this->attributes['nama_mata_kuliah'];
+    }
 }
