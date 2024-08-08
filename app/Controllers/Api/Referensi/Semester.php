@@ -32,25 +32,31 @@ class Semester extends ResourceController
                 $dataRiwayat = $riwayat->select("riwayat_pendidikan_mahasiswa.id, riwayat_pendidikan_mahasiswa.angkatan, riwayat_pendidikan_mahasiswa.id_prodi, (SELECT jenis_keluar.jenis_keluar FROM mahasiswa_lulus_do LEFT JOIN jenis_keluar on jenis_keluar.id_jenis_keluar = mahasiswa_lulus_do.id_jenis_keluar WHERE mahasiswa_lulus_do.id_riwayat_pendidikan = riwayat_pendidikan_mahasiswa.id  limit 1) as nama_jenis_keluar")->findAll();
                 $tempMhs = [];
                 $biaya = new \App\Models\SettingBiayaModel();
+                $dataBiaya = $biaya->findAll();
                 foreach ($dataRiwayat as $key => $value) {
-                    $itemBiaya = $biaya->where('id_prodi', $value->id_prodi)->where('angkatan', $value->angkatan)->first();
-                    if (!is_null($itemBiaya)) {
-                        if (is_null($value->nama_jenis_keluar)) {
-                            $item = [
-                                'id' => Uuid::uuid4()->toString(),
-                                'id_riwayat_pendidikan' => $value->id,
-                                'id_semester' => $itemSemester->id_semester,
-                                'id_status_mahasiswa' => "N",
-                                'ips' => "0",
-                                'ipk' => "0",
-                                'sks_total' => "0",
-                                'sks_semester' => "0",
-                                'biaya_kuliah_smt' => $itemBiaya->biaya
-                            ];
-                            $tempMhs[] = $item;
+                    if ($value->angkatan >= 2018) {
+                        foreach ($dataBiaya as $keyBiaya => $valueBiaya) {
+                            if ($valueBiaya->id_prodi == $value->id_prodi && $valueBiaya->angkatan == $value->angkatan)
+                                $itemBiaya = $valueBiaya;
                         }
-                    } else {
-                        throw new \Exception("Data Pembiayaan untuk angkatan " . $value->angkatan . " belum ada", 1);
+                        if (!is_null($itemBiaya)) {
+                            if (is_null($value->nama_jenis_keluar)) {
+                                $item = [
+                                    'id' => Uuid::uuid4()->toString(),
+                                    'id_riwayat_pendidikan' => $value->id,
+                                    'id_semester' => $itemSemester->id_semester,
+                                    'id_status_mahasiswa' => "N",
+                                    'ips' => "0",
+                                    'ipk' => "0",
+                                    'sks_total' => "0",
+                                    'sks_semester' => "0",
+                                    'biaya_kuliah_smt' => $itemBiaya->biaya
+                                ];
+                                $tempMhs[] = $item;
+                            }
+                        } else {
+                            throw new \Exception("Data Pembiayaan untuk angkatan " . $value->angkatan . " belum ada", 1);
+                        }
                     }
                 }
                 $kuliah = new \App\Models\PerkuliahanMahasiswaModel();
@@ -62,24 +68,24 @@ class Semester extends ResourceController
             $object->set('a_periode_aktif', '0')->where('a_periode_aktif', '1')->update();
             $object->save($model);
             $object = new \App\Models\PeriodePerkuliahanModel();
-            if($itemSemester->semester=="1"){
+            if ($itemSemester->semester == "1") {
                 if ($object->where('id_semester', $param->id_semester)->countAllResults() == 0) {
                     $prodi = new \App\Models\ProdiModel();
                     $dataProdi = $prodi->where('status', 'A')->findAll();
                     foreach ($dataProdi as $key => $value) {
                         $item = [
-                            'id'=>Uuid::uuid4()->toString(),
+                            'id' => Uuid::uuid4()->toString(),
                             'id_prodi' => $value->id_prodi,
                             'id_semester' => $param->id_semester,
                             'id_semester' => $param->id_semester,
-                            'jumlah_target_mahasiswa_baru'=>0,
-                            'jumlah_pendaftar_ikut_seleksi'=>0,
-                            'jumlah_pendaftar_lulus_seleksi'=>0,
-                            'jumlah_daftar_ulang'=>0,
-                            'jumlah_mengundurkan_diri'=>0,
-                            'jumlah_minggu_pertemuan'=>0,
-                            'tanggal_awal_perkuliahan'=>$itemSemester->tanggal_mulai,
-                            'tanggal_akhir_perkuliahan'=>$itemSemester->tanggal_selesai,
+                            'jumlah_target_mahasiswa_baru' => 0,
+                            'jumlah_pendaftar_ikut_seleksi' => 0,
+                            'jumlah_pendaftar_lulus_seleksi' => 0,
+                            'jumlah_daftar_ulang' => 0,
+                            'jumlah_mengundurkan_diri' => 0,
+                            'jumlah_minggu_pertemuan' => 0,
+                            'tanggal_awal_perkuliahan' => $itemSemester->tanggal_mulai,
+                            'tanggal_akhir_perkuliahan' => $itemSemester->tanggal_selesai,
                         ];
                         $model = new \App\Entities\PeriodePerkuliahanEntity();
                         $model->fill($item);
