@@ -62,27 +62,29 @@ class Semester extends ResourceController
             $object->set('a_periode_aktif', '0')->where('a_periode_aktif', '1')->update();
             $object->save($model);
             $object = new \App\Models\PeriodePerkuliahanModel();
-            if ($object->where('id_semester', $param->id_semester)->countAllResults() == 0) {
-                $prodi = new \App\Models\ProdiModel();
-                $dataProdi = $prodi->where('status', 'A')->findAll();
-                foreach ($dataProdi as $key => $value) {
-                    $item = [
-                        'id'=>Uuid::uuid4()->toString(),
-                        'id_prodi' => $value->id_prodi,
-                        'id_semester' => $param->id_semester,
-                        'id_semester' => $param->id_semester,
-                        'jumlah_target_mahasiswa_baru'=>0,
-                        'jumlah_pendaftar_ikut_seleksi'=>0,
-                        'jumlah_pendaftar_lulus_seleksi'=>0,
-                        'jumlah_daftar_ulang'=>0,
-                        'jumlah_mengundurkan_diri'=>0,
-                        'jumlah_minggu_pertemuan'=>0,
-                        'tanggal_awal_perkuliahan'=>$itemSemester->tanggal_mulai,
-                        'tanggal_akhir_perkuliahan'=>$itemSemester->tanggal_selesai,
-                    ];
-                    $model = new \App\Entities\PeriodePerkuliahanEntity();
-                    $model->fill($item);
-                    $object->insert($model);
+            if($itemSemester->semester=="1"){
+                if ($object->where('id_semester', $param->id_semester)->countAllResults() == 0) {
+                    $prodi = new \App\Models\ProdiModel();
+                    $dataProdi = $prodi->where('status', 'A')->findAll();
+                    foreach ($dataProdi as $key => $value) {
+                        $item = [
+                            'id'=>Uuid::uuid4()->toString(),
+                            'id_prodi' => $value->id_prodi,
+                            'id_semester' => $param->id_semester,
+                            'id_semester' => $param->id_semester,
+                            'jumlah_target_mahasiswa_baru'=>0,
+                            'jumlah_pendaftar_ikut_seleksi'=>0,
+                            'jumlah_pendaftar_lulus_seleksi'=>0,
+                            'jumlah_daftar_ulang'=>0,
+                            'jumlah_mengundurkan_diri'=>0,
+                            'jumlah_minggu_pertemuan'=>0,
+                            'tanggal_awal_perkuliahan'=>$itemSemester->tanggal_mulai,
+                            'tanggal_akhir_perkuliahan'=>$itemSemester->tanggal_selesai,
+                        ];
+                        $model = new \App\Entities\PeriodePerkuliahanEntity();
+                        $model->fill($item);
+                        $object->insert($model);
+                    }
                 }
             }
             $conn->transComplete();
