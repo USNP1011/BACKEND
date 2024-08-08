@@ -94,9 +94,10 @@ class KelasKuliah extends ResourceController
         return $this->respond([
             'status' => true,
             'data' => $object
-                ->select("riwayat_pendidikan_mahasiswa.*, mahasiswa.nama_mahasiswa")
+                ->select("riwayat_pendidikan_mahasiswa.*, mahasiswa.nama_mahasiswa, prodi.nama_program_studi")
                 ->join("mahasiswa", "mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa", 'left')
                 ->join("mahasiswa_lulus_do", "riwayat_pendidikan_mahasiswa.id=mahasiswa_lulus_do.id_riwayat_pendidikan", "left")
+                ->join("prodi", "riwayat_pendidikan_mahasiswa.id_prodi=prodi.id_prodi", "left")
                 ->groupStart()
                 ->like('nim', $param->cari)
                 ->orLike('mahasiswa.nama_mahasiswa', $param->cari)

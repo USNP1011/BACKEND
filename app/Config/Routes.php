@@ -70,6 +70,7 @@ $routes->group('get_data', static function($routes){
     $routes->get('mahasiswa_lulus_do', 'GetData::mahasiswaLulusDO');
     $routes->get('kampus_merdeka', 'GetData::konversiKampusMerdeka');
     $routes->get('transkrip', 'GetData::transkrip');
+    $routes->get('periode_kuliah', 'GetData::periodePerkuliahan');
 });
 
 $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($routes){
@@ -370,4 +371,7 @@ $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($
         $routes->get('pengajuan/(:hash)', 'Keuangan\Perwalian::pengajuan/$1');
         $routes->post('pengajuan', 'Keuangan\Perwalian::updatePengajuan');
     });
+});
+$routes->group('sync', function($routes){
+    $routes->get('', 'Sync::getSync');
 });
