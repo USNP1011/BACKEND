@@ -17,6 +17,7 @@ class AktivitasKuliah extends ResourceController
             'data' => is_null($id) ? $object->findAll() : $object->select("perkuliahan_mahasiswa.*, mahasiswa.nama_mahasiswa")
             ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=perkuliahan_mahasiswa.id_riwayat_pendidikan', 'left')
             ->join('mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id', 'left')
+            ->orderBy('id_semester', 'asc')
             ->where('perkuliahan_mahasiswa.id', $id)->first()
         ]);
     }
