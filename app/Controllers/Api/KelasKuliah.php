@@ -402,7 +402,7 @@ class KelasKuliah extends ResourceController
 
     public function paginate()
     {
-        $item = $this->request->getJSON();
+        $param = $this->request->getJSON();
         $object = model(KelasKuliahModel::class);
         $item = [
             'status' => true,
@@ -416,14 +416,14 @@ class KelasKuliah extends ResourceController
                 ->join('kelas', 'kelas_kuliah.kelas_id=kelas.id', 'left')
                 ->join('ruangan', 'ruangan.id=kelas_kuliah.ruangan_id', 'left')
                 ->groupStart()
-                ->like('kelas.nama_kelas_kuliah', $item->cari)
-                ->orLike('matakuliah.kode_mata_kuliah', $item->cari)
-                ->orLike('matakuliah.nama_mata_kuliah', $item->cari)
-                ->orLike('prodi.nama_program_studi', $item->cari)
+                ->like('kelas.nama_kelas_kuliah', $param->cari)
+                ->orLike('matakuliah.kode_mata_kuliah', $param->cari)
+                ->orLike('matakuliah.nama_mata_kuliah', $param->cari)
+                ->orLike('prodi.nama_program_studi', $param->cari)
                 ->groupEnd()
                 ->where('a_periode_aktif', '1')
-                ->orderBy('prodi.nama_program_studi', 'desc')
-                ->paginate($item->count, 'default', $item->page),
+                ->orderBy(isset($param->order) && $param->order->field != "" ? $param->order->field : 'prodi.nama_program_studi', isset($param->order) && $param->order->field != "" ? $param->order->direction : 'desc')
+                ->paginate($param->count, 'default', $param->page),
             'pager' => $object->pager->getDetails()
         ];
         return $this->respond($item);
