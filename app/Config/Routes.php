@@ -170,7 +170,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
         $routes->delete('(:hash)', 'Settings::deletePembiayaan/$1', ['filter' => 'auth']);
     });
     
-    $routes->group('mahasiswa', ['filter' => 'auth'], function($routes){
+    $routes->group('mahasiswa', function($routes){
         $routes->get('', 'Mahasiswa::show', ['filter' => 'auth']);
         $routes->get('(:hash)', 'Mahasiswa::show/$1', ['filter' => 'general']);
         $routes->get('(:hash)/riwayat_pendidikan', 'Mahasiswa::riwayatPendidikan/$1', ['filter' => 'auth']);
