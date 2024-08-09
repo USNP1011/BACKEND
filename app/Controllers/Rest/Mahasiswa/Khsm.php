@@ -16,6 +16,7 @@ class Khsm extends ResourceController
             $perkuliahan = new \App\Models\PerkuliahanMahasiswaModel();
             $itemPerkuliahan = $perkuliahan->select('perkuliahan_mahasiswa.ips,perkuliahan_mahasiswa.ipk, perkuliahan_mahasiswa.sks_semester, perkuliahan_mahasiswa.sks_total, semester.nama_semester')
                 ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->join('semester', 'semester.id_semester=perkuliahan_mahasiswa.id_semester', 'left')->where('perkuliahan_mahasiswa.id_semester', $id)->first();
+            if (is_null($itemPerkuliahan)) throw new \Exception("Tidak ada KHS pada semester tersebut", 1);
             $itemPerkuliahan->nim = $profile->nim;
             $itemPerkuliahan->nama_mahasiswa = $profile->nama_mahasiswa;
             $itemPerkuliahan->nama_program_studi = $profile->nama_program_studi;
