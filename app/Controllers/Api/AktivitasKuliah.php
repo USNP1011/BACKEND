@@ -15,10 +15,10 @@ class AktivitasKuliah extends ResourceController
         return $this->respond([
             'status' => true,
             'data' => is_null($id) ? $object->findAll() : $object->select("perkuliahan_mahasiswa.*, mahasiswa.nama_mahasiswa")
-            ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=perkuliahan_mahasiswa.id_riwayat_pendidikan', 'left')
-            ->join('mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id', 'left')
-            ->orderBy('id_semester', 'asc')
-            ->where('perkuliahan_mahasiswa.id', $id)->first()
+                ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=perkuliahan_mahasiswa.id_riwayat_pendidikan', 'left')
+                ->join('mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id', 'left')
+                ->orderBy('id_semester', 'asc')
+                ->where('perkuliahan_mahasiswa.id', $id)->first()
         ]);
     }
 
@@ -28,11 +28,11 @@ class AktivitasKuliah extends ResourceController
         return $this->respond([
             'status' => true,
             'data' => $object->select("perkuliahan_mahasiswa.*, semester.nama_semester, status_mahasiswa.nama_status_mahasiswa")
-            ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=perkuliahan_mahasiswa.id_riwayat_pendidikan', 'left')
-            ->join('semester', 'semester.id_semester=perkuliahan_mahasiswa.id_semester', 'left')
-            ->join('status_mahasiswa', 'status_mahasiswa.id_status_mahasiswa=perkuliahan_mahasiswa.id_status_mahasiswa', 'left')
-            ->orderBy('id_semester', 'asc')
-            ->where('id_mahasiswa', $id)->findAll()
+                ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=perkuliahan_mahasiswa.id_riwayat_pendidikan', 'left')
+                ->join('semester', 'semester.id_semester=perkuliahan_mahasiswa.id_semester', 'left')
+                ->join('status_mahasiswa', 'status_mahasiswa.id_status_mahasiswa=perkuliahan_mahasiswa.id_status_mahasiswa', 'left')
+                ->orderBy('id_semester', 'asc')
+                ->where('id_mahasiswa', $id)->findAll()
         ]);
     }
 
@@ -115,15 +115,19 @@ class AktivitasKuliah extends ResourceController
                 ->join('prodi', 'prodi.id_prodi=riwayat_pendidikan_mahasiswa.id_prodi', 'left')
                 ->join('semester', 'semester.id_semester=perkuliahan_mahasiswa.id_semester', 'left')
                 ->join('status_mahasiswa', 'status_mahasiswa.id_status_mahasiswa=perkuliahan_mahasiswa.id_status_mahasiswa', 'left')
-                ->where('perkuliahan_mahasiswa.id_semester', $semester->id_semester)
                 ->groupStart()
                 ->like('mahasiswa.nama_mahasiswa', $param->cari)
                 ->orLike('riwayat_pendidikan_mahasiswa.nim', $param->cari)
                 ->groupEnd()
-                ->orderBy(isset($param->order) && $param->order != "" ? $param->order->field : 'prodi.nama_program_studi', isset($param->order) && $param->order != "" ? $param->order->direction : 'desc')
+                ->where('perkuliahan_mahasiswa.id_semester', $semester->id_semester)
+                ->orderBy(isset($param->order) && $param->order->field != "" ? $param->order->field : 'prodi.nama_program_studi', isset($param->order) && $param->order->direction != "" ? $param->order->direction : 'desc')
                 ->paginate($param->count, 'default', $param->page),
             'pager' => $object->pager->getDetails()
         ];
         return $this->respond($item);
+        try {
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage());
+        }
     }
 }

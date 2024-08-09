@@ -422,7 +422,7 @@ class KelasKuliah extends ResourceController
                 ->orLike('prodi.nama_program_studi', $param->cari)
                 ->groupEnd()
                 ->where('a_periode_aktif', '1')
-                ->orderBy(isset($param->order) && $param->order->field != "" ? $param->order->field : 'prodi.nama_program_studi', isset($param->order) && $param->order->field != "" ? $param->order->direction : 'desc')
+                ->orderBy(isset($param->order) && $param->order->field != "" ? $param->order->field : 'prodi.nama_program_studi', isset($param->order) && $param->order->direction != "" ? $param->order->direction : 'desc')
                 ->paginate($param->count, 'default', $param->page),
             'pager' => $object->pager->getDetails()
         ];

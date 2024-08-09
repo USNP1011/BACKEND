@@ -150,7 +150,7 @@ class Matakuliah extends ResourceController
             ->like('nama_mata_kuliah', $param->cari)
             ->orLike('kode_mata_kuliah', $param->cari)
             ->orLike('prodi.nama_program_studi', $param->cari)
-            ->orderBy(isset($param->order) && $param->order->field != "" ? $param->order->field : 'prodi.nama_program_studi', isset($param->order) && $param->order->field != "" ? $param->order->direction : 'desc')
+            ->orderBy(isset($param->order) && $param->order->field != "" ? $param->order->field : 'prodi.nama_program_studi', isset($param->order) && $param->order->direction != "" ? $param->order->direction : 'desc')
             ->paginate($param->count, 'default', $param->page),
             'pager' => $object->pager->getDetails()
         ];
