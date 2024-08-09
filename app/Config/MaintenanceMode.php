@@ -12,6 +12,9 @@ class MaintenanceMode extends BaseConfig
     //--------------------------------------------------------------------
     // 
     //
+
     public $FilePath = WRITEPATH . 'framework/';
     public $FileName = 'down';
+
+    
 }

@@ -34,6 +34,16 @@ class DosenAuth implements FilterInterface
     {
         $authenticationHeader = $request->getServer('HTTP_AUTHORIZATION');
         try {
+            $check = new \CodeigniterExt\MaintenanceMode\Controllers\MaintenanceMode();
+            $itemCheck = $check->check();
+			if(is_array($itemCheck)){
+                $set = true;
+                foreach ($itemCheck['user'] as $key => $value) {
+                    if($value=="Dosen") $set = false;
+                }
+                if(!$set) throw new Exception("Sedang Maintenace", 503);
+            } 
+
             $encodedToken = getJWTFromRequest($authenticationHeader);
             $data=validateJWTFromRequest($encodedToken);
             $auth = false;
@@ -51,7 +61,7 @@ class DosenAuth implements FilterInterface
                         'error' => $ex->getMessage()
                     ]
                 )
-                ->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED);
+                ->setStatusCode($ex->getMessage());
         }
     }
 
