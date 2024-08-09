@@ -29,6 +29,7 @@ class AktivitasKuliah extends ResourceController
             'status' => true,
             'data' => $object->select("perkuliahan_mahasiswa.*")
             ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=perkuliahan_mahasiswa.id_riwayat_pendidikan', 'left')
+            ->orderBy('id_semester', 'asc')
             ->where('id_mahasiswa', $id)->findAll()
         ]);
     }
