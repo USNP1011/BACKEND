@@ -23,9 +23,10 @@ class Khsm extends ResourceController
             $itemPerkuliahan->nama_kaprodi = $profile->nama_kaprodi;
             $itemPerkuliahan->dosen_wali = $profile->dosen_wali;
             $object = new \App\Models\PesertaKelasModel();
-            $itemPerkuliahan->detail = $object->select("peserta_kelas.nilai_angka, peserta_kelas.nilai_huruf, peserta_kelas.nilai_indeks, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, (matakuliah.sks_mata_kuliah*peserta_kelas.nilai_indeks) as nxsks")
+            $itemPerkuliahan->detail = $object->select("peserta_kelas.nilai_angka, peserta_kelas.nilai_huruf, peserta_kelas.nilai_indeks, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, matakuliah_kurikulum.semester, (matakuliah.sks_mata_kuliah*peserta_kelas.nilai_indeks) as nxsks")
                 ->join('kelas_kuliah', 'kelas_kuliah.id=peserta_kelas.kelas_kuliah_id', 'left')
-                ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id')
+                ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
+                ->join('matakuliah_kurikulum', 'matakuliah_kurikulum.matakuliah_id=kelas_kuliah.matakuliah_id', 'left')
                 ->where('kelas_kuliah.id_semester', $id)
                 ->where('peserta_kelas.id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->findAll();
 
