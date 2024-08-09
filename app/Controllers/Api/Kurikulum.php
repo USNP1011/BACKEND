@@ -49,7 +49,7 @@ class Kurikulum extends ResourceController
             'status' => true,
             'data' => $object->select('matakuliah.*')
             ->join('matakuliah', 'matakuliah.id=matakuliah_kurikulum.mahasiswa_id', 'left')
-            ->where('id_prodi', $id)->findAll()
+            ->where('matakuliah.id_prodi', $id)->findAll()
         ]);
     }
 
