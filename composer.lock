@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "77ea6066b9d30f65f48a4c2d3e7b576a",
+    "content-hash": "db5a36dad6c1e1868932896fba86ed79",
     "packages": [
         {
             "name": "agungsugiarto/codeigniter4-cors",
@@ -333,6 +333,43 @@
                 "source": "https://github.com/codeigniter4/shield"
             },
             "time": "2024-06-13T08:54:48+00:00"
+        },
+        {
+            "name": "codeigniterext/maintenancemode",
+            "version": "0.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/arashsaffari/maintenancemode.git",
+                "reference": "7749d3052a975c461d523f6dca5039d144e300b3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/arashsaffari/maintenancemode/zipball/7749d3052a975c461d523f6dca5039d144e300b3",
+                "reference": "7749d3052a975c461d523f6dca5039d144e300b3",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "CodeigniterExt\\MaintenanceMode\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Arash Saffari",
+                    "email": "arash@saffari.com"
+                }
+            ],
+            "description": "Maintenance Mode module for CodeIgniter 4",
+            "support": {
+                "issues": "https://github.com/arashsaffari/maintenancemode/issues",
+                "source": "https://github.com/arashsaffari/maintenancemode/tree/0.0.2"
+            },
+            "time": "2022-12-24T02:42:45+00:00"
         },
         {
             "name": "firebase/php-jwt",
