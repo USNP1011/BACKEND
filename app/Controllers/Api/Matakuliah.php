@@ -139,7 +139,7 @@ class Matakuliah extends ResourceController
         }
     }
 
-    public function paginate($page = 1, $count = 10, $cari = null)
+    public function paginate()
     {
         $param = $this->request->getJSON();
         $object = model(MatakuliahModel::class);
