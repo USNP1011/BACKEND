@@ -74,6 +74,11 @@ class Krsm extends ResourceController
                         'id_riwayat_pendidikan' => $profile->id_riwayat_pendidikan,
                         'id_semester' => $semester->id_semester,
                         'nama_semester' => $semester->nama_semester,
+                        'nama_mahasiswa' => $profile->nama_mahasiswa,
+                        'nim' => $profile->nim,
+                        'nama_program_studi' => $profile->nama_program_studi,
+                        'nama_kaprodi' => getKaprodi($profile->id_prodi)->nama_dosen,
+                        'dosen_wali' => $profile->dosen_wali,
                         'detail' => $items
                     ];
                     return $this->respond([
