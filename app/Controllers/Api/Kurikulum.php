@@ -44,10 +44,12 @@ class Kurikulum extends ResourceController
 
     public function matakuliah_prodi($id = null)
     {
-        $object = new MatakuliahModel();
+        $object = new MatakuliahKurikulumModel();
         return $this->respond([
             'status' => true,
-            'data' => $object->where('id_prodi', $id)->findAll()
+            'data' => $object->select('matakuliah.*')
+            ->join('matakuliah', 'matakuliah.id=matakuliah_kurikulum.mahasiswa_id', 'left')
+            ->where('id_prodi', $id)->findAll()
         ]);
     }
 
