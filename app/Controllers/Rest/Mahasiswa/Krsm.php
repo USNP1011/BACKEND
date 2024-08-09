@@ -70,6 +70,10 @@ class Krsm extends ResourceController
                         ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)
                         ->where('kelas_kuliah.id_semester', $semester->id_semester)
                         ->findAll();
+                    $sks_semester = 0;
+                    foreach ($items as $key => $value) {
+                        $sks_semester+=$value->sks_mata_kuliah;
+                    }
                     $matakuliah = [
                         'id_riwayat_pendidikan' => $profile->id_riwayat_pendidikan,
                         'id_semester' => $semester->id_semester,
@@ -79,6 +83,7 @@ class Krsm extends ResourceController
                         'nama_program_studi' => $profile->nama_program_studi,
                         'nama_kaprodi' => getKaprodi($profile->id_prodi)->nama_dosen,
                         'dosen_wali' => $profile->dosen_wali,
+                        'sks_semester'=>$sks_semester,
                         'detail' => $items
                     ];
                     return $this->respond([
