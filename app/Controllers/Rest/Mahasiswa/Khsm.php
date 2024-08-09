@@ -12,7 +12,9 @@ class Khsm extends ResourceController
         try {
             if (is_null($id_mahasiswa)) {
                 $profile = getProfile();
-            } else $profile = getProfileByMahasiswa($id_mahasiswa);
+            } else {
+                $profile = getProfileByMahasiswa($id_mahasiswa);
+            }
             $perkuliahan = new \App\Models\PerkuliahanMahasiswaModel();
             $itemPerkuliahan = $perkuliahan->select('perkuliahan_mahasiswa.ips,perkuliahan_mahasiswa.ipk, perkuliahan_mahasiswa.sks_semester, perkuliahan_mahasiswa.sks_total, semester.nama_semester')
                 ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->join('semester', 'semester.id_semester=perkuliahan_mahasiswa.id_semester', 'left')->where('perkuliahan_mahasiswa.id_semester', $id)->first();
@@ -20,7 +22,7 @@ class Khsm extends ResourceController
             $itemPerkuliahan->nim = $profile->nim;
             $itemPerkuliahan->nama_mahasiswa = $profile->nama_mahasiswa;
             $itemPerkuliahan->nama_program_studi = $profile->nama_program_studi;
-            $itemPerkuliahan->nama_kaprodi = $profile->nama_kaprodi;
+            $itemPerkuliahan->nama_kaprodi = getKaprodi($profile->id_prodi)->nama_dosen;
             $itemPerkuliahan->dosen_wali = $profile->dosen_wali;
             $object = new \App\Models\PesertaKelasModel();
             $itemPerkuliahan->detail = $object->select("peserta_kelas.nilai_angka, peserta_kelas.nilai_huruf, peserta_kelas.nilai_indeks, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, matakuliah_kurikulum.semester, (matakuliah.sks_mata_kuliah*peserta_kelas.nilai_indeks) as nxsks, if(nilai_indeks>=2,'L', 'TL') as ket")

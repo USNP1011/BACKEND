@@ -73,3 +73,8 @@ function getProfileProdi()
     $profile->id_prodi = $profile->kaprodi->id_prodi;
     return $profile;
 }
+
+function getKaprodi($id_prodi = null) {
+    $object = new \App\Models\KaprodiModel();
+    return $object->select('kaprodi.*, dosen.nama_dosen')->join('dosen', 'dosen.id_dosen=kaprodi.id_dosen', 'left')->where('kaprodi.id_prodi', $id_prodi)->first();
+}
