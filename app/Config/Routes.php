@@ -246,7 +246,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
         $routes->put('dosen', 'KelasKuliah::updateDosen', ['filter' => 'auth']);
         $routes->delete('(:hash)', 'KelasKuliah::delete/$1', ['filter' => 'auth']);
         $routes->delete('mahasiswa/(:hash)', 'KelasKuliah::deleteMahasiswa/$1', ['filter' => 'auth']);
-        $routes->delete('dosen/(:hash)', 'deleteDosen::delete/$1', ['filter' => 'auth']);
+        $routes->delete('dosen/(:hash)', 'KelasKuliah::deleteDosen/$1', ['filter' => 'auth']);
     });
 
     $routes->group('kurikulum', ['filter' => 'auth'], function($routes){
