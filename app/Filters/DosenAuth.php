@@ -36,32 +36,34 @@ class DosenAuth implements FilterInterface
         try {
             $check = new \CodeigniterExt\MaintenanceMode\Controllers\MaintenanceMode();
             $itemCheck = $check->check();
-			if(is_array($itemCheck)){
+            if (is_array($itemCheck)) {
                 $set = true;
                 foreach ($itemCheck['user'] as $key => $value) {
-                    if($value=="Dosen") $set = false;
+                    if ($value == "Dosen") $set = false;
                 }
-                if(!$set) throw new Exception("Sedang Maintenace", 503);
-            } 
+                if (!$set) throw new Exception("Sedang Maintenace", 503);
+            }
 
             $encodedToken = getJWTFromRequest($authenticationHeader);
-            $data=validateJWTFromRequest($encodedToken);
+            $data = validateJWTFromRequest($encodedToken);
             $auth = false;
             foreach ($data as $key => $value) {
-                if($value->role=="Dosen") $auth = true;
+                if ($value->role == "Dosen") $auth = true;
             }
-            if($auth)return $request;
+            if ($auth) return $request;
             else throw new Exception("Anda tidak memiliki izin", 401);
-            
-        } 
-        catch (Exception $ex) {
+        } catch (Exception $ex) {
             return Services::response()
                 ->setJSON(
                     [
-                        'error' => $ex->getMessage()
+                        "status" => $ex->getCode(),
+                        "error" => $ex->getCode(),
+                        "messages" => [
+                            "error" => $ex->getMessage()
+                        ]
                     ]
                 )
-                ->setStatusCode($ex->getMessage());
+                ->setStatusCode($ex->getCode());
         }
     }
 

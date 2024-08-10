@@ -41,10 +41,14 @@ class GeneralAuth implements FilterInterface
             return Services::response()
                 ->setJSON(
                     [
-                        'error' => $ex->getMessage()
+                        "status" => $ex->getCode(),
+                        "error" => $ex->getCode(),
+                        "messages" => [
+                            "error" => $ex->getMessage()
+                        ]
                     ]
                 )
-                ->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED);
+                ->setStatusCode($ex->getCode());
         }
     }
 
