@@ -214,7 +214,8 @@ class AuthController extends ResourceController
                 "message" => "User created successfully"
             ]);
         } catch (\Throwable $th) {
-            return $this->fail(handleErrorDB($th->getCode()));
+            return $this->fail($th->getMessage());
+            // return $this->fail(handleErrorDB($th->getCode()));
         }
     }
 
