@@ -84,6 +84,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->get('jenis_keluar', 'Referensi\jenisKeluar::store', ['filter' => 'general']);
     $routes->get('jenis_sertifikasi', 'Referensi\JenisSertifikasi::store', ['filter' => 'general']);
     $routes->get('jenis_pendaftaran', 'Referensi\JenisPendaftaran::store', ['filter' => 'general']);
+    $routes->get('jenis_pembiayaan', 'Referensi\JenisPembiayaan::store', ['filter' => 'general']);
     $routes->get('jenis_sms', 'Referensi\JenisSMS::store', ['filter' => 'general']);
     $routes->get('jenis_peran', 'Referensi\JenisPeran::store', ['filter' => 'general']);
     $routes->get('bentuk_pendidikan', 'Referensi\BentukPendidikan::store', ['filter' => 'general']);

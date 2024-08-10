@@ -11,13 +11,9 @@ class PerkuliahanMahasiswaModel extends Model
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields = [
-        'id_registrasi_mahasiswa',
         'id_riwayat_pendidikan',
 		'id_semester',
-        'nama_semester',
-        'nama_program_studi',
 		'id_status_mahasiswa',
-		'nama_status_mahasiswa',
 		'ips',
 		'ipk',
 		'sks_semester',
@@ -27,7 +23,8 @@ class PerkuliahanMahasiswaModel extends Model
 		'updated_at',
 		'deleted_at',
 		'sync_at',
-		'status_sync'
+		'status_sync',
+        'id_pembiayaan'
     ];
 	protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
