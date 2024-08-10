@@ -22,9 +22,10 @@ class Sync extends BaseController
         // Nilai Transfer
         $object = new \App\Models\NilaiTransferModel();
         $data->nilai_transfer = $object->select("nilai_transfer.id, (if(id_transfer is null AND deleted_at is null, 'insert', if(id_transfer is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_transfer is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_transfer is null AND deleted_at is null, 'insert', if(id_transfer is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_transfer is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+
         // Kelas Kuliah
         $object = new \App\Models\KelasKuliahModel();
-        $data->kelas_kuliah = $object->select("kelas_kuliah.id, (if(id_kelas_kuliah is null AND deleted_at is null, 'insert', if(id_kelas_kuliah is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_kelas_kuliah is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_kelas_kuliah is null AND deleted_at is null, 'insert', if(id_kelas_kuliah is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_kelas_kuliah is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->where('id_semester', $semester->id_semester)->findAll();
+        $data->kelas_kuliah = $object->select("id,id_kelas_kuliah,id_prodi,matakuliah_id,id_semester,nama_semester,nama_program_studi,kelas_id,kode_mata_kuliah,nama_mata_kuliah,bahasan,tanggal_mulai_efektif,tanggal_akhir_efektif,lingkup,mode,kapasitas, (if(id_kelas_kuliah is null AND deleted_at is null, 'insert', if(id_kelas_kuliah is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_kelas_kuliah is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_kelas_kuliah is null AND deleted_at is null, 'insert', if(id_kelas_kuliah is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_kelas_kuliah is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->where('id_semester', $semester->id_semester)->findAll();
 
         // Peserta Kelas
         $object = new \App\Models\PesertaKelasModel();

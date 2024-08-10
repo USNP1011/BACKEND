@@ -111,12 +111,13 @@ class AktivitasKuliah extends ResourceController
             $object = new PerkuliahanMahasiswaModel();
             $item = [
                 'status' => true,
-                'data' => $object->select("perkuliahan_mahasiswa.*, mahasiswa.nama_mahasiswa, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.id_mahasiswa as mahasiswa_id, prodi.nama_program_studi, semester.nama_semester, status_mahasiswa.nama_status_mahasiswa")
+                'data' => $object->select("perkuliahan_mahasiswa.*, mahasiswa.nama_mahasiswa, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.id_mahasiswa as mahasiswa_id, prodi.nama_program_studi, semester.nama_semester, status_mahasiswa.nama_status_mahasiswa, nama_pembiayaan")
                     ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=perkuliahan_mahasiswa.id_riwayat_pendidikan', 'left')
                     ->join('mahasiswa', 'mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa', 'left')
                     ->join('prodi', 'prodi.id_prodi=riwayat_pendidikan_mahasiswa.id_prodi', 'left')
                     ->join('semester', 'semester.id_semester=perkuliahan_mahasiswa.id_semester', 'left')
                     ->join('status_mahasiswa', 'status_mahasiswa.id_status_mahasiswa=perkuliahan_mahasiswa.id_status_mahasiswa', 'left')
+                    ->join('pembiayaan', 'pembiayaan.id_pembiayaan=perkuliahan_mahasiswa.id_pembiayaan', 'left')
                     ->groupStart()
                     ->like('mahasiswa.nama_mahasiswa', $param->cari)
                     ->orLike('riwayat_pendidikan_mahasiswa.nim', $param->cari)
