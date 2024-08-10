@@ -60,7 +60,7 @@ class Krsm extends ResourceController
                     }
                 } else {
                     $object = new \App\Models\PesertaKelasModel();
-                    $items = $object->select("kelas_kuliah.*, kelas.nama_kelas_kuliah, matakuliah.sks_mata_kuliah, penugasan_dosen.nidn, penugasan_dosen.nama_dosen, ruangan.nama_ruangan")
+                    $items = $object->select("kelas_kuliah.id, kelas_kuliah.id as kelas_kuliah_id,id_kelas_kuliah,kelas_kuliah.id_prodi,matakuliah_id,id_semester,nama_semester,kelas_kuliah.kelas_id,bahasan,lingkup,mode,kapasitas,hari,jam_mulai,jam_selesai,ruangan_id,kelas_kuliah.sync_at,kelas_kuliah.status_sync, kelas.nama_kelas_kuliah, matakuliah.sks_mata_kuliah, penugasan_dosen.nidn, penugasan_dosen.nama_dosen, ruangan.nama_ruangan")
                         ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
                         ->join('matakuliah', 'kelas_kuliah.matakuliah_id = matakuliah.id', 'left')
                         ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id = kelas_kuliah.id', 'left')
