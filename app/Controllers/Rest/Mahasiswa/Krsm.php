@@ -27,12 +27,13 @@ class Krsm extends ResourceController
                             ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->first();
                         if (!is_null($data)) {
                             $object = new \App\Models\TempPesertaKelasModel();
-                            $data->detail = $object->select('temp_peserta_kelas.*, matakuliah.nama_mata_kuliah, matakuliah.kode_mata_kuliah, matakuliah.sks_mata_kuliah, kelas.nama_kelas_kuliah, dosen.nidn, dosen.nama_dosen')
+                            $data->detail = $object->select('temp_peserta_kelas.*, matakuliah.nama_mata_kuliah, matakuliah.kode_mata_kuliah, matakuliah.sks_mata_kuliah, kelas.nama_kelas_kuliah, dosen.nidn, dosen.nama_dosen, kelas_kuliah.hari, kelas_kuliah.jam_mulai, jam_selesai')
                                 ->join('kelas_kuliah', 'kelas_kuliah.id=temp_peserta_kelas.kelas_kuliah_id', 'left')
                                 ->join('matakuliah', 'kelas_kuliah.matakuliah_id=matakuliah.id', 'left')
                                 ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id', 'left')
-                                ->join('dosen', 'dosen_pengajar_kelas.id_dosen=dosen.id_dosen', 'left')
-                                ->join('kelas', 'kelas_kuliah.kelas_id=kelas.id', 'left')
+                                ->join('penugasan_dosen', 'penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen', 'left')
+                                ->join('dosen', 'dosen.id_dosen=penugasan_dosen.id_dosen', 'left')
+                                ->join('kelas', 'kelas.id=kelas_kuliah.kelas_id', 'left')
                                 ->where('temp_krsm_id', $data->id)->findAll();
                             $object = new \App\Models\TahapanModel();
                             return $this->respond([
