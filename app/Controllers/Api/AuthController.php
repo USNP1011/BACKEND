@@ -227,6 +227,8 @@ class AuthController extends ResourceController
         } else if ($role == 'Mahasiswa') {
             $object = new \App\Models\MahasiswaModel();
             $object->update($id, ['id_user' => $id_user]);
+            $item = $object->where('id_user', $id_user)->first();
+            $object->update($id, ['sync_at' => $item->updated_at]);
             return true;
         }
     }
