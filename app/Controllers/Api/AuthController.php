@@ -226,8 +226,10 @@ class AuthController extends ResourceController
             $object->update($id, ['id_user' => $id_user]);
             return true;
         } else if ($role == 'Mahasiswa') {
-            $object = new \App\Models\MahasiswaModel();
-            $object->set("id_user='".$id_user."', sync_at=updated_at")->update($id);
+            $conn = \Config\Database::connect();
+            $conn->query("UPDATE mahasiswa SET id_user='".$id_user."', sync_at=updated_at");
+            // $object = new \App\Models\MahasiswaModel();
+            // $object->set("id_user='".$id_user."', sync_at=updated_at")->update($id);
             return true;
         }
     }
