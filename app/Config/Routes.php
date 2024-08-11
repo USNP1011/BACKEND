@@ -7,6 +7,7 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->set404Override('App\Controllers\Errors::show404');
 $routes->get('/', 'Home::index');
+$routes->get('check', 'Check::read');
 
 service('auth')->routes($routes);
 $routes->group('pt', static function($routes){

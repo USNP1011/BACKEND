@@ -133,16 +133,16 @@
         },
         {
             "name": "codeigniter4/framework",
-            "version": "v4.5.3",
+            "version": "v4.5.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/codeigniter4/framework.git",
-                "reference": "be27314371eece7ff3ac7c13d5b2f39f95038dfa"
+                "reference": "336e0781a0e5f6e0a72a5ebc1c76d99f1a8bd408"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/codeigniter4/framework/zipball/be27314371eece7ff3ac7c13d5b2f39f95038dfa",
-                "reference": "be27314371eece7ff3ac7c13d5b2f39f95038dfa",
+                "url": "https://api.github.com/repos/codeigniter4/framework/zipball/336e0781a0e5f6e0a72a5ebc1c76d99f1a8bd408",
+                "reference": "336e0781a0e5f6e0a72a5ebc1c76d99f1a8bd408",
                 "shasum": ""
             },
             "require": {
@@ -203,7 +203,7 @@
                 "slack": "https://codeigniterchat.slack.com",
                 "source": "https://github.com/codeigniter4/CodeIgniter4"
             },
-            "time": "2024-06-25T02:18:23+00:00"
+            "time": "2024-07-27T08:31:38+00:00"
         },
         {
             "name": "codeigniter4/settings",
@@ -845,16 +845,16 @@
         },
         {
             "name": "symfony/finder",
-            "version": "v6.4.8",
+            "version": "v6.4.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "3ef977a43883215d560a2cecb82ec8e62131471c"
+                "reference": "af29198d87112bebdd397bd7735fbd115997824c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/3ef977a43883215d560a2cecb82ec8e62131471c",
-                "reference": "3ef977a43883215d560a2cecb82ec8e62131471c",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/af29198d87112bebdd397bd7735fbd115997824c",
+                "reference": "af29198d87112bebdd397bd7735fbd115997824c",
                 "shasum": ""
             },
             "require": {
@@ -889,7 +889,7 @@
             "description": "Finds files and directories via an intuitive fluent interface",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/finder/tree/v6.4.8"
+                "source": "https://github.com/symfony/finder/tree/v6.4.10"
             },
             "funding": [
                 {
@@ -905,7 +905,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-05-31T14:49:08+00:00"
+            "time": "2024-07-24T07:06:38+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -1060,16 +1060,16 @@
         },
         {
             "name": "zircote/swagger-php",
-            "version": "4.10.5",
+            "version": "4.10.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zircote/swagger-php.git",
-                "reference": "0840dad40fd6759912485f34bfccf13b49b29226"
+                "reference": "e462ff5269ea0ec91070edd5d51dc7215bdea3b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/0840dad40fd6759912485f34bfccf13b49b29226",
-                "reference": "0840dad40fd6759912485f34bfccf13b49b29226",
+                "url": "https://api.github.com/repos/zircote/swagger-php/zipball/e462ff5269ea0ec91070edd5d51dc7215bdea3b6",
+                "reference": "e462ff5269ea0ec91070edd5d51dc7215bdea3b6",
                 "shasum": ""
             },
             "require": {
@@ -1135,9 +1135,9 @@
             ],
             "support": {
                 "issues": "https://github.com/zircote/swagger-php/issues",
-                "source": "https://github.com/zircote/swagger-php/tree/4.10.5"
+                "source": "https://github.com/zircote/swagger-php/tree/4.10.6"
             },
-            "time": "2024-07-16T03:13:27+00:00"
+            "time": "2024-07-26T03:04:43+00:00"
         }
     ],
     "packages-dev": [
@@ -1814,16 +1814,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "10.5.27",
+            "version": "10.5.29",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "2425f713b2a5350568ccb1a2d3984841a23e83c5"
+                "reference": "8e9e80872b4e8064401788ee8a32d40b4455318f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/2425f713b2a5350568ccb1a2d3984841a23e83c5",
-                "reference": "2425f713b2a5350568ccb1a2d3984841a23e83c5",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/8e9e80872b4e8064401788ee8a32d40b4455318f",
+                "reference": "8e9e80872b4e8064401788ee8a32d40b4455318f",
                 "shasum": ""
             },
             "require": {
@@ -1895,7 +1895,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.27"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/10.5.29"
             },
             "funding": [
                 {
@@ -1911,7 +1911,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-07-10T11:48:06+00:00"
+            "time": "2024-07-30T11:08:00+00:00"
         },
         {
             "name": "psr/container",
@@ -2942,5 +2942,5 @@
         "php": "^8.1"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
