@@ -7,21 +7,35 @@ use Ramsey\Uuid\Uuid;
 
 class Khsm extends ResourceController
 {
-    public function show($id = null, $id_mahasiswa=null)
+    public function show($id = null, $id_mahasiswa = null)
     {
         try {
-            if(is_null($id_mahasiswa)){
+            if (is_null($id_mahasiswa)) {
                 $profile = getProfile();
-                
-            }else $profile = getProfileByMahasiswa($id_mahasiswa);
+            } else {
+                $profile = getProfileByMahasiswa($id_mahasiswa);
+            }
+            $perkuliahan = new \App\Models\PerkuliahanMahasiswaModel();
+            $itemPerkuliahan = $perkuliahan->select('perkuliahan_mahasiswa.ips,perkuliahan_mahasiswa.ipk, perkuliahan_mahasiswa.sks_semester, perkuliahan_mahasiswa.sks_total, semester.nama_semester')
+                ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->join('semester', 'semester.id_semester=perkuliahan_mahasiswa.id_semester', 'left')->where('perkuliahan_mahasiswa.id_semester', $id)->first();
+            if (is_null($itemPerkuliahan)) throw new \Exception("Tidak ada KHS pada semester " . getSemesterById($id)->nama_semester, 1);
+            $itemPerkuliahan->nim = $profile->nim;
+            $itemPerkuliahan->nama_mahasiswa = $profile->nama_mahasiswa;
+            $itemPerkuliahan->nama_program_studi = $profile->nama_program_studi;
+            $itemPerkuliahan->nama_kaprodi = getKaprodi($profile->id_prodi)->nama_dosen;
+            $itemPerkuliahan->dosen_wali = $profile->dosen_wali;
             $object = new \App\Models\PesertaKelasModel();
+            $itemPerkuliahan->detail = $object->select("peserta_kelas.nilai_angka, peserta_kelas.nilai_huruf, peserta_kelas.nilai_indeks, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, matakuliah_kurikulum.semester, (matakuliah.sks_mata_kuliah*peserta_kelas.nilai_indeks) as nxsks, if(nilai_indeks>=2,'L', 'TL') as ket")
+                ->join('kelas_kuliah', 'kelas_kuliah.id=peserta_kelas.kelas_kuliah_id', 'left')
+                ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
+                ->join('matakuliah_kurikulum', 'matakuliah_kurikulum.matakuliah_id=kelas_kuliah.matakuliah_id', 'left')
+                ->where('kelas_kuliah.id_semester', $id)
+                ->where('peserta_kelas.id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->findAll();
+            if (count($itemPerkuliahan->detail) == 0) throw new \Exception("Tidak ada KHS pada semester " . getSemesterById($id)->nama_semester, 1);
+
             return $this->respond([
                 'status' => true,
-                'data' => $object->select("peserta_kelas.*, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, (matakuliah.sks_mata_kuliah*peserta_kelas.nilai_indeks) as nxsks")
-                    ->join('kelas_kuliah', 'kelas_kuliah.id=peserta_kelas.kelas_kuliah_id', 'left')
-                    ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id')
-                    ->where('kelas_kuliah.id_semester', $id)
-                    ->where('peserta_kelas.id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->findAll()
+                'data' => $itemPerkuliahan
             ]);
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage());

@@ -14,33 +14,37 @@ class Jadwal extends ResourceController
 
     public function show($id = null)
     {
-        $profile = getProfile();
-        $param = $this->request->getJSON();
-        $semester = getSemesterAktif();
-        $object = new KelasKuliahModel();
-        return $this->respond([
-            'status' => true,
-            'data' => $object->select("`kelas_kuliah`.*,
-                `matakuliah`.`kode_mata_kuliah`,
-                `matakuliah`.`nama_mata_kuliah`,
-                `matakuliah`.`sks_mata_kuliah`,
-                `prodi`.`kode_program_studi`,
-                `prodi`.`nama_program_studi`,
-                `kelas`.`nama_kelas_kuliah`,
-                `dosen`.`nama_dosen`,
-                `ruangan`.`nama_ruangan`")
-                ->join("matakuliah", "`kelas_kuliah`.`matakuliah_id` = `matakuliah`.`id`", "left")
-                ->join("prodi", "`matakuliah`.`id_prodi` = `prodi`.`id_prodi`", "left")
-                ->join("kelas", "`kelas`.`id` = `kelas_kuliah`.`kelas_id`", "left")
-                ->join("ruangan", "`ruangan`.`id` = `kelas_kuliah`.`ruangan_id`", "left")
-                ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id')
-                ->join('dosen', 'dosen_pengajar_kelas.id_dosen=dosen.id_dosen')
-                ->where("prodi.id_prodi", $profile->id_prodi)
-                ->where("kelas_kuliah.id_semester", $semester->id_semester)
-                ->groupStart()
-                ->orLike('`matakuliah`.`nama_mata_kuliah`', $param->cari)
-                ->groupEnd()
-                ->paginate(200, 'default', 1)
-        ]);
+        try {
+            $profile = getProfile();
+            $param = $this->request->getJSON();
+            $semester = getSemesterAktif();
+            $object = new KelasKuliahModel();
+            return $this->respond([
+                'status' => true,
+                'data' => $object->select("`kelas_kuliah`.*,
+                    `matakuliah`.`kode_mata_kuliah`,
+                    `matakuliah`.`nama_mata_kuliah`,
+                    `matakuliah`.`sks_mata_kuliah`,
+                    `prodi`.`kode_program_studi`,
+                    `prodi`.`nama_program_studi`,
+                    `kelas`.`nama_kelas_kuliah`,
+                    `dosen`.`nama_dosen`,
+                    `ruangan`.`nama_ruangan`")
+                    ->join("matakuliah", "`kelas_kuliah`.`matakuliah_id` = `matakuliah`.`id`", "left")
+                    ->join("prodi", "`matakuliah`.`id_prodi` = `prodi`.`id_prodi`", "left")
+                    ->join("kelas", "`kelas`.`id` = `kelas_kuliah`.`kelas_id`", "left")
+                    ->join("ruangan", "`ruangan`.`id` = `kelas_kuliah`.`ruangan_id`", "left")
+                    ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id', 'left')
+                    ->join('dosen', 'dosen_pengajar_kelas.id_dosen=dosen.id_dosen', 'left')
+                    ->where("kelas_kuliah.id_prodi", $profile->id_prodi)
+                    ->where("kelas_kuliah.id_semester", $semester->id_semester)
+                    ->groupStart()
+                    ->orLike('`matakuliah`.`nama_mata_kuliah`', $param->cari)
+                    ->groupEnd()
+                    ->paginate(200, 'default', 1)
+            ]);
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage());
+        }
     }
 }

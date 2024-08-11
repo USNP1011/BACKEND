@@ -94,9 +94,10 @@ class KelasKuliah extends ResourceController
         return $this->respond([
             'status' => true,
             'data' => $object
-                ->select("riwayat_pendidikan_mahasiswa.*, mahasiswa.nama_mahasiswa")
+                ->select("riwayat_pendidikan_mahasiswa.*, mahasiswa.nama_mahasiswa, prodi.nama_program_studi")
                 ->join("mahasiswa", "mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa", 'left')
                 ->join("mahasiswa_lulus_do", "riwayat_pendidikan_mahasiswa.id=mahasiswa_lulus_do.id_riwayat_pendidikan", "left")
+                ->join("prodi", "riwayat_pendidikan_mahasiswa.id_prodi=prodi.id_prodi", "left")
                 ->groupStart()
                 ->like('nim', $param->cari)
                 ->orLike('mahasiswa.nama_mahasiswa', $param->cari)
@@ -112,8 +113,11 @@ class KelasKuliah extends ResourceController
         return $this->respond([
             'status' => true,
             'data' => $object
-                ->select("dosen_pengajar_kelas.*, penugasan_dosen.nama_dosen, penugasan_dosen.nidn")
+                ->select("dosen_pengajar_kelas.*, matakuliah.sks_mata_kuliah as sks_substansi_total, penugasan_dosen.nama_dosen, penugasan_dosen.nidn, jenis_evaluasi.nama_jenis_evaluasi")
                 ->join("penugasan_dosen", "penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen", "left")
+                ->join('kelas_kuliah', 'kelas_kuliah.id=dosen_pengajar_kelas.kelas_kuliah_id', 'left')
+                ->join('matakuliah', 'kelas_kuliah.matakuliah_id=matakuliah.id', 'left')
+                ->join('jenis_evaluasi', 'jenis_evaluasi.id_jenis_evaluasi=dosen_pengajar_kelas.id_jenis_evaluasi', 'left')
                 ->where('kelas_kuliah_id', $id)->findAll()
         ]);
     }
@@ -401,7 +405,7 @@ class KelasKuliah extends ResourceController
 
     public function paginate()
     {
-        $item = $this->request->getJSON();
+        $param = $this->request->getJSON();
         $object = model(KelasKuliahModel::class);
         $item = [
             'status' => true,
@@ -415,13 +419,14 @@ class KelasKuliah extends ResourceController
                 ->join('kelas', 'kelas_kuliah.kelas_id=kelas.id', 'left')
                 ->join('ruangan', 'ruangan.id=kelas_kuliah.ruangan_id', 'left')
                 ->groupStart()
-                ->like('kelas.nama_kelas_kuliah', $item->cari)
-                ->orLike('matakuliah.kode_mata_kuliah', $item->cari)
-                ->orLike('matakuliah.nama_mata_kuliah', $item->cari)
-                ->orLike('prodi.nama_program_studi', $item->cari)
+                ->like('kelas.nama_kelas_kuliah', $param->cari)
+                ->orLike('matakuliah.kode_mata_kuliah', $param->cari)
+                ->orLike('matakuliah.nama_mata_kuliah', $param->cari)
+                ->orLike('prodi.nama_program_studi', $param->cari)
                 ->groupEnd()
                 ->where('a_periode_aktif', '1')
-                ->paginate($item->count, 'default', $item->page),
+                ->orderBy(isset($param->order) && $param->order->field != "" ? $param->order->field : 'prodi.nama_program_studi', isset($param->order) && $param->order->direction != "" ? $param->order->direction : 'desc')
+                ->paginate($param->count, 'default', $param->page),
             'pager' => $object->pager->getDetails()
         ];
         return $this->respond($item);

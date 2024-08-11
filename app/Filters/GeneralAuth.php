@@ -34,6 +34,26 @@ class GeneralAuth implements FilterInterface
     {
         $authenticationHeader = $request->getServer('HTTP_AUTHORIZATION');
         try {
+            $check = new \CodeigniterExt\MaintenanceMode\Controllers\MaintenanceMode();
+            $itemCheck = $check->check();
+            if (is_array($itemCheck)) {
+                $admin = false;
+                $mahasiswa = false;
+                $keuangan = false;
+                $dosen = false;
+                $prodi = false;
+                $all = false;
+                foreach ($itemCheck['user'] as $key => $value) {
+                    if ($value == "Admin") $admin = true;
+                    else if($value == "Mahasiswa") $mahasiswa = true;
+                    else if($value == "Dosen") $dosen = true;
+                    else if($value == "Prodi") $prodi = true;
+                    else if($value == "Keuangan") $keuangan = true;
+                    else if($value == "All") $all = true;
+                }
+                if (($admin && $mahasiswa && $dosen && $prodi && $keuangan) || $all) throw new Exception("Sedang Maintenace", 503);
+            }
+            
             $encodedToken = getJWTFromRequest($authenticationHeader);
             validateJWTFromRequest($encodedToken);
             return $request;
@@ -41,10 +61,14 @@ class GeneralAuth implements FilterInterface
             return Services::response()
                 ->setJSON(
                     [
-                        'error' => $ex->getMessage()
+                        "status" => $ex->getCode(),
+                        "error" => $ex->getCode(),
+                        "messages" => [
+                            "error" => $ex->getMessage()
+                        ]
                     ]
                 )
-                ->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED);
+                ->setStatusCode($ex->getCode());
         }
     }
 

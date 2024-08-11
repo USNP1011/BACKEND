@@ -7,7 +7,7 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->set404Override('App\Controllers\Errors::show404');
 $routes->get('/', 'Home::index');
-$routes->get('check', 'Check::read');
+$routes->get('testing', 'Testing::read');
 
 service('auth')->routes($routes);
 $routes->group('pt', static function($routes){
@@ -70,6 +70,7 @@ $routes->group('get_data', static function($routes){
     $routes->get('mahasiswa_lulus_do', 'GetData::mahasiswaLulusDO');
     $routes->get('kampus_merdeka', 'GetData::konversiKampusMerdeka');
     $routes->get('transkrip', 'GetData::transkrip');
+    $routes->get('periode_kuliah', 'GetData::periodePerkuliahan');
 });
 
 $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($routes){
@@ -83,6 +84,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->get('jenis_keluar', 'Referensi\jenisKeluar::store', ['filter' => 'general']);
     $routes->get('jenis_sertifikasi', 'Referensi\JenisSertifikasi::store', ['filter' => 'general']);
     $routes->get('jenis_pendaftaran', 'Referensi\JenisPendaftaran::store', ['filter' => 'general']);
+    $routes->get('jenis_pembiayaan', 'Referensi\JenisPembiayaan::store', ['filter' => 'general']);
     $routes->get('jenis_sms', 'Referensi\JenisSMS::store', ['filter' => 'general']);
     $routes->get('jenis_peran', 'Referensi\JenisPeran::store', ['filter' => 'general']);
     $routes->get('bentuk_pendidikan', 'Referensi\BentukPendidikan::store', ['filter' => 'general']);
@@ -169,7 +171,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
         $routes->delete('(:hash)', 'Settings::deletePembiayaan/$1', ['filter' => 'auth']);
     });
     
-    $routes->group('mahasiswa', ['filter' => 'auth'], function($routes){
+    $routes->group('mahasiswa', function($routes){
         $routes->get('', 'Mahasiswa::show', ['filter' => 'auth']);
         $routes->get('(:hash)', 'Mahasiswa::show/$1', ['filter' => 'general']);
         $routes->get('(:hash)/riwayat_pendidikan', 'Mahasiswa::riwayatPendidikan/$1', ['filter' => 'auth']);
@@ -245,7 +247,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
         $routes->put('dosen', 'KelasKuliah::updateDosen', ['filter' => 'auth']);
         $routes->delete('(:hash)', 'KelasKuliah::delete/$1', ['filter' => 'auth']);
         $routes->delete('mahasiswa/(:hash)', 'KelasKuliah::deleteMahasiswa/$1', ['filter' => 'auth']);
-        $routes->delete('dosen/(:hash)', 'deleteDosen::delete/$1', ['filter' => 'auth']);
+        $routes->delete('dosen/(:hash)', 'KelasKuliah::deleteDosen/$1', ['filter' => 'auth']);
     });
 
     $routes->group('kurikulum', ['filter' => 'auth'], function($routes){
@@ -370,4 +372,7 @@ $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($
         $routes->get('pengajuan/(:hash)', 'Keuangan\Perwalian::pengajuan/$1');
         $routes->post('pengajuan', 'Keuangan\Perwalian::updatePengajuan');
     });
+});
+$routes->group('sync', function($routes){
+    $routes->get('', 'Sync::getSync');
 });

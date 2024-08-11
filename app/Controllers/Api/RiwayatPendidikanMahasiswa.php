@@ -64,6 +64,8 @@ class RiwayatPendidikanMahasiswa extends ResourceController
             $itemData = $userObject->findById($userObject->getInsertID());
             $item->id_user = $userObject->getInsertID();
             $userObject->addToDefaultGroup($itemData);
+            $itemData->forcePasswordReset();
+            $itemData->activate();
 
             $mhs = new \App\Models\MahasiswaModel();
             $mhs->update($item->id_mahasiswa, ['id_user'=>$item->id_user]);
@@ -82,22 +84,22 @@ class RiwayatPendidikanMahasiswa extends ResourceController
             $model->fill((array)$item);
             $object->insert($model);
 
-            // $perkuliahan = new \App\Models\PerkuliahanMahasiswaModel();
-            // $modelPerkuliahan = new \App\Entities\AktivitasKuliahEntity();
-            // $semester = getSemesterAktif();
-            // $itemKuliah = [
-            //     'id'=> Uuid::uuid4()->toString(),
-            //     'id_riwayat_pendidikan'=>$item->id,
-            //     'id_mahasiswa'=>$item->id_mahasiswa,
-            //     'id_semester'=>$semester->id_semester,
-            //     'nama_semester'=>$semester->nama_semester,
-            //     'nim'=>$item->nim,
-            //     'id_prodi'=>$item->id_prodi,
-            //     'id_status_mahasiswa'=>"N",
+            $perkuliahan = new \App\Models\PerkuliahanMahasiswaModel();
+            $modelPerkuliahan = new \App\Entities\AktivitasKuliahEntity();
+            $semester = getSemesterAktif();
+            $itemKuliah = [
+                'id'=> Uuid::uuid4()->toString(),
+                'id_riwayat_pendidikan'=>$item->id,
+                'id_mahasiswa'=>$item->id_mahasiswa,
+                'id_semester'=>$semester->id_semester,
+                'nama_semester'=>$semester->nama_semester,
+                'nim'=>$item->nim,
+                'id_prodi'=>$item->id_prodi,
+                'id_status_mahasiswa'=>"N",
 
-            // ];
-            // $modelPerkuliahan->fill($itemKuliah);
-            // $perkuliahan->insert($modelPerkuliahan);
+            ];
+            $modelPerkuliahan->fill($itemKuliah);
+            $perkuliahan->insert($modelPerkuliahan);
 
             $conn->transComplete();
             return $this->respond([

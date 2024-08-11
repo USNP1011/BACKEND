@@ -8,7 +8,7 @@ class TranskripModel extends Model
     protected $primaryKey = 'id';    
 	protected $useAutoIncrement = false;
     protected $returnType       = 'App\Entities\TranskripEntity';
-    protected $useSoftDeletes   = false;
+    protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields = [
         'id_riwayat_pendidikan',
@@ -26,4 +26,5 @@ class TranskripModel extends Model
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
 }

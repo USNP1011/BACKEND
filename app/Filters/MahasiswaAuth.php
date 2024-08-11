@@ -34,24 +34,36 @@ class MahasiswaAuth implements FilterInterface
     {
         $authenticationHeader = $request->getServer('HTTP_AUTHORIZATION');
         try {
+            $check = new \App\Controllers\MaintenanceMode();
+            $itemCheck = $check->check();
+            if (is_array($itemCheck)) {
+                $set = true;
+                foreach ($itemCheck['user'] as $key => $value) {
+                    if ($value == "Mahasiswa") $set = false;
+                }
+                if (!$set) throw new Exception("Sedang Maintenace", 503);
+            }
+
             $encodedToken = getJWTFromRequest($authenticationHeader);
-            $data=validateJWTFromRequest($encodedToken);
+            $data = validateJWTFromRequest($encodedToken);
             $auth = false;
             foreach ($data as $key => $value) {
-                if($value->role=="Mahasiswa") $auth = true;
+                if ($value->role == "Mahasiswa") $auth = true;
             }
-            if($auth)return $request;
+            if ($auth) return $request;
             else throw new Exception("Anda tidak memiliki izin", 401);
-            
-        } 
-        catch (Exception $ex) {
+        } catch (Exception $ex) {
             return Services::response()
                 ->setJSON(
                     [
-                        'error' => $ex->getMessage()
+                        "status" => $ex->getCode(),
+                        "error" => $ex->getCode(),
+                        "messages" => [
+                            "error" => $ex->getMessage()
+                        ]
                     ]
                 )
-                ->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED);
+                ->setStatusCode($ex->getCode());
         }
     }
 

@@ -34,7 +34,7 @@ class Kurikulum extends ResourceController
                 'data' => $object
                 ->select("matakuliah_kurikulum.id, matakuliah_kurikulum.semester, matakuliah_kurikulum.matakuliah_id, matakuliah_kurikulum.status_sync, matakuliah_kurikulum.sync_at, matakuliah_kurikulum.apakah_wajib, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, matakuliah.sks_tatap_muka, matakuliah.sks_praktek, matakuliah.sks_praktek_lapangan, matakuliah.sks_simulasi")
                 ->join("matakuliah", "matakuliah.id = matakuliah_kurikulum.matakuliah_id", "left")
-                ->orderBy('matakuliah_kurikulum.created_at', 'desc')
+                ->orderBy('matakuliah_kurikulum.semester', 'asc')
                 ->where('kurikulum_id', $id)->findAll()
             ]);
         } catch (\Throwable $th) {
@@ -44,10 +44,12 @@ class Kurikulum extends ResourceController
 
     public function matakuliah_prodi($id = null)
     {
-        $object = new MatakuliahModel();
+        $object = new MatakuliahKurikulumModel();
         return $this->respond([
             'status' => true,
-            'data' => $object->where('id_prodi', $id)->findAll()
+            'data' => $object->select('matakuliah.*')
+            ->join('matakuliah', 'matakuliah.id=matakuliah_kurikulum.matakuliah_id', 'left')
+            ->where('matakuliah_kurikulum.id_prodi', $id)->findAll()
         ]);
     }
 

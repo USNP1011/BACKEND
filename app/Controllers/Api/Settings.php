@@ -90,6 +90,7 @@ class Settings extends ResourceController
             'status' => true,
             'data' => is_null($id) ? $object->select('setting_biaya.*, prodi.nama_program_studi')
                 ->join('prodi', 'prodi.id_prodi=setting_biaya.id_prodi', 'left')
+                ->orderBy('id', 'desc')
                 ->findAll()
                 :
                 $object->select('setting_biaya.*, prodi.nama_program_studi')

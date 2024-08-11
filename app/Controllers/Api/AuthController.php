@@ -58,10 +58,7 @@ class AuthController extends ResourceController
                 'password' => 'required'
             ];
             if (!$this->validateData($this->request->getJSON(true), $itemRules, [], null)) {
-                return $this->fail(
-                    ['error' => $this->validator->getErrors()],
-                    $this->codes['unauthorized']
-                );
+                return $this->fail($this->validator->getErrors());
             }
 
             $credentials             = $this->request->getJsonVar(setting('Auth.validFields'));
@@ -217,7 +214,8 @@ class AuthController extends ResourceController
                 "message" => "User created successfully"
             ]);
         } catch (\Throwable $th) {
-            return $this->fail(handleErrorDB($th->getCode()));
+            return $this->fail($th->getMessage());
+            // return $this->fail(handleErrorDB($th->getCode()));
         }
     }
 
@@ -228,8 +226,10 @@ class AuthController extends ResourceController
             $object->update($id, ['id_user' => $id_user]);
             return true;
         } else if ($role == 'Mahasiswa') {
-            $object = new \App\Models\MahasiswaModel();
-            $object->update($id, ['id_user' => $id_user]);
+            $conn = \Config\Database::connect();
+            $conn->query("UPDATE mahasiswa SET id_user='".$id_user."', sync_at=updated_at WHERE id='".$id."'");
+            // $object = new \App\Models\MahasiswaModel();
+            // $object->set("id_user='".$id_user."', sync_at=updated_at")->update($id);
             return true;
         }
     }

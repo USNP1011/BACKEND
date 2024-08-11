@@ -12,11 +12,11 @@ class Prodi extends ResourceController
 
     public function profile($id = null)
     {
-        $profile = getProfile();
+        $profile = getProfileProdi();
         $prodi = new \App\Models\ProdiModel();
-        $kaprodi = new \App\Models\KaprodiModel();
         $itemProdi = $prodi->where('id_prodi', $profile->id_prodi)->first();
-        $itemProdi->kaprodi = $kaprodi->select('kaprodi.*, dosen.nama_dosen as nama_kaprodi, dosen.nidn')->join('dosen', 'dosen.id_dosen=kaprodi.id_dosen')->first();
+        $itemProdi->kaprodi = $profile->kaprodi;
+        $itemProdi->kaprodi->nama_kaprodi = $profile->nama_dosen;
         return $this->respond([
             'status' => true,
             'data' => $itemProdi

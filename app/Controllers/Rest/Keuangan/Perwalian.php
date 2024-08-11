@@ -69,7 +69,7 @@ class Perwalian extends ResourceController
                 }
                 $object->delete($param->id);
                 $object = new \App\Models\PerkuliahanMahasiswaModel();
-                $object->where('id_riwayat_pendidikan', $pengajuan->id_riwayat_pendidikan)->where('id_semester', $pengajuan->id_semester)->set('id_status_mahasiswa','A')->set('sks_total', $sks)->update();
+                $object->where('id_riwayat_pendidikan', $pengajuan->id_riwayat_pendidikan)->where('id_semester', $pengajuan->id_semester)->set('id_status_mahasiswa','A')->set('sks_semester', $sks)->update();
                 $conn->transComplete();
                 return $this->respond([
                     'status' => true

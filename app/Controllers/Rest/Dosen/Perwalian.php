@@ -40,8 +40,12 @@ class Perwalian extends ResourceController
                     'data' => $object->select("temp_krsm.id, temp_krsm.id_riwayat_pendidikan, temp_krsm.id_tahapan, temp_krsm.id_semester, temp_krsm.created_at as tanggal_pengajuan, mahasiswa.nama_mahasiswa, riwayat_pendidikan_mahasiswa.nim, prodi.id_prodi, prodi.nama_program_studi, prodi.kode_program_studi, (SELECT sum(matakuliah.sks_mata_kuliah) FROM `temp_peserta_kelas` LEFT JOIN `kelas_kuliah` ON `kelas_kuliah`.`id` = `temp_peserta_kelas`.`kelas_kuliah_id` LEFT JOIN `matakuliah` ON `kelas_kuliah`.`matakuliah_id` = `matakuliah`.`id`) as total_sks_pengajuan, (SELECT ips from perkuliahan_mahasiswa where perkuliahan_mahasiswa.id_riwayat_pendidikan = temp_krsm.id_riwayat_pendidikan order by id_semester desc limit 1,1) as ips, (SELECT ipk from perkuliahan_mahasiswa where perkuliahan_mahasiswa.id_riwayat_pendidikan = temp_krsm.id_riwayat_pendidikan order by id_semester desc limit 1,1) as ipk")
                         ->join("riwayat_pendidikan_mahasiswa", "riwayat_pendidikan_mahasiswa.id=temp_krsm.id_riwayat_pendidikan", "left")
                         ->join("mahasiswa", "mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa", "left")
+                        ->join("dosen_wali", "dosen_wali.id_riwayat_pendidikan=riwayat_pendidikan_mahasiswa.id", "left")
                         ->join('prodi', 'prodi.id_prodi=riwayat_pendidikan_mahasiswa.id_prodi', 'left')
-                        ->where('temp_krsm.id_semester', $semester->id_semester)->where('id_tahapan', 1)->findAll()
+                        ->where('temp_krsm.id_semester', $semester->id_semester)->where('id_tahapan', 1)
+                        ->where('dosen_wali.id_dosen', $profile->id_dosen)
+                        ->where('id_tahapan', 1)
+                        ->findAll()
                 ]);
             } else {
                 $tahapan = new \App\Models\TahapanModel();

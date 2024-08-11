@@ -619,6 +619,33 @@ class GetData extends BaseController
         $semester->insertBatch($data->data);
     }
 
+    public function periodePerkuliahan()
+    {
+        $periodeKuliah = new \App\Models\PeriodePerkuliahanModel();
+        $data = $this->api->getData('GetListPeriodePerkuliahan', $this->token);
+        if ($data->error_code == 100) {
+            $this->token = $this->api->getToken()->data->token;
+            $data = $this->api->getData('GetListPeriodePerkuliahan', $this->token);
+        }
+        foreach ($data->data as $key => $value) {
+            $item = [
+                'id'=>Uuid::uuid4()->toString(),
+                'id_prodi'=>$value->id_prodi,
+                'id_semester'=>$value->id_semester,
+                'jumlah_target_mahasiswa_baru'=>$value->jumlah_target_mahasiswa_baru,
+                'jumlah_pendaftar_ikut_seleksi'=>$value->calon_ikut_seleksi,
+                'jumlah_pendaftar_lulus_seleksi'=>$value->calon_lulus_seleksi,
+                'jumlah_daftar_ulang'=>$value->daftar_sbg_mhs,
+                'jumlah_mengundurkan_diri'=>$value->pst_undur_diri,
+                'jumlah_minggu_pertemuan'=>$value->jml_mgu_kul,
+                'tanggal_awal_perkuliahan'=>$value->tanggal_awal_perkuliahan,
+                'tanggal_akhir_perkuliahan'=>$value->tanggal_akhir_perkuliahan,
+                'status_sync'=>$value->status_sync,
+            ];
+            $periodeKuliah->insert($item);
+        }
+    }
+
     public function kurikulum()
     {
         $kurikulum = new \App\Models\KurikulumModel();
@@ -943,7 +970,7 @@ class GetData extends BaseController
         $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
         $conn = \Config\Database::connect();
         try {
-            $data = $this->api->getData('GetTranskripMahasiswa', $this->token, "", "id_registrasi_mahasiswa", 5000,10000);
+            $data = $this->api->getData('GetTranskripMahasiswa', $this->token, "", "id_registrasi_mahasiswa", 5000, 10000);
             $conn->transException(true)->transStart();
             $dataUpdate = [];
             foreach ($data->data as $key => $value) {
@@ -956,8 +983,8 @@ class GetData extends BaseController
                     'nilai_angka' => $value->nilai_angka,
                     'nilai_indeks' => $value->nilai_indeks,
                     'nilai_huruf' => $value->nilai_huruf,
-		            'status_sync'=>'sudah sync'
-                    
+                    'status_sync' => 'sudah sync'
+
                 ];
                 if (!is_null($value->id_kelas_kuliah)) {
                     $item = $kelas->where('id_kelas_kuliah', $value->id_kelas_kuliah)->first();
