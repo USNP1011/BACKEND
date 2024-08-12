@@ -79,7 +79,7 @@ class Perwalian extends ResourceController
                             'nama_mahasiswa'=>$itemMhs->nama_mahasiswa,
                             'nim'=>$itemMhs->nim,
                             'angkatan'=>$itemMhs->angkatan,
-                            'id_tahapan'=>$itemTahapan->id_tahapan,
+                            'id_tahapan'=>$itemTahapan->id,
                             'detail' => $detail
                         ],
                         'roles' => ['sks_max' => $sum <= 2 ? 20 : (int)$itemSkala->sks_max]
