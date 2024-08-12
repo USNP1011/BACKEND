@@ -95,9 +95,9 @@ class Mahasiswa extends ResourceController
                 }
             }
             if (!is_null($item)) {
-                $kuri->nilai_angka = $value->nilai_angka;
-                $kuri->nilai_huruf = $value->nilai_huruf;
-                $kuri->nilai_indeks = $value->nilai_indeks;
+                $kuri->nilai_angka = $item->nilai_angka;
+                $kuri->nilai_huruf = $item->nilai_huruf;
+                $kuri->nilai_indeks = $item->nilai_indeks;
             } else {
                 $kuri->nilai_angka = null;
                 $kuri->nilai_huruf = null;
