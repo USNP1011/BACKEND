@@ -62,7 +62,7 @@ class Perwalian extends ResourceController
         try {
             $itemTahapan = $tahapan->where('id', ($param->id_tahapan + 1))->first();
             if ($itemTahapan) {
-                $object->update($param->id, ['id_tahapan' => $itemTahapan->id]);
+                $object->update($param->id, ['id_tahapan' => $itemTahapan->id, 'pesan'=>null]);
                 return $this->respond([
                     'status' => true
                 ]);
