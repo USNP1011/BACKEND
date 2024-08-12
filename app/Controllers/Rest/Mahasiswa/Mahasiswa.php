@@ -102,6 +102,17 @@ class Mahasiswa extends ResourceController
                 $kuri->nilai_angka = null;
                 $kuri->nilai_huruf = null;
                 $kuri->nilai_indeks = null;
+                $pesertaKelas = new \App\Models\PesertaKelasModel();
+                $itemPesertaKelas = $pesertaKelas->select("peserta_kelas.*, kelas_kuliah.matakuliah_id")
+                    ->join('kelas_kuliah', 'kelas_kuliah.id=peserta_kelas.kelas_kuliah_id', 'left')
+                    ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->findAll();
+                foreach ($itemPesertaKelas as $key => $peserta) {
+                    if ($kuri->matakuliah_id == $peserta->matakuliah_id) {
+                        $kuri->nilai_angka = $peserta->nilai_angka;
+                        $kuri->nilai_huruf = $peserta->nilai_huruf;
+                        $kuri->nilai_indeks = $peserta->nilai_indeks;
+                    }
+                }
             }
         }
         return $this->respond([
@@ -110,7 +121,7 @@ class Mahasiswa extends ResourceController
         ]);
     }
 
-    public function transkrip($id=null)
+    public function transkrip($id = null)
     {
         if (is_null($id)) $profile = getProfile();
         else $profile = getProfileByMahasiswa($id);
