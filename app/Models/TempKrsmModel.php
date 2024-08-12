@@ -14,6 +14,7 @@ class TempKrsmModel extends Model
         'id_riwayat_pendidikan',
         'id_semester',
         'id_tahapan',
+        'pesan'
     ];
 	protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';

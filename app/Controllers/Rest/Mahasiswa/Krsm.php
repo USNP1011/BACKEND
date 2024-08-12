@@ -38,13 +38,14 @@ class Krsm extends ResourceController
                             $object = new \App\Models\TahapanModel();
                             return $this->respond([
                                 'status' => true,
-                                'data' => ["pengajuan" => $object->where('id', $data->id_tahapan)->first()->tahapan, "matakuliah" => $data, 'roles' => ['sks_max' => $sum <= 2 ? 20 : (int)$itemSkala->sks_max]],
+                                'data' => ["pengajuan" => $object->where('id', $data->id_tahapan)->first()->tahapan, "matakuliah" => $data, 'pesan'=> $data->pesan, 'roles' => ['sks_max' => $sum <= 2 ? 20 : (int)$itemSkala->sks_max]],
                             ]);
                         } else {
                             return $this->respond([
                                 'status' => true,
                                 'data' => [
                                     "pengajuan" => "belum pengajuan",
+                                    "pesan"=>null,
                                     "matakuliah" => [
                                         'id_riwayat_pendidikan' => $profile->id_riwayat_pendidikan,
                                         'id_semester' => $semester->id_semester,
@@ -91,6 +92,7 @@ class Krsm extends ResourceController
                         'status' => true,
                         'data' => [
                             "pengajuan" => "Aktif",
+                            "pesan"=>null,
                             "matakuliah" => $matakuliah,
                             "roles" => ['sks_max' => 0]
                         ]

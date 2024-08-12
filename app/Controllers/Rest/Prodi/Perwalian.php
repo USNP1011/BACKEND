@@ -73,6 +73,24 @@ class Perwalian extends ResourceController
         }
     }
 
+    function tolakPengajuan() {
+        $object = new \App\Models\TempKrsmModel();
+        $tahapan = new \App\Models\TahapanModel();
+        $param = $this->request->getJSON();
+        try {
+            $itemTahapan = $tahapan->where('id', ($param->id_tahapan - 1))->first();
+            if ($itemTahapan) {
+                $object->update($param->id, ['id_tahapan' => $itemTahapan->id, 'pesan'=>$param->pesan]);
+                return $this->respond([
+                    'status' => true
+                ]);
+            }
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage());
+            // return $this->fail(handleErrorDB($th->getCode()));
+        }
+    }
+
     function deleted($id = null)
     {
         $peserta = new \App\Models\TempPesertaKelasModel();
