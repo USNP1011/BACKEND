@@ -825,7 +825,7 @@ class GetData extends BaseController
         $pesertaKelas = new \App\Models\PesertaKelasModel();
         $conn = \Config\Database::connect();
         try {
-            $data = $this->api->getData('GetDetailNilaiPerkuliahanKelas', $this->token, "");
+            $data = $this->api->getData('GetDetailNilaiPerkuliahanKelas', $this->token, "id_semester='20232'");
             $conn->transException(true)->transStart();
             $dataUpdate = [];
             foreach ($data->data as $key => $value) {
@@ -835,15 +835,13 @@ class GetData extends BaseController
                     ->where('kelas_kuliah.id_kelas_kuliah', $value->id_kelas_kuliah)->where('riwayat_pendidikan_mahasiswa.id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
                 if (!is_null($itemKelas)) {
                     $itemUpdate = [
-                        'id' => $itemKelas->id,
                         'nilai_angka' => $value->nilai_angka,
                         'nilai_huruf' => $value->nilai_huruf,
-                        'nilai_indeks' => $value->nilai_indeks,
+                        'nilai_indeks' => $value->nilai_indeks
                     ];
-                    $dataUpdate[] = $itemUpdate;
+                    $pesertaKelas->update($itemKelas->id, $itemUpdate);
                 }
             }
-            $pesertaKelas->updateBatch($dataUpdate, 'id');
             $conn->transComplete();
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage());
