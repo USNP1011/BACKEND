@@ -72,6 +72,7 @@ class Perwalian extends ResourceController
                     'status' => true,
                     'data' => [
                         "pengajuan" => $itemTahapan->tahapan,
+                        "pesan"=> $itemMhs->pesan,
                         'matakuliah' => [
                             'id_riwayat_pendidikan' => $itemMhs->id_riwayat_pendidikan,
                             'id_semester' => $itemMhs->id_semester,
