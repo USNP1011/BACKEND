@@ -53,6 +53,7 @@ class AdminAuth implements FilterInterface
             if ($auth) return $request;
             else throw new Exception("Anda tidak memiliki izin", 401);
         } catch (Exception $ex) {
+            $code = $ex->getCode();
             return Services::response()
                 ->setJSON(
                     [
@@ -63,7 +64,7 @@ class AdminAuth implements FilterInterface
                         ]
                     ]
                 )
-                ->setStatusCode($ex->getCode());
+                ->setStatusCode($ex->getCode()!=0 ? $ex->getCode() : 401);
         }
     }
 
