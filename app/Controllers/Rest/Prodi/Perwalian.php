@@ -59,8 +59,9 @@ class Perwalian extends ResourceController
         $object = new \App\Models\TempKrsmModel();
         $tahapan = new \App\Models\TahapanModel();
         $param = $this->request->getJSON();
+        $itemParam = $object->where('id', $param->id)->first();
         try {
-            $itemTahapan = $tahapan->where('id', ($param->id_tahapan + 1))->first();
+            $itemTahapan = $tahapan->where('id', ($itemParam->id_tahapan + 1))->first();
             if ($itemTahapan) {
                 $object->update($param->id, ['id_tahapan' => $itemTahapan->id, 'pesan'=>null]);
                 return $this->respond([
