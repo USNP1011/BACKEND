@@ -63,7 +63,7 @@ class MahasiswaAuth implements FilterInterface
                         ]
                     ]
                 )
-                ->setStatusCode($ex->getCode());
+                ->setStatusCode($ex->getCode()!=0 ? $ex->getCode() : ResponseInterface::HTTP_UNAUTHORIZED);
         }
     }
 

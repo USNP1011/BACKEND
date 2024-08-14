@@ -64,7 +64,7 @@ class AdminAuth implements FilterInterface
                         ]
                     ]
                 )
-                ->setStatusCode($ex->getCode()!=0 ? $ex->getCode() : 401);
+                ->setStatusCode($ex->getCode()!=0 ? $ex->getCode() : ResponseInterface::HTTP_UNAUTHORIZED);
         }
     }
 
