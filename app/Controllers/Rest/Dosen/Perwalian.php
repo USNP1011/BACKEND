@@ -58,7 +58,8 @@ class Perwalian extends ResourceController
                     ->join('kelas', 'kelas_kuliah.kelas_id=kelas.id', 'left')
                     ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
                     ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id', 'left')
-                    ->join('dosen', 'dosen.id_dosen=dosen_pengajar_kelas.id_dosen', 'left')
+                    ->join('penugasan_dosen', 'penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen', 'left')
+                    ->join('dosen', 'dosen.id_dosen=penugasan_dosen.id_dosen', 'left')
                     ->join('matakuliah_kurikulum', 'matakuliah_kurikulum.matakuliah_id=matakuliah.id', 'left')
                     ->where('temp_krsm_id', $id)
                     ->findAll();
