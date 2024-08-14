@@ -145,7 +145,7 @@ class Matakuliah extends ResourceController
         $object = model(MatakuliahModel::class);
         $item = [
             'status' => true,
-            'data' => $object->select('matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, matakuliah.id_jenis_mata_kuliah, prodi.nama_program_studi, matakuliah.status_sync, matakuliah.sync_at')
+            'data' => $object->select('matakuliah.id, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, matakuliah.id_jenis_mata_kuliah, prodi.nama_program_studi, matakuliah.status_sync, matakuliah.sync_at')
             ->join('prodi', 'prodi.id_prodi=matakuliah.id_prodi')
             ->like('nama_mata_kuliah', $param->cari)
             ->orLike('kode_mata_kuliah', $param->cari)
