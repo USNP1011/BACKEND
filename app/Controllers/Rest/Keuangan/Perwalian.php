@@ -46,7 +46,7 @@ class Perwalian extends ResourceController
         $conn = \Config\Database::connect();
         try {
             $conn->transException(true)->transStart();
-            $itemTahapan = $tahapan->where('id', ($param->id_tahapan + 1))->first();
+            $itemTahapan = $tahapan->where('id', ($pengajuan->id_tahapan + 1))->first();
             if ($itemTahapan) {
                 $object->update($param->id, ['id_tahapan' => $itemTahapan->id]);
                 $conn->transComplete();
