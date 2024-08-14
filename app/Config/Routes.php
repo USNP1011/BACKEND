@@ -360,7 +360,7 @@ $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($
         $routes->get('mahasiswa', 'Prodi\Perwalian::show');
         $routes->get('pengajuan', 'Prodi\Perwalian::pengajuan');
         $routes->get('pengajuan/(:hash)', 'Prodi\Perwalian::pengajuan/$1');
-        $routes->post('pengajuan', 'Prodi\Perwalian::updatePengajuan');
+        $routes->post('', 'Prodi\Perwalian::updatePengajuan');
         $routes->put('reject', 'Prodi\Perwalian::tolakPengajuan');
     });
 
