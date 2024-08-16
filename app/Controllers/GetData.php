@@ -541,18 +541,23 @@ class GetData extends BaseController
     {
         $mahasiswa = new \App\Models\MahasiswaModel();
         $conn = \Config\Database::connect();
+        $report = ['gagal'=>[], 'berhasil'=>[]];
         try {
             $conn->transException(true)->transStart();
             $data = $this->api->getData('GetBiodataMahasiswa', $this->token, "status_sync='belum sync'", "", "");
+            $report['total'] = $data->data;
             foreach ($data->data as $key => $value) {
                 $value->oap = "2";
                 $value->suku = "-";
                 if (!$this->validateData((array) $value, 'mahasiswa')) {
-                    // $result = [
-                    //     "status" => false,
-                    //     "message" => $this->validator->getErrors(),
-                    // ];
-                    // return $this->failValidationErrors($result);
+                    $item = [
+                        'nama' => $value->nama_mahasiswa,
+                        'status' => [
+                            "status" => false,
+                            "message" => $this->validator->getErrors(),
+                        ]
+                    ];
+                    $report['gagal'][]=$item;
                 } else {
                     $myuuid = Uuid::uuid4();
                     $value->id = $myuuid->toString();
@@ -570,7 +575,7 @@ class GetData extends BaseController
                     $modelMahasiswa->fill((array)$value);
                     if ($mahasiswa->insert($modelMahasiswa)) {
                         $dataRiwayat = $this->api->getData('GetListRiwayatPendidikanMahasiswa', $this->token, "id_mahasiswa='" . $value->id_mahasiswa . "'", "", 1);
-                        if(!is_null($dataRiwayat->data)){
+                        if (!is_null($dataRiwayat->data)) {
                             foreach ($dataRiwayat->data as $keyRiwayat => $valueRiwayat) {
                                 $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
                                 $model = new \App\Entities\RiwayatPendidikanMahasiswa();
@@ -582,12 +587,17 @@ class GetData extends BaseController
                             }
                         }
                     }
+                    $item = [
+                        'nama' => $value->nama_mahasiswa,
+                        'status' => "success"
+                    ];
+                    $report['berhasil'][]=$item;
                 }
             }
             $conn->transComplete();
             return $this->respond([
                 'status' => true,
-                'data' => $data
+                'data' => $report
             ]);
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage());
