@@ -142,7 +142,7 @@ class AuthController extends ResourceController
 
         $result = $authenticator->check($credentials);
         if (!$result->isOK()) {
-            return $this->failNotFound("Password lama yang anda masukkan tidak sesuai");
+            return $this->failUnauthorized("Password lama yang anda masukkan tidak sesuai");
         }
         $users = auth()->getProvider();
         // $user = $users->findById($this->request->getJsonVar('id'));
