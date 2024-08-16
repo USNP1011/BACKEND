@@ -145,7 +145,8 @@ class AuthController extends ResourceController
             return $this->failUnauthorized($result->reason());
         }
         $users = auth()->getProvider();
-        $user = $users->findById($this->request->getJsonVar('id'));
+        // $user = $users->findById($this->request->getJsonVar('id'));
+        $user = $users->findByCredentials(['username'=>$credentials['username']]);
         $user->activate();
         $user->fill(['password' => $this->request->getJsonVar('newPassword')]);
         $cek = $users->save($user);
