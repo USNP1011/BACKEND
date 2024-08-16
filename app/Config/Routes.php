@@ -353,6 +353,8 @@ $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($
 
     $routes->group('dosen', ['filter' => 'dosen'], function($routes){
         $routes->get('profile', 'Dosen\Dosen::profile');
+        $routes->get('jadwal_mengajar', 'Dosen\Dosen::jadwalMenajar');
+        $routes->get('jadwal_mengajar/(:hash)', 'Dosen\Dosen::pesertaKelas/$1');
     });
 
     //Prodi
