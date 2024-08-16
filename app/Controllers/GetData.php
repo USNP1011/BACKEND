@@ -544,7 +544,7 @@ class GetData extends BaseController
         $report = ['gagal'=>[], 'berhasil'=>[]];
         try {
             $conn->transException(true)->transStart();
-            $data = $this->api->getData('GetBiodataMahasiswa', $this->token, "status_sync='belum sync'", "", "");
+            $data = $this->api->getData('GetBiodataMahasiswa', $this->token, "id_mahasiswa='d1efadbc-00e6-4be9-aef8-9589f3292094'", "", "");
             $report['total'] = $data->data;
             foreach ($data->data as $key => $value) {
                 $value->oap = "2";
