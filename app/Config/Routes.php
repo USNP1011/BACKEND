@@ -306,7 +306,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
 
     $routes->post('reset_password', 'AuthController::resetPassword', ['filter'=>'general']);
     $routes->post('create_user', 'AuthController::createUser', ['filter'=>'general']);
-    $routes->post('change_user', 'AuthController::changePassword', ['filter'=>'general']);
+    $routes->post('change_password', 'AuthController::changePassword', ['filter'=>'general']);
 });
 
 $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($routes){

@@ -540,21 +540,57 @@ class GetData extends BaseController
     public function mahasiswa()
     {
         $mahasiswa = new \App\Models\MahasiswaModel();
-
-        $data = $this->api->getData('GetBiodataMahasiswa', $this->token);
-        $a = date('Y-m-d', strtotime(str_replace('-', '/', '10-10-2021')));
-        foreach ($data->data as $key => $value) {
-            $myuuid = Uuid::uuid4();
-            $value->id = $myuuid->toString();
-            $tanggal = explode('-', $value->tanggal_lahir);
-            $value->tanggal_lahir = $value->tanggal_lahir != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
-            $tanggal = explode('-', $value->tanggal_lahir_ayah);
-            $value->tanggal_lahir_ayah = $value->tanggal_lahir_ayah != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
-            $tanggal = explode('-', $value->tanggal_lahir_ibu);
-            $value->tanggal_lahir_ibu = $value->tanggal_lahir_ibu != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
-            $tanggal = explode('-', $value->tanggal_lahir_wali);
-            $value->tanggal_lahir_wali = $value->tanggal_lahir_wali != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
-            $mahasiswa->insert($value);
+        $conn = \Config\Database::connect();
+        try {
+            $conn->transException(true)->transStart();
+            $data = $this->api->getData('GetBiodataMahasiswa', $this->token, "status_sync='belum sync'", "", "");
+            foreach ($data->data as $key => $value) {
+                $value->oap = "2";
+                $value->suku = "-";
+                if (!$this->validateData((array) $value, 'mahasiswa')) {
+                    // $result = [
+                    //     "status" => false,
+                    //     "message" => $this->validator->getErrors(),
+                    // ];
+                    // return $this->failValidationErrors($result);
+                } else {
+                    $myuuid = Uuid::uuid4();
+                    $value->id = $myuuid->toString();
+                    $value->status_sync = "sudah sync";
+                    $value->status_at = date("Y-m-d");
+                    $tanggal = explode('-', $value->tanggal_lahir);
+                    $value->tanggal_lahir = $value->tanggal_lahir != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
+                    $tanggal = explode('-', $value->tanggal_lahir_ayah);
+                    $value->tanggal_lahir_ayah = $value->tanggal_lahir_ayah != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
+                    $tanggal = explode('-', $value->tanggal_lahir_ibu);
+                    $value->tanggal_lahir_ibu = $value->tanggal_lahir_ibu != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
+                    $tanggal = explode('-', $value->tanggal_lahir_wali);
+                    $value->tanggal_lahir_wali = $value->tanggal_lahir_wali != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
+                    $modelMahasiswa = new \App\Entities\Mahasiswa();
+                    $modelMahasiswa->fill((array)$value);
+                    if ($mahasiswa->insert($modelMahasiswa)) {
+                        $dataRiwayat = $this->api->getData('GetListRiwayatPendidikanMahasiswa', $this->token, "id_mahasiswa='" . $value->id_mahasiswa . "'", "", 1);
+                        if(!is_null($dataRiwayat->data)){
+                            foreach ($dataRiwayat->data as $keyRiwayat => $valueRiwayat) {
+                                $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
+                                $model = new \App\Entities\RiwayatPendidikanMahasiswa();
+                                $valueRiwayat->id = Uuid::uuid4()->toString();
+                                $valueRiwayat->angkatan = $valueRiwayat->nim;
+                                $valueRiwayat->id_mahasiswa = $mahasiswa->where('id_mahasiswa', $valueRiwayat->id_mahasiswa)->first()->id;
+                                $model->fill((array)$valueRiwayat);
+                                $riwayat->insert($model);
+                            }
+                        }
+                    }
+                }
+            }
+            $conn->transComplete();
+            return $this->respond([
+                'status' => true,
+                'data' => $data
+            ]);
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage());
         }
     }
 
@@ -629,18 +665,18 @@ class GetData extends BaseController
         }
         foreach ($data->data as $key => $value) {
             $item = [
-                'id'=>Uuid::uuid4()->toString(),
-                'id_prodi'=>$value->id_prodi,
-                'id_semester'=>$value->id_semester,
-                'jumlah_target_mahasiswa_baru'=>$value->jumlah_target_mahasiswa_baru,
-                'jumlah_pendaftar_ikut_seleksi'=>$value->calon_ikut_seleksi,
-                'jumlah_pendaftar_lulus_seleksi'=>$value->calon_lulus_seleksi,
-                'jumlah_daftar_ulang'=>$value->daftar_sbg_mhs,
-                'jumlah_mengundurkan_diri'=>$value->pst_undur_diri,
-                'jumlah_minggu_pertemuan'=>$value->jml_mgu_kul,
-                'tanggal_awal_perkuliahan'=>$value->tanggal_awal_perkuliahan,
-                'tanggal_akhir_perkuliahan'=>$value->tanggal_akhir_perkuliahan,
-                'status_sync'=>$value->status_sync,
+                'id' => Uuid::uuid4()->toString(),
+                'id_prodi' => $value->id_prodi,
+                'id_semester' => $value->id_semester,
+                'jumlah_target_mahasiswa_baru' => $value->jumlah_target_mahasiswa_baru,
+                'jumlah_pendaftar_ikut_seleksi' => $value->calon_ikut_seleksi,
+                'jumlah_pendaftar_lulus_seleksi' => $value->calon_lulus_seleksi,
+                'jumlah_daftar_ulang' => $value->daftar_sbg_mhs,
+                'jumlah_mengundurkan_diri' => $value->pst_undur_diri,
+                'jumlah_minggu_pertemuan' => $value->jml_mgu_kul,
+                'tanggal_awal_perkuliahan' => $value->tanggal_awal_perkuliahan,
+                'tanggal_akhir_perkuliahan' => $value->tanggal_akhir_perkuliahan,
+                'status_sync' => $value->status_sync,
             ];
             $periodeKuliah->insert($item);
         }
