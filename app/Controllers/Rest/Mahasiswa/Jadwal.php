@@ -28,6 +28,7 @@ class Jadwal extends ResourceController
                     `prodi`.`kode_program_studi`,
                     `prodi`.`nama_program_studi`,
                     `kelas`.`nama_kelas_kuliah`,
+                    (if(dosen_pengajar_kelas.id_registrasi_dosen IS NULL , SELECT dosen.nama_dosen FROM dosen WHERE dosen.id_dosen=dosen_pengajar_kelas.id_dosen, SELECT penugasan_dosen.nama_dosen FROM penugasan_dosen WHERE penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen)) as nama_dosen
                     `dosen`.`nama_dosen`,
                     `matakuliah_kurikulum`.`semester`,
                     `ruangan`.`nama_ruangan`")
@@ -36,8 +37,8 @@ class Jadwal extends ResourceController
                     ->join("kelas", "`kelas`.`id` = `kelas_kuliah`.`kelas_id`", "left")
                     ->join("ruangan", "`ruangan`.`id` = `kelas_kuliah`.`ruangan_id`", "left")
                     ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id', 'left')
-                    ->join('penugasan_dosen', 'dosen_pengajar_kelas.id_registrasi_dosen=penugasan_dosen.id_registrasi_dosen', 'left')
-                    ->join('dosen', 'penugasan_dosen.id_dosen=dosen.id_dosen', 'left')
+                    // ->join('penugasan_dosen', 'dosen_pengajar_kelas.id_registrasi_dosen=penugasan_dosen.id_registrasi_dosen', 'left')
+                    // ->join('dosen', 'penugasan_dosen.id_dosen=dosen.id_dosen', 'left')
                     ->join("matakuliah_kurikulum", "`matakuliah_kurikulum`.`matakuliah_id` = `matakuliah`.`id`", "left")
                     ->where("kelas_kuliah.id_prodi", $profile->id_prodi)
                     ->where("kelas_kuliah.id_semester", $semester->id_semester)

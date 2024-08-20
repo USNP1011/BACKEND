@@ -128,7 +128,7 @@ class KelasKuliah extends ResourceController
         $object = new DosenModel();
         return $this->respond([
             'status' => true,
-            'data' => $object->select('dosen.*, penugasan_dosen.id_registrasi_dosen')
+            'data' => $object->select('dosen.*, penugasan_dosen.id_registrasi_dosen, penugasan_dosen.id_prodi, penugasan_dosen.nama_program_studi')
             ->join('penugasan_dosen', 'penugasan_dosen.id_dosen=dosen.id_dosen', 'left')->findAll()
         ]);
     }

@@ -236,20 +236,6 @@ class Validation extends BaseConfig
     ];
 
     public array $pengajarKelas = [
-        "id_registrasi_dosen" => [
-            "label" => "id_registrasi_dosen",
-            "rules" => "required",
-            "errors" => [
-                "required" => "id_registrasi_dosen Tidak Boleh Kosong"
-            ]
-        ],
-        "id_prodi" => [
-            "label" => "id_prodi",
-            "rules" => "required",
-            "errors" => [
-                "required" => "id_prodi Tidak Boleh Kosong"
-            ]
-        ],
         "id_semester" => [
             "label" => "id_semester",
             "rules" => "required",
