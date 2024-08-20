@@ -38,6 +38,7 @@ class Jadwal extends ResourceController
                 ->join("ruangan", "`ruangan`.`id` = `kelas_kuliah`.`ruangan_id`", "left")
                 ->where("prodi.id_prodi", $id)
                 ->where("kelas_kuliah.id_semester", $semester->id_semester)
+                ->where("dosen_pengajar_kelas.mengajar", '1')
                 // ->groupStart()
                 // ->orLike('`matakuliah`.`nama_mata_kuliah`', $param->cari)
                 // ->groupEnd()
