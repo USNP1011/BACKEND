@@ -257,7 +257,6 @@ class Validation extends BaseConfig
                 "required" => "id_jenis_evaluasi Tidak Boleh Kosong"
             ]
         ],
-        
     ];
 
     public array $dosenWali = [
