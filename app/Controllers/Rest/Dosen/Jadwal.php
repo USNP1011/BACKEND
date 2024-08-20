@@ -28,15 +28,13 @@ class Jadwal extends ResourceController
                 `prodi`.`kode_program_studi`,
                 `prodi`.`nama_program_studi`,
                 `kelas`.`nama_kelas_kuliah`,
-                `dosen`.`nama_dosen`,
+                (if(dosen_pengajar_kelas.id_registrasi_dosen IS NOT NULL , (SELECT penugasan_dosen.nama_dosen FROM penugasan_dosen WHERE penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen LIMIT 1), (SELECT dosen.nama_dosen FROM dosen WHERE dosen.id_dosen = dosen_pengajar_kelas.id_dosen))) as nama_dosen,
                 `ruangan`.`nama_ruangan`")
                 ->join("matakuliah", "`kelas_kuliah`.`matakuliah_id` = `matakuliah`.`id`", "left")
                 ->join("matakuliah_kurikulum", "`matakuliah_kurikulum`.`matakuliah_id` = `matakuliah`.`id`", "left")
                 ->join("prodi", "`matakuliah`.`id_prodi` = `prodi`.`id_prodi`", "left")
                 ->join("kelas", "`kelas`.`id` = `kelas_kuliah`.`kelas_id`", "left")
                 ->join("ruangan", "`ruangan`.`id` = `kelas_kuliah`.`ruangan_id`", "left")
-                ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id', 'left')
-                ->join('dosen', 'dosen_pengajar_kelas.id_dosen=dosen.id_dosen', 'left')
                 ->where("prodi.id_prodi", $id)
                 ->where("kelas_kuliah.id_semester", $semester->id_semester)
                 // ->groupStart()
