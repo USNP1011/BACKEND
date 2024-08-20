@@ -37,6 +37,7 @@ class KelasKuliah extends ResourceController
                 ->join('ruangan', 'ruangan.id=kelas_kuliah.ruangan_id', 'left')
                 ->join('kelas', 'kelas.id=kelas_kuliah.kelas_id', 'left')
                 ->where('a_periode_aktif', '1')
+                ->where('dosen_pengajar_kelas', '1')
                 ->findAll() :
                 $object
                 ->select("kelas_kuliah.*, kelas.nama_kelas_kuliah, ruangan.nama_ruangan, semester.nama_semester, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, prodi.nama_program_studi, penugasan_dosen.nama_dosen, matakuliah.sks_mata_kuliah, (SELECT COUNT(*) FROM peserta_kelas WHERE peserta_kelas.kelas_kuliah_id=kelas_kuliah.id)as peserta_kelas")
