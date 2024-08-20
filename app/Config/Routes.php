@@ -103,9 +103,9 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->get('get_wilayah/(:any)/(:any)/(:any)', 'Referensi\Wilayah::by_id/$1/$2/$3', ['filter' => 'general']);
     $routes->get('jenis_aktivitas', 'Referensi\JenisAktivitas::store', ['filter' => 'general']);
     $routes->get('pengajar_kelas', 'Referensi\PengajarKelas::store', ['filter' => 'general']);
-    $routes->get('dosen', 'Referensi\Dosen::store', ['filter' => 'general']);
-    $routes->get('dosen/(:any)', 'Referensi\Dosen::store/$1', ['filter' => 'general']);
+    
     $routes->get('prodi', 'Referensi\Prodi::store', ['filter' => 'general']);
+
 
     $routes->group('user', ['filter' => 'auth'], function($routes){
         $routes->get('', 'Referensi\SkalaSKS::store');
@@ -115,6 +115,12 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
         $routes->delete('(:hash)', 'Referensi\SkalaSKS::delete/$1');
     });
 
+    $routes->group('dosen', ['filter' => 'general'], function($routes){
+        $routes->get('', 'Referensi\Dosen::store');
+        $routes->get('(:hash)', 'Referensi\Dosen::store/$1');
+        $routes->post('', 'Referensi\Dosen::create');
+    });
+    
     $routes->group('kaprodi', ['filter' => 'auth'], function($routes){
         $routes->get('', 'Kaprodi::store');
         $routes->get('(:hash)', 'Kaprodi::store/$1');

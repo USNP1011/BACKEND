@@ -7,7 +7,7 @@ class DosenModel extends Model
     protected $table = 'dosen';
     protected $primaryKey = 'id_dosen';    
 	protected $useAutoIncrement = false;
-    protected $returnType       = 'object';
+    protected $returnType       = 'App\Entities\Mahasiswa';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields = [
@@ -58,6 +58,7 @@ class DosenModel extends Model
 		'nama_pangkat_golongan',
 		'nama_sumber_gaji',
 		'nama_pekerjaan_suami_istri',
+		'status',
 		'id_user'
     ];
 }

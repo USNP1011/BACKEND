@@ -541,7 +541,7 @@ class GetData extends BaseController
     {
         $mahasiswa = new \App\Models\MahasiswaModel();
         $conn = \Config\Database::connect();
-        $report = ['gagal'=>[], 'berhasil'=>[]];
+        $report = ['gagal' => [], 'berhasil' => []];
         try {
             $conn->transException(true)->transStart();
             $data = $this->api->getData('GetBiodataMahasiswa', $this->token, "id_mahasiswa='d1efadbc-00e6-4be9-aef8-9589f3292094'", "", "");
@@ -557,7 +557,7 @@ class GetData extends BaseController
                             "message" => $this->validator->getErrors(),
                         ]
                     ];
-                    $report['gagal'][]=$item;
+                    $report['gagal'][] = $item;
                 } else {
                     $myuuid = Uuid::uuid4();
                     $value->id = $myuuid->toString();
@@ -591,7 +591,7 @@ class GetData extends BaseController
                         'nama' => $value->nama_mahasiswa,
                         'status' => "success"
                     ];
-                    $report['berhasil'][]=$item;
+                    $report['berhasil'][] = $item;
                 }
             }
             $conn->transComplete();
@@ -710,16 +710,38 @@ class GetData extends BaseController
     public function matakuliah()
     {
         $matakuliah = new \App\Models\MatakuliahModel();
-
-        $data = $this->api->getData('GetDetailMataKuliah', $this->token, "");
-        if ($data->error_code == 100) {
-            $this->token = $this->api->getToken()->data->token;
-            $data = $this->api->getData('GetDetailMataKuliah', $this->token);
-        }
-        foreach ($data->data as $key => $value) {
-            $value->id = Uuid::uuid4()->toString();
-            $value->status_sync = "sudah sync";
-            $matakuliah->insert($value);
+        $conn = \Config\Database::connect();
+        try {
+            $conn->transException(true)->transStart();
+            $data = $this->api->getData('GetDetailMataKuliah', $this->token, "");
+            if ($data->error_code == 100) {
+                $this->token = $this->api->getToken()->data->token;
+                $data = $this->api->getData('GetDetailMataKuliah', $this->token);
+            }
+            $result = ['update' => [], 'insert' => []];
+            foreach ($data->data as $key => $value) {
+                $itemKuliah = $matakuliah->where('id_matkul', $value->id_matkul)->first();
+                if (is_null($itemKuliah)) {
+                    $value->id = Uuid::uuid4()->toString();
+                    $value->status_sync = "sudah sync";
+                    $model = new \App\Entities\MatakuliahKurikulumEntity();
+                    $model->fill((array) $value);
+                    $matakuliah->insert($model);
+                    $result['insert'][] = $value;
+                } else {
+                    $model = new \App\Entities\MatakuliahKurikulumEntity();
+                    $model->fill((array) $value);
+                    $matakuliah->update($itemKuliah->id, $model);
+                    $result['update'][] = $value;
+                }
+            }
+            $conn->transComplete();
+            return $this->respond([
+                'status' => true,
+                'data'=>$result
+            ]);
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage());
         }
     }
 
@@ -728,18 +750,41 @@ class GetData extends BaseController
         $detail = new \App\Models\MatakuliahKurikulumModel();
         $kurikulum = new \App\Models\KurikulumModel();
         $matakuliah = new \App\Models\MatakuliahModel();
-
-        $data = $this->api->getData('GetMatkulKurikulum', $this->token, "nama_kurikulum not in('TI-2011')");
-        if ($data->error_code == 100) {
-            $this->token = $this->api->getToken()->data->token;
+        $conn = \Config\Database::connect();
+        try {
+            $conn->transException(true)->transStart();
             $data = $this->api->getData('GetMatkulKurikulum', $this->token, "nama_kurikulum not in('TI-2011')");
-        }
-        foreach ($data->data as $key => $value) {
-            $value->id = Uuid::uuid4()->toString();
-            $value->kurikulum_id = $kurikulum->where('id_kurikulum', $value->id_kurikulum)->first()->id;
-            $value->matakuliah_id = $matakuliah->where('id_matkul', $value->id_matkul)->first()->id;
-            $value->status_sync = "sudah sync";
-            $detail->insert($value);
+            if ($data->error_code == 100) {
+                $this->token = $this->api->getToken()->data->token;
+                $data = $this->api->getData('GetMatkulKurikulum', $this->token, "nama_kurikulum not in('TI-2011')");
+            }
+            foreach ($data->data as $key => $value) {
+                $itemKurikulum = $kurikulum->where('id_kurikulum', $value->id_kurikulum)->first();
+                $value->kurikulum_id = $itemKurikulum->id;
+                $itemMatakuliah = $matakuliah->where('id_matkul', $value->id_matkul)->first();
+                $value->matakuliah_id = $itemMatakuliah->id;
+                $itemDetail = $detail->where('kurikulum_id', $value->kurikulum_id)->where('matakuliah_id', $value->matakuliah_id)->first();
+                if (is_null($itemDetail)) {
+                    $value->id = Uuid::uuid4()->toString();
+                    $value->status_sync = "sudah sync";
+                    $detail->insert($value);
+                } else {
+                    $item = [
+                        'kurikulum_id' => $value->kurikulum_id,
+                        'matakuliah_id' => $value->matakuliah_id,
+                        'apakah_wajib' => $value->apakah_wajib,
+                        'semester' => $value->semester
+                    ];
+                    $value->status_sync = "sudah sync";
+                    $detail->update($itemDetail->id, $value);
+                }
+            }
+            $conn->transComplete();
+            return $this->respond([
+                'status' => true
+            ]);
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage());
         }
     }
 
