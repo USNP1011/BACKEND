@@ -32,6 +32,7 @@ class Jadwal extends ResourceController
                 `ruangan`.`nama_ruangan`")
                 ->join("matakuliah", "`kelas_kuliah`.`matakuliah_id` = `matakuliah`.`id`", "left")
                 ->join("matakuliah_kurikulum", "`matakuliah_kurikulum`.`matakuliah_id` = `matakuliah`.`id`", "left")
+                ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id', 'left')
                 ->join("prodi", "`matakuliah`.`id_prodi` = `prodi`.`id_prodi`", "left")
                 ->join("kelas", "`kelas`.`id` = `kelas_kuliah`.`kelas_id`", "left")
                 ->join("ruangan", "`ruangan`.`id` = `kelas_kuliah`.`ruangan_id`", "left")
