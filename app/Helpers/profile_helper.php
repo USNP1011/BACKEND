@@ -56,6 +56,13 @@ function getProfileByMahasiswa($id)
     return $profile;
 }
 
+function checkMahasiswa($array) {
+    foreach ($array as $key => $value) {
+        if($value->role=="Mahasiswa") return true;
+    }
+    return false;
+}
+
 function getProfileProdi()
 {
     helper('request');
@@ -77,4 +84,9 @@ function getProfileProdi()
 function getKaprodi($id_prodi = null) {
     $object = new \App\Models\KaprodiModel();
     return $object->select('kaprodi.*, dosen.nama_dosen')->join('dosen', 'dosen.id_dosen=kaprodi.id_dosen', 'left')->where('kaprodi.id_prodi', $id_prodi)->first();
+}
+
+function getDosenByUser($id_user = null) {
+    $object = new \App\Models\DosenModel();
+    return $object->where('id_user', $id_user)->first();
 }

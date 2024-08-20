@@ -88,9 +88,13 @@ class AuthController extends ResourceController
                 'username' => $item->username,
                 'email' => $item->email,
                 'status' => $item->status,
-                'semester' => $semester->where('a_periode_aktif', '1')->first(),
-                'roles' => $role->select("user_role.id, role.role")->join('role', 'role.id=user_role.role_id', 'left')->where('user_role.users_id', $item->id)->findAll()
+                'semester' => $semester->select('id_semester, nama_semester, batas_pengisian_krsm')->where('a_periode_aktif', '1')->first(),
+                'roles' => $role->select("role.role")->join('role', 'role.id=user_role.role_id', 'left')->where('user_role.users_id', $item->id)->findAll()
             ];
+
+            if(!checkMahasiswa($set['roles'])){
+                $set['status'] = getDosenByUser($item->id)->status;
+            }
 
             return $this->respond([
                 'message' => 'User authenticated successfully',
