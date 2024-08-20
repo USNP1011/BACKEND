@@ -22,6 +22,7 @@ class DosenPengajarKelasModel extends Model
 		'realisasi_minggu_pertemuan',
 		'id_jenis_evaluasi',
         'nama_jenis_evaluasi',
+        'mengajar',
         'status_sync',
         'sync_at'
     ];
