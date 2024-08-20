@@ -28,7 +28,7 @@ class Jadwal extends ResourceController
                     `prodi`.`kode_program_studi`,
                     `prodi`.`nama_program_studi`,
                     `kelas`.`nama_kelas_kuliah`,
-                    (if(dosen_pengajar_kelas.id_registrasi_dosen IS NULL , SELECT dosen.nama_dosen FROM dosen WHERE dosen.id_dosen=dosen_pengajar_kelas.id_dosen, SELECT penugasan_dosen.nama_dosen FROM penugasan_dosen WHERE penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen)) as nama_dosen
+                    (if(dosen_pengajar_kelas.id_registrasi_dosen IS NULL , SELECT dosen.nama_dosen FROM dosen WHERE dosen.id_dosen=dosen_pengajar_kelas.id_dosen, SELECT penugasan_dosen.nama_dosen FROM penugasan_dosen WHERE penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen)) as nama_dosen,
                     `dosen`.`nama_dosen`,
                     `matakuliah_kurikulum`.`semester`,
                     `ruangan`.`nama_ruangan`")
