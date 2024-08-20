@@ -2,6 +2,7 @@
 
 namespace App\Controllers\Api;
 
+use App\Models\DosenModel;
 use App\Models\DosenPengajarKelasModel;
 use App\Models\KelasKuliahModel;
 use App\Models\PenugasanDosenModel;
@@ -124,10 +125,11 @@ class KelasKuliah extends ResourceController
 
     public function dosenAll($id = null): object
     {
-        $object = new PenugasanDosenModel();
+        $object = new DosenModel();
         return $this->respond([
             'status' => true,
-            'data' => $object->findAll()
+            'data' => $object->select('dosen.*, penugasan_dosen.id_registrasi_dosen')
+            ->join('penugasan_dosen', 'penugasan_dosen.id_dosen=dosen.id_dosen', 'left')->findAll()
         ]);
     }
 
