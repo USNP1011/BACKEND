@@ -389,4 +389,9 @@ $routes->group('sync', function($routes){
     $routes->get('kelas_kuliah', 'Sync::syncKelasKuliah');
     $routes->get('pengajar_kelas', 'Sync::syncPengajarKelas');
     $routes->get('peserta_kelas', 'Sync::syncPesertaKelas');
+    $routes->get('perkuliahan_mahasiswa', 'Sync::syncPerkuliahanMahasiswa');
+});
+
+$routes->group('repair', function($routes){
+    $routes->get('', 'Repair::repair');
 });
