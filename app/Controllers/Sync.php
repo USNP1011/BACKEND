@@ -26,7 +26,7 @@ class Sync extends BaseController
         // Kelas Kuliah
         $object = new \App\Models\KelasKuliahModel();
         $data->kelas_kuliah = $object->select("kelas_kuliah.id, kelas_kuliah.id_kelas_kuliah,kelas_kuliah.id_prodi,matakuliah_id,kelas_kuliah.id_semester,kelas_kuliah.nama_semester,kelas_kuliah.nama_program_studi,kelas_kuliah.kode_mata_kuliah,kelas_kuliah.nama_mata_kuliah,kelas_kuliah.bahasan,kelas_kuliah.tanggal_mulai_efektif,kelas_kuliah.tanggal_akhir_efektif,kelas_kuliah.lingkup,kelas_kuliah.mode,kelas_kuliah.kapasitas, (if(kelas_kuliah.id_kelas_kuliah is null AND deleted_at is null, 'insert', if(kelas_kuliah.id_kelas_kuliah is not null AND deleted_at is null and sync_at<updated_at, 'update', if(kelas_kuliah.id_kelas_kuliah is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(kelas_kuliah.id_kelas_kuliah is null AND deleted_at is null, 'insert', if(kelas_kuliah.id_kelas_kuliah is not null AND deleted_at is null and sync_at<updated_at, 'update', if(kelas_kuliah.id_kelas_kuliah is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")
-        ->findAll();
+            ->findAll();
 
         // Peserta Kelas
         $object = new \App\Models\PesertaKelasModel();
@@ -64,6 +64,78 @@ class Sync extends BaseController
         $object = new \App\Models\PerkuliahanMahasiswaModel();
         $data->perkuliahan_mahasiswa = $object->select("perkuliahan_mahasiswa.id, (if(sync_at is null AND deleted_at is null, 'insert', if(sync_at is not null AND deleted_at is null and sync_at<updated_at, 'update', if(sync_at is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(sync_at is null AND deleted_at is null, 'insert', if(sync_at is not null AND deleted_at is null and sync_at<updated_at, 'update', if(sync_at is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
 
+        return $this->respond($data);
+    }
+
+    function syncMahasiswa()
+    {
+        $object = \Config\Database::connect();
+        $data = $object->query("SELECT mahasiswa.*, (if(id_mahasiswa is null AND deleted_at is null, 'insert', if(id_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync FROM mahasiswa WHERE if(id_mahasiswa is null AND deleted_at is null, 'insert', if(id_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->getResult();
+        foreach ($data as $key => $value) {
+            $item = [
+                'nama_mahasiswa' => $value->nama_mahasiswa,
+                'jenis_kelamin' => $value->jenis_kelamin,
+                'jalan' => $value->jalan,
+                'rt' => $value->,
+                'rw' => $value->,
+                'dusun' => $value->,
+                'kelurahan' => $value->,
+                'kode_pos' => $value->,
+                'nisn' => $value->,
+                'nik' => $value->,
+                'tempat_lahir' => $value->,
+                'tanggal_lahir' => $value->,
+                'nama_ayah' => $value->,
+                'tanggal_lahir_ayah' => $value->,
+                'nik_ayah' => $value->,
+                'id_pendidikan_ayah' => $value->,
+                'id_pekerjaan_ayah' => $value->,
+                'id_penghasilan_ayah' => $value->,
+                'id_kebutuhan_khusus_ayah' => $value->,
+                'nama_ibu_kandung' => $value->,
+                'tanggal_lahir_ibu' => $value->,
+                'nik_ibu' => $value->,
+                'id_pendidikan_ibu' => $value->,
+                'id_pekerjaan_ibu' => $value->,
+                'id_penghasilan_ibu' => $value->,
+                'id_kebutuhan_khusus_ibu' => $value->,
+                'nama_wali' => $value->,
+                'tanggal_lahir_wali' => $value->,
+                'id_pendidikan_wali' => $value->,
+                'id_pekerjaan_wali' => $value->,
+                'id_penghasilan_wali' => $value->,
+                'id_kebutuhan_khusus_mahasiswa' => $value->,
+                'telepon' => $value->,
+                'handphone' => $value->,
+                'email' => $value->,
+                'penerima_kps' => $value->,
+                'nomor_kps' => $value->,
+                'no_kps' => $value->,
+                'npwp' => $value->,
+                'id_wilayah' => $value->,
+                'id_jenis_tinggal' => $value->,
+                'nama_jenis_tinggal' => $value->,
+                'id_agama' => $value->,
+                'nama_agama' => $value->,
+                'id_alat_transportasi' => $value->,
+                'nama_alat_transportasi' => $value->,
+                'nama_wilayah' => $value->,
+                'kewarganegaraan' => $value->,
+                'nama_pendidikan_ayah' => $value->,
+                'nama_pendidikan_ibu' => $value->,
+                'nama_pendidikan_wali' => $value->,
+                'nama_pekerjaan_ayah' => $value->,
+                'nama_pekerjaan_ibu' => $value->,
+                'nama_pekerjaan_wali' => $value->,
+                'nama_penghasilan_ayah' => $value->,
+                'nama_penghasilan_ibu' => $value->,
+                'nama_penghasilan_wali' => $value->,
+                'nama_kebutuhan_khusus_ayah' => $value->,
+                'nama_kebutuhan_khusus_ibu' => $value->,
+                'nama_kebutuhan_khusus_wali' => $value->,
+                'nama_kebutuhan_khusus_mahasiswa' => $value->,
+            ];
+        }
         return $this->respond($data);
     }
 }

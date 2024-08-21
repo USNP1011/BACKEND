@@ -384,4 +384,5 @@ $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($
 });
 $routes->group('sync', function($routes){
     $routes->get('', 'Sync::getSync');
+    $routes->get('mahasiswa', 'Sync::syncMahasiswa');
 });

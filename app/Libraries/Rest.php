@@ -68,4 +68,37 @@ class Rest
             return json_decode($response);
         }
     }
+
+    function developerMode($act, $token, $filter="", $order="", $limit="", $offset="")
+    {
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://feeder.usn-papua.ac.id/ws/sandbox2.php',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => 0,
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => '{
+                "act": "' . $act . '",
+                "token": "'.$token.'",
+                "filter": "'.$filter.'",
+                "order": "'.$order.'",
+                "limit": "'.$limit.'",
+                "offset": "'.$offset.'"
+            }',
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        return json_decode($response);
+    }
 }

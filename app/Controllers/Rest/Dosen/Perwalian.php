@@ -50,18 +50,20 @@ class Perwalian extends ResourceController
             } else {
                 $tahapan = new \App\Models\TahapanModel();
                 $itemMhs = $object->select('temp_krsm.*, mahasiswa.nama_mahasiswa, riwayat_pendidikan_mahasiswa.nim,riwayat_pendidikan_mahasiswa.angkatan')
-                ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=temp_krsm.id_riwayat_pendidikan', 'left')
-                ->join('mahasiswa', 'mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa', 'left')
-                ->where('temp_krsm.id', $id)->first();
-                $detail = $detail->select('temp_peserta_kelas.id, temp_peserta_kelas.kelas_kuliah_id, temp_peserta_kelas.id_riwayat_pendidikan, temp_peserta_kelas.temp_krsm_id, matakuliah.nama_mata_kuliah, matakuliah.kode_mata_kuliah, matakuliah.sks_mata_kuliah, kelas_kuliah.hari, kelas_kuliah.jam_mulai, kelas_kuliah.jam_selesai, kelas.nama_kelas_kuliah, dosen.nama_dosen, kelas_kuliah.hari, kelas_kuliah.jam_mulai, kelas_kuliah.jam_selesai, matakuliah_kurikulum.semester')
+                    ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=temp_krsm.id_riwayat_pendidikan', 'left')
+                    ->join('mahasiswa', 'mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa', 'left')
+                    ->where('temp_krsm.id', $id)->first();
+                $detail = $detail->select('temp_peserta_kelas.id, temp_peserta_kelas.kelas_kuliah_id, temp_peserta_kelas.id_riwayat_pendidikan, temp_peserta_kelas.temp_krsm_id, matakuliah.nama_mata_kuliah, matakuliah.kode_mata_kuliah, matakuliah.sks_mata_kuliah, kelas_kuliah.hari, kelas_kuliah.jam_mulai, kelas_kuliah.jam_selesai, kelas.nama_kelas_kuliah, 
+                (if(dosen_pengajar_kelas.id_registrasi_dosen IS NOT NULL , (SELECT penugasan_dosen.nama_dosen FROM penugasan_dosen WHERE penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen LIMIT 1), (SELECT dosen.nama_dosen FROM dosen WHERE dosen.id_dosen = dosen_pengajar_kelas.id_dosen))) as nama_dosen, 
+                kelas_kuliah.hari, 
+                kelas_kuliah.jam_mulai, kelas_kuliah.jam_selesai, matakuliah_kurikulum.semester')
                     ->join('kelas_kuliah', 'kelas_kuliah.id=temp_peserta_kelas.kelas_kuliah_id', 'left')
                     ->join('kelas', 'kelas_kuliah.kelas_id=kelas.id', 'left')
                     ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
                     ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id', 'left')
-                    ->join('penugasan_dosen', 'penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen', 'left')
-                    ->join('dosen', 'dosen.id_dosen=penugasan_dosen.id_dosen', 'left')
                     ->join('matakuliah_kurikulum', 'matakuliah_kurikulum.matakuliah_id=matakuliah.id', 'left')
                     ->where('temp_krsm_id', $id)
+                    ->where("dosen_pengajar_kelas.mengajar", '1')
                     ->findAll();
                 $itemTahapan = $tahapan->where('id', $itemMhs->id_tahapan)->first();
                 $object = new \App\Models\PerkuliahanMahasiswaModel();
@@ -73,15 +75,15 @@ class Perwalian extends ResourceController
                     'status' => true,
                     'data' => [
                         "pengajuan" => $itemTahapan->tahapan,
-                        "pesan"=> $itemMhs->pesan,
+                        "pesan" => $itemMhs->pesan,
                         'matakuliah' => [
                             'id_riwayat_pendidikan' => $itemMhs->id_riwayat_pendidikan,
                             'id_semester' => $itemMhs->id_semester,
                             'nama_semester' => $semester->nama_semester,
-                            'nama_mahasiswa'=>$itemMhs->nama_mahasiswa,
-                            'nim'=>$itemMhs->nim,
-                            'angkatan'=>$itemMhs->angkatan,
-                            'id_tahapan'=>$itemTahapan->id,
+                            'nama_mahasiswa' => $itemMhs->nama_mahasiswa,
+                            'nim' => $itemMhs->nim,
+                            'angkatan' => $itemMhs->angkatan,
+                            'id_tahapan' => $itemTahapan->id,
                             'detail' => $detail
                         ],
                         'roles' => ['sks_max' => $sum <= 2 ? 20 : (int)$itemSkala->sks_max]
@@ -108,8 +110,7 @@ class Perwalian extends ResourceController
                 return $this->respond([
                     'status' => true
                 ]);
-            }else{
-                
+            } else {
             }
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage());
