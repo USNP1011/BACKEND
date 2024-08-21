@@ -42,7 +42,10 @@ class Sync extends BaseController
 
         // Dosen Pengajar Kelas
         $object = new \App\Models\DosenPengajarKelasModel();
-        $data->dosen_pengajar_kelas = $object->select("dosen_pengajar_kelas.id, (if(id_aktivitas_mengajar is null AND deleted_at is null, 'insert', if(id_aktivitas_mengajar is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_aktivitas_mengajar is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_aktivitas_mengajar is null AND deleted_at is null, 'insert', if(id_aktivitas_mengajar is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_aktivitas_mengajar is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+        $data->dosen_pengajar_kelas = $object->select("dosen_pengajar_kelas.id, (if(id_aktivitas_mengajar is null AND dosen_pengajar_kelas.deleted_at is null, 'insert', if(id_aktivitas_mengajar is not null AND dosen_pengajar_kelas.deleted_at is null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at, 'update', if(id_aktivitas_mengajar is not null and dosen_pengajar_kelas.deleted_at is not null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at,'delete', null)))) as set_sync")
+            ->join('penugasan_dosen', 'penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen', 'left')
+            ->join('dosen', 'dosen.id_dosen=penugasan_dosen.id_dosen', 'left')
+            ->where("if(id_aktivitas_mengajar is null AND dosen_pengajar_kelas.deleted_at is null, 'insert', if(id_aktivitas_mengajar is not null AND dosen_pengajar_kelas.deleted_at is null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at, 'update', if(id_aktivitas_mengajar is not null and dosen_pengajar_kelas.deleted_at is not null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at,'delete', null))) IS NOT NULL AND dosen.status='Dosen'")->findAll();
 
         // Aktivitas Mahasiswa
         $object = new \App\Models\AktivitasMahasiswaModel();
@@ -133,7 +136,166 @@ class Sync extends BaseController
                     $setData = (object) $item;
                     $result = $this->api->insertData('InsertBiodataMahasiswa', $this->token, $setData);
                     if ($result->error_code == "0") {
-                        $query = "UPDATE mahasiswa SET id_mahasiswa='" . $result->data->id_mahasiswa . "', sync_at = '" . date('Y-m-d') . "', status_sync='sudah sync' WHERE id = '".$value->id."'";
+                        $query = "UPDATE mahasiswa SET id_mahasiswa='" . $result->data->id_mahasiswa . "', sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $object->query($query);
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $record['gagal'][] = $item;
+                    }
+                }
+            }
+            return $this->respond($record);
+        } catch (\Throwable $th) {
+            return $this->fail($record);
+        }
+    }
+
+    function syncHistoryPendidikan()
+    {
+        $object = \Config\Database::connect();
+        $record = ['berhasil' => [], 'gagal' => []];
+        try {
+            $data = $object->query("SELECT riwayat_pendidikan_mahasiswa.*, (if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync FROM riwayat_pendidikan_mahasiswa WHERE if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL LIMIT 30")->getResult();
+            foreach ($data as $key => $value) {
+                $mahasiswa = $object->query("SELECT mahasiswa.id, mahasiswa.id_mahasiswa FROM mahasiswa WHERE mahasiswa.id='" . $value->id_mahasiswa . "'")->getRowObject();
+                $item = [
+                    'id_mahasiswa' => $mahasiswa->id_mahasiswa,
+                    'nim' => $value->nim,
+                    'id_jenis_daftar' => $value->id_jenis_daftar,
+                    'id_jalur_daftar' => $value->id_jalur_daftar,
+                    'id_periode_masuk' => $value->id_periode_masuk,
+                    'tanggal_daftar' => $value->tanggal_daftar,
+                    'id_prodi' => $value->id_prodi,
+                    'id_perguruan_tinggi' => $value->id_perguruan_tinggi,
+                    'sks_diakui' => $value->sks_diakui,
+                    'id_perguruan_tinggi_asal' => $value->id_perguruan_tinggi_asal,
+                    'id_prodi_asal' => $value->id_prodi_asal,
+                    'id_pembiayaan' => $value->id_pembiayaan,
+                    'biaya_masuk' => $value->biaya_masuk,
+                ];
+                if ($value->set_sync == 'insert') {
+                    $setData = (object) $item;
+                    $result = $this->api->insertData('InsertRiwayatPendidikanMahasiswa', $this->token, $setData);
+                    if ($result->error_code == "0") {
+                        $query = "UPDATE riwayat_pendidikan_mahasiswa SET id_registrasi_mahasiswa='" . $result->data->id_registrasi_mahasiswa . "', sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $object->query($query);
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $record['gagal'][] = $item;
+                    }
+                }
+            }
+            return $this->respond($record);
+        } catch (\Throwable $th) {
+            return $this->fail($record);
+        }
+    }
+
+    function syncKelasKuliah()
+    {
+        $object = \Config\Database::connect();
+        $record = ['berhasil' => [], 'gagal' => []];
+        try {
+            $data = $object->query("SELECT kelas_kuliah.id, kelas_kuliah.id_kelas_kuliah,kelas_kuliah.id_prodi,matakuliah_id,kelas_kuliah.id_semester,kelas_kuliah.nama_semester,kelas_kuliah.nama_program_studi,kelas_kuliah.kode_mata_kuliah,kelas_kuliah.nama_mata_kuliah,kelas_kuliah.bahasan,kelas_kuliah.tanggal_mulai_efektif,kelas_kuliah.tanggal_akhir_efektif,kelas_kuliah.lingkup,kelas_kuliah.mode,kelas_kuliah.kapasitas, kelas.nama_kelas_kuliah, matakuliah.id_matkul, matakuliah.sks_mata_kuliah, matakuliah.sks_tatap_muka, matakuliah.sks_praktek, matakuliah.sks_praktek_lapangan, matakuliah.sks_simulasi, (if(kelas_kuliah.id_kelas_kuliah is null AND kelas_kuliah.deleted_at is null, 'insert', if(kelas_kuliah.id_kelas_kuliah is not null AND kelas_kuliah.deleted_at is null and kelas_kuliah.sync_at<kelas_kuliah.updated_at, 'update', if(kelas_kuliah.id_kelas_kuliah is not null and kelas_kuliah.deleted_at is not null and kelas_kuliah.sync_at<kelas_kuliah.updated_at,'delete', null)))) as set_sync 
+            FROM kelas_kuliah 
+            LEFT JOIN kelas on kelas.id=kelas_kuliah.kelas_id
+            LEFT JOIN matakuliah on matakuliah.id=kelas_kuliah.matakuliah_id 
+            WHERE if(kelas_kuliah.id_kelas_kuliah is null AND kelas_kuliah.deleted_at is null, 'insert', if(kelas_kuliah.id_kelas_kuliah is not null AND kelas_kuliah.deleted_at is null and kelas_kuliah.sync_at<kelas_kuliah.updated_at, 'update', if(kelas_kuliah.id_kelas_kuliah is not null and kelas_kuliah.deleted_at is not null and kelas_kuliah.sync_at<kelas_kuliah.updated_at,'delete', null))) IS NOT NULL LIMIT 37")->getResult();
+            foreach ($data as $key => $value) {
+                $item = [
+                    'id_semester' => $value->id_semester,
+                    'id_prodi' => $value->id_prodi,
+                    'id_matkul' => $value->id_matkul,
+                    'nama_kelas_kuliah' => $value->nama_kelas_kuliah,
+                    'sks_mk' => $value->sks_mata_kuliah,
+                    'sks_tm' => $value->sks_tatap_muka,
+                    'sks_prak' => $value->sks_praktek,
+                    'sks_prak_lap' => $value->sks_praktek_lapangan,
+                    'sks_sim' => $value->sks_simulasi,
+                    'bahasan' => $value->bahasan,
+                    'tanggal_mulai_efektif' => $value->tanggal_mulai_efektif,
+                    'tanggal_akhir_efektif' => $value->tanggal_akhir_efektif,
+                    'lingkup' => $value->lingkup,
+                    'mode' => $value->mode,
+                    'kapasitas' => $value->kapasitas,
+                ];
+                if ($value->set_sync == 'insert') {
+                    $setData = (object) $item;
+                    $result = $this->api->insertData('InsertKelasKuliah', $this->token, $setData);
+                    if ($result->error_code == "0") {
+                        $query = "UPDATE kelas_kuliah SET id_kelas_kuliah='" . $result->data->id_kelas_kuliah . "', sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $object->query($query);
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $record['gagal'][] = $item;
+                    }
+                }
+            }
+            return $this->respond($record);
+        } catch (\Throwable $th) {
+            return $this->fail($record);
+        }
+    }
+
+    function syncPengajarKelas()
+    {
+        $object = \Config\Database::connect();
+        $record = ['berhasil' => [], 'gagal' => []];
+        try {
+            $data = $object->query("SELECT dosen_pengajar_kelas.*, kelas_kuliah.id_kelas_kuliah, (if(id_aktivitas_mengajar is null AND dosen_pengajar_kelas.deleted_at is null, 'insert', if(id_aktivitas_mengajar is not null AND dosen_pengajar_kelas.deleted_at is null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at, 'update', if(id_aktivitas_mengajar is not null and dosen_pengajar_kelas.deleted_at is not null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at,'delete', null)))) as set_sync 
+            FROM dosen_pengajar_kelas 
+            LEFT JOIN penugasan_dosen on penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen
+            LEFT JOIN dosen on dosen.id_dosen=penugasan_dosen.id_dosen 
+            LEFT JOIN kelas_kuliah on kelas_kuliah.id=dosen_pengajar_kelas.kelas_kuliah_id 
+            WHERE if(id_aktivitas_mengajar is null AND dosen_pengajar_kelas.deleted_at is null, 'insert', if(id_aktivitas_mengajar is not null AND dosen_pengajar_kelas.deleted_at is null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at, 'update', if(id_aktivitas_mengajar is not null and dosen_pengajar_kelas.deleted_at is not null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at,'delete', null))) IS NOT NULL AND dosen.status='Dosen' LIMIT 50")->getResult();
+            foreach ($data as $key => $value) {
+                $item = [
+                    'id_registrasi_dosen' => $value->id_registrasi_dosen,
+                    'id_kelas_kuliah' => $value->id_kelas_kuliah,
+                    'id_substansi' => $value->id_substansi,
+                    'sks_substansi_total' => $value->sks_substansi_total,
+                    'rencana_minggu_pertemuan' => $value->rencana_minggu_pertemuan,
+                    'realisasi_minggu_pertemuan' => $value->realisasi_minggu_pertemuan,
+                    'id_jenis_evaluasi' => $value->id_jenis_evaluasi,
+                ];
+                if ($value->set_sync == 'insert') {
+                    $setData = (object) $item;
+                    $result = $this->api->insertData('InsertDosenPengajarKelasKuliah', $this->token, $setData);
+                    if ($result->error_code == "0") {
+                        $query = "UPDATE dosen_pengajar_kelas SET id_aktivitas_mengajar='" . $result->data->id_aktivitas_mengajar . "', sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $object->query($query);
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $record['gagal'][] = $item;
+                    }
+                }
+            }
+            return $this->respond($record);
+        } catch (\Throwable $th) {
+            return $this->fail($record);
+        }
+    }
+
+    function syncPesertaKelas()
+    {
+        $object = \Config\Database::connect();
+        $record = ['berhasil' => [], 'gagal' => []];
+        try {
+            $data = $object->query("SELECT peserta_kelas.*, kelas_kuliah.id_kelas_kuliah, riwayat_pendidikan_mahasiswa.id_registrasi_mahasiswa, (if(peserta_kelas.status_sync is null AND peserta_kelas.deleted_at is null, 'insert', if(peserta_kelas.status_sync is not null AND peserta_kelas.deleted_at is null and peserta_kelas.sync_at<peserta_kelas.updated_at, 'update', if(peserta_kelas.status_sync is not null and peserta_kelas.deleted_at is not null and peserta_kelas.sync_at<peserta_kelas.updated_at,'delete', null)))) as set_sync 
+            FROM peserta_kelas 
+            LEFT JOIN riwayat_pendidikan_mahasiswa on riwayat_pendidikan_mahasiswa.id=peserta_kelas.id_riwayat_pendidikan
+            LEFT JOIN kelas_kuliah on kelas_kuliah.id=peserta_kelas.kelas_kuliah_id 
+            WHERE if(peserta_kelas.status_sync is null AND peserta_kelas.deleted_at is null, 'insert', if(peserta_kelas.status_sync is not null AND peserta_kelas.deleted_at is null and peserta_kelas.sync_at<peserta_kelas.updated_at, 'update', if(peserta_kelas.status_sync is not null and peserta_kelas.deleted_at is not null and peserta_kelas.sync_at<peserta_kelas.updated_at,'delete', null))) IS NOT NULL LIMIT 100")->getResult();
+            foreach ($data as $key => $value) {
+                $item = [
+                    'id_registrasi_mahasiswa' => $value->id_registrasi_mahasiswa,
+                    'id_kelas_kuliah' => $value->id_kelas_kuliah
+                ];
+                if ($value->set_sync == 'insert') {
+                    $setData = (object) $item;
+                    $result = $this->api->insertData('InsertPesertaKelasKuliah', $this->token, $setData);
+                    if ($result->error_code == "0") {
+                        $query = "UPDATE peserta_kelas SET sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
                         $object->query($query);
                         $record['berhasil'][] = $item;
                     } else {
