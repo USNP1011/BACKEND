@@ -143,7 +143,7 @@ class Sync extends BaseController
             }
             return $this->respond($record);
         } catch (\Throwable $th) {
-            return $this->fail($th->getMessage());
+            return $this->fail($record);
         }
     }
 }
