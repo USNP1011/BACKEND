@@ -2,10 +2,18 @@
 
 namespace App\Controllers;
 
+use App\Libraries\Rest;
 use stdClass;
 
 class Sync extends BaseController
 {
+    protected $token;
+    protected $api;
+    public function __construct()
+    {
+        $this->api = new Rest();
+        $this->token = $this->api->getToken()->data->token;
+    }
     public function getSync(): object
     {
         $conn = \Config\Database::connect();
@@ -70,72 +78,72 @@ class Sync extends BaseController
     function syncMahasiswa()
     {
         $object = \Config\Database::connect();
-        $data = $object->query("SELECT mahasiswa.*, (if(id_mahasiswa is null AND deleted_at is null, 'insert', if(id_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync FROM mahasiswa WHERE if(id_mahasiswa is null AND deleted_at is null, 'insert', if(id_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->getResult();
-        foreach ($data as $key => $value) {
-            $item = [
-                'nama_mahasiswa' => $value->nama_mahasiswa,
-                'jenis_kelamin' => $value->jenis_kelamin,
-                'jalan' => $value->jalan,
-                'rt' => $value->,
-                'rw' => $value->,
-                'dusun' => $value->,
-                'kelurahan' => $value->,
-                'kode_pos' => $value->,
-                'nisn' => $value->,
-                'nik' => $value->,
-                'tempat_lahir' => $value->,
-                'tanggal_lahir' => $value->,
-                'nama_ayah' => $value->,
-                'tanggal_lahir_ayah' => $value->,
-                'nik_ayah' => $value->,
-                'id_pendidikan_ayah' => $value->,
-                'id_pekerjaan_ayah' => $value->,
-                'id_penghasilan_ayah' => $value->,
-                'id_kebutuhan_khusus_ayah' => $value->,
-                'nama_ibu_kandung' => $value->,
-                'tanggal_lahir_ibu' => $value->,
-                'nik_ibu' => $value->,
-                'id_pendidikan_ibu' => $value->,
-                'id_pekerjaan_ibu' => $value->,
-                'id_penghasilan_ibu' => $value->,
-                'id_kebutuhan_khusus_ibu' => $value->,
-                'nama_wali' => $value->,
-                'tanggal_lahir_wali' => $value->,
-                'id_pendidikan_wali' => $value->,
-                'id_pekerjaan_wali' => $value->,
-                'id_penghasilan_wali' => $value->,
-                'id_kebutuhan_khusus_mahasiswa' => $value->,
-                'telepon' => $value->,
-                'handphone' => $value->,
-                'email' => $value->,
-                'penerima_kps' => $value->,
-                'nomor_kps' => $value->,
-                'no_kps' => $value->,
-                'npwp' => $value->,
-                'id_wilayah' => $value->,
-                'id_jenis_tinggal' => $value->,
-                'nama_jenis_tinggal' => $value->,
-                'id_agama' => $value->,
-                'nama_agama' => $value->,
-                'id_alat_transportasi' => $value->,
-                'nama_alat_transportasi' => $value->,
-                'nama_wilayah' => $value->,
-                'kewarganegaraan' => $value->,
-                'nama_pendidikan_ayah' => $value->,
-                'nama_pendidikan_ibu' => $value->,
-                'nama_pendidikan_wali' => $value->,
-                'nama_pekerjaan_ayah' => $value->,
-                'nama_pekerjaan_ibu' => $value->,
-                'nama_pekerjaan_wali' => $value->,
-                'nama_penghasilan_ayah' => $value->,
-                'nama_penghasilan_ibu' => $value->,
-                'nama_penghasilan_wali' => $value->,
-                'nama_kebutuhan_khusus_ayah' => $value->,
-                'nama_kebutuhan_khusus_ibu' => $value->,
-                'nama_kebutuhan_khusus_wali' => $value->,
-                'nama_kebutuhan_khusus_mahasiswa' => $value->,
-            ];
+        $record = ['berhasil' => [], 'gagal' => []];
+        try {
+            $data = $object->query("SELECT mahasiswa.*, (if(id_mahasiswa is null AND deleted_at is null, 'insert', if(id_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync FROM mahasiswa WHERE if(id_mahasiswa is null AND deleted_at is null, 'insert', if(id_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->getResult();
+            foreach ($data as $key => $value) {
+                $item = [
+                    'nama_mahasiswa' => $value->nama_mahasiswa,
+                    'jenis_kelamin' => $value->jenis_kelamin,
+                    'jalan' => $value->jalan,
+                    'rt' => $value->rt,
+                    'rw' => $value->rw,
+                    'dusun' => $value->dusun,
+                    'kelurahan' => $value->kelurahan,
+                    'kode_pos' => $value->kode_pos,
+                    'nisn' => $value->nisn,
+                    'nik' => $value->nik,
+                    'tempat_lahir' => $value->tempat_lahir,
+                    'tanggal_lahir' => $value->tanggal_lahir,
+                    'nama_ayah' => $value->nama_ayah,
+                    'tanggal_lahir_ayah' => $value->tanggal_lahir_ayah,
+                    'nik_ayah' => $value->nik_ayah,
+                    'id_pendidikan_ayah' => $value->id_pendidikan_ayah,
+                    'id_pekerjaan_ayah' => $value->id_pekerjaan_ayah,
+                    'id_penghasilan_ayah' => $value->id_penghasilan_ayah,
+                    'id_kebutuhan_khusus_ayah' => $value->id_kebutuhan_khusus_ayah,
+                    'nama_ibu_kandung' => $value->nama_ibu_kandung,
+                    'tanggal_lahir_ibu' => $value->tanggal_lahir_ibu,
+                    'nik_ibu' => $value->nik_ibu,
+                    'id_pendidikan_ibu' => $value->id_pendidikan_ibu,
+                    'id_pekerjaan_ibu' => $value->id_pekerjaan_ibu,
+                    'id_penghasilan_ibu' => $value->id_penghasilan_ibu,
+                    'id_kebutuhan_khusus_ibu' => $value->id_kebutuhan_khusus_ibu,
+                    'nama_wali' => $value->nama_wali,
+                    'tanggal_lahir_wali' => $value->tanggal_lahir_wali,
+                    'id_pendidikan_wali' => $value->id_pendidikan_wali,
+                    'id_pekerjaan_wali' => $value->id_pekerjaan_wali,
+                    'id_penghasilan_wali' => $value->id_penghasilan_wali,
+                    'id_kebutuhan_khusus_mahasiswa' => $value->id_kebutuhan_khusus_mahasiswa,
+                    'telepon' => $value->telepon,
+                    'handphone' => $value->handphone,
+                    'email' => $value->email,
+                    'penerima_kps' => $value->penerima_kps,
+                    'nomor_kps' => $value->nomor_kps,
+                    'no_kps' => $value->no_kps,
+                    'npwp' => $value->npwp,
+                    'id_wilayah' => $value->id_wilayah,
+                    'id_jenis_tinggal' => $value->id_jenis_tinggal,
+                    'id_agama' => $value->id_agama,
+                    'id_alat_transportasi' => $value->id_alat_transportasi,
+                    'nama_wilayah' => $value->nama_wilayah,
+                    'kewarganegaraan' => $value->kewarganegaraan
+                ];
+                if ($value->set_sync == 'insert') {
+                    $setData = (object) $item;
+                    $result = $this->api->insertData('InsertBiodataMahasiswa', $this->token, $setData);
+                    if ($result->error_code == "0") {
+                        $query = "UPDATE mahasiswa SET id_mahasiswa='" . $result->data->id_mahasiswa . "', sync_at = '" . date('Y-m-d') . "', status_sync='sudah sync' WHERE id = '".$value->id."'";
+                        $object->query($query);
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $record['gagal'][] = $item;
+                    }
+                }
+            }
+            return $this->respond($record);
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage());
         }
-        return $this->respond($data);
     }
 }

@@ -27,12 +27,14 @@ class Krsm extends ResourceController
                             ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->first();
                         if (!is_null($data)) {
                             $object = new \App\Models\TempPesertaKelasModel();
-                            $data->detail = $object->select('temp_peserta_kelas.*, matakuliah.nama_mata_kuliah, matakuliah.kode_mata_kuliah, matakuliah.sks_mata_kuliah, kelas.nama_kelas_kuliah, dosen.nidn, dosen.nama_dosen, kelas_kuliah.hari, kelas_kuliah.jam_mulai, jam_selesai')
+                            $data->detail = $object->select('temp_peserta_kelas.*, matakuliah.nama_mata_kuliah, matakuliah.kode_mata_kuliah, matakuliah.sks_mata_kuliah, kelas.nama_kelas_kuliah, 
+                            (if(dosen_pengajar_kelas.id_registrasi_dosen IS NOT NULL , (SELECT penugasan_dosen.nidn FROM penugasan_dosen WHERE penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen LIMIT 1), (SELECT dosen.nidn FROM dosen WHERE dosen.id_dosen = dosen_pengajar_kelas.id_dosen))) as nidn, 
+                            (if(dosen_pengajar_kelas.id_registrasi_dosen IS NOT NULL , (SELECT penugasan_dosen.nama_dosen FROM penugasan_dosen WHERE penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen LIMIT 1), (SELECT dosen.nama_dosen FROM dosen WHERE dosen.id_dosen = dosen_pengajar_kelas.id_dosen))) as nama_dosen, 
+                            kelas_kuliah.hari, 
+                            kelas_kuliah.jam_mulai, jam_selesai')
                                 ->join('kelas_kuliah', 'kelas_kuliah.id=temp_peserta_kelas.kelas_kuliah_id', 'left')
                                 ->join('matakuliah', 'kelas_kuliah.matakuliah_id=matakuliah.id', 'left')
                                 ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id', 'left')
-                                ->join('penugasan_dosen', 'penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen', 'left')
-                                ->join('dosen', 'dosen.id_dosen=penugasan_dosen.id_dosen', 'left')
                                 ->join('kelas', 'kelas.id=kelas_kuliah.kelas_id', 'left')
                                 ->where('temp_krsm_id', $data->id)->findAll();
                             $object = new \App\Models\TahapanModel();
@@ -61,11 +63,16 @@ class Krsm extends ResourceController
                     }
                 } else {
                     $object = new \App\Models\PesertaKelasModel();
-                    $items = $object->select("kelas_kuliah.id, kelas_kuliah.id as kelas_kuliah_id,id_kelas_kuliah,kelas_kuliah.id_prodi,matakuliah_id,id_semester,nama_semester,kelas_kuliah.kelas_id,bahasan,lingkup,mode,kapasitas,hari,jam_mulai,jam_selesai,ruangan_id,kelas_kuliah.sync_at,kelas_kuliah.status_sync, kelas.nama_kelas_kuliah, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, penugasan_dosen.nidn, penugasan_dosen.nama_dosen, ruangan.nama_ruangan")
+                    $items = $object->select("kelas_kuliah.id, kelas_kuliah.id as kelas_kuliah_id,id_kelas_kuliah,kelas_kuliah.id_prodi,matakuliah_id,id_semester,nama_semester,kelas_kuliah.kelas_id,bahasan,lingkup,mode,kapasitas,hari,jam_mulai,jam_selesai,ruangan_id,kelas_kuliah.sync_at,kelas_kuliah.status_sync, kelas.nama_kelas_kuliah, 
+                    matakuliah.kode_mata_kuliah, 
+                    matakuliah.nama_mata_kuliah, 
+                    matakuliah.sks_mata_kuliah, 
+                    (if(dosen_pengajar_kelas.id_registrasi_dosen IS NOT NULL , (SELECT penugasan_dosen.nidn FROM penugasan_dosen WHERE penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen LIMIT 1), (SELECT dosen.nidn FROM dosen WHERE dosen.id_dosen = dosen_pengajar_kelas.id_dosen))) as nidn, 
+                    (if(dosen_pengajar_kelas.id_registrasi_dosen IS NOT NULL , (SELECT penugasan_dosen.nama_dosen FROM penugasan_dosen WHERE penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen LIMIT 1), (SELECT dosen.nama_dosen FROM dosen WHERE dosen.id_dosen = dosen_pengajar_kelas.id_dosen))) as nama_dosen, 
+                    ruangan.nama_ruangan")
                         ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
                         ->join('matakuliah', 'kelas_kuliah.matakuliah_id = matakuliah.id', 'left')
                         ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id = kelas_kuliah.id', 'left')
-                        ->join('penugasan_dosen', 'penugasan_dosen.id_registrasi_dosen = dosen_pengajar_kelas.id_registrasi_dosen', 'left')
                         ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = peserta_kelas.id_riwayat_pendidikan', 'left')
                         ->join('ruangan', 'ruangan.id = kelas_kuliah.ruangan_id', 'left')
                         ->join('kelas', 'kelas.id = kelas_kuliah.kelas_id', 'left')
