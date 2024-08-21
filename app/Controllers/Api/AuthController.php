@@ -92,9 +92,8 @@ class AuthController extends ResourceController
                 'roles' => $role->select("role.role")->join('role', 'role.id=user_role.role_id', 'left')->where('user_role.users_id', $item->id)->findAll()
             ];
 
-            if(!checkMahasiswa($set['roles'])){
+            if (!checkMahasiswa($set['roles']) && !checkAdmin($set['roles']))
                 $set['status'] = getDosenByUser($item->id)->status;
-            }
 
             return $this->respond([
                 'message' => 'User authenticated successfully',
@@ -150,14 +149,13 @@ class AuthController extends ResourceController
         }
         $users = auth()->getProvider();
         // $user = $users->findById($this->request->getJsonVar('id'));
-        $user = $users->findByCredentials(['username'=>$credentials['username']]);
+        $user = $users->findByCredentials(['username' => $credentials['username']]);
         $user->activate();
         $user->fill(['password' => $this->request->getJsonVar('newPassword')]);
         $cek = $users->save($user);
         return $this->respond([
             'status' => true
         ]);
-       
     }
 
     function createUser(): ResponseInterface
@@ -171,7 +169,7 @@ class AuthController extends ResourceController
                 $itemDosen = $dsn->where('id_dosen', $request->id)->first();
                 $itemUser = [
                     'username' => $itemDosen->nidn,
-                    'email' => $itemDosen->email ?? ($itemDosen->nidn."@usn-papua.ac.id"),
+                    'email' => $itemDosen->email ?? ($itemDosen->nidn . "@usn-papua.ac.id"),
                     'password' => $itemDosen->nidn,
                 ];
             } else if ($request->role == "Mahasiswa") {
@@ -179,7 +177,7 @@ class AuthController extends ResourceController
                 $itemMahasiswa = $mhs->select("mahasiswa.*, riwayat_pendidikan_mahasiswa.nim")->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id', 'left')->where('mahasiswa.id', $request->id)->first();
                 $itemUser = [
                     'username' => $itemMahasiswa->nim,
-                    'email' => $itemMahasiswa->email ?? $itemMahasiswa->nim."@usn-papua.ac.id",
+                    'email' => $itemMahasiswa->email ?? $itemMahasiswa->nim . "@usn-papua.ac.id",
                     'password' => $itemMahasiswa->nim,
                 ];
             } else {
@@ -232,7 +230,7 @@ class AuthController extends ResourceController
             return true;
         } else if ($role == 'Mahasiswa') {
             $conn = \Config\Database::connect();
-            $conn->query("UPDATE mahasiswa SET id_user='".$id_user."', sync_at=updated_at WHERE id='".$id."'");
+            $conn->query("UPDATE mahasiswa SET id_user='" . $id_user . "', sync_at=updated_at WHERE id='" . $id . "'");
             // $object = new \App\Models\MahasiswaModel();
             // $object->set("id_user='".$id_user."', sync_at=updated_at")->update($id);
             return true;

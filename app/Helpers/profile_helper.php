@@ -63,6 +63,13 @@ function checkMahasiswa($array) {
     return false;
 }
 
+function checkAdmin($array) {
+    foreach ($array as $key => $value) {
+        if($value->role=="Admin") return true;
+    }
+    return false;
+}
+
 function getProfileProdi()
 {
     helper('request');
