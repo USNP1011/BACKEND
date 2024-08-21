@@ -286,7 +286,7 @@ class Sync extends BaseController
             LEFT JOIN riwayat_pendidikan_mahasiswa on riwayat_pendidikan_mahasiswa.id=peserta_kelas.id_riwayat_pendidikan
             LEFT JOIN mahasiswa on mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa
             LEFT JOIN kelas_kuliah on kelas_kuliah.id=peserta_kelas.kelas_kuliah_id 
-            WHERE if(peserta_kelas.status_sync is null AND peserta_kelas.deleted_at is null, 'insert', if(peserta_kelas.status_sync is not null AND peserta_kelas.deleted_at is null and peserta_kelas.sync_at<peserta_kelas.updated_at, 'update', if(peserta_kelas.status_sync is not null and peserta_kelas.deleted_at is not null and peserta_kelas.sync_at<peserta_kelas.updated_at,'delete', null))) IS NOT NULL LIMIT 50")->getResult();
+            WHERE if(peserta_kelas.status_sync is null AND peserta_kelas.deleted_at is null, 'insert', if(peserta_kelas.status_sync is not null AND peserta_kelas.deleted_at is null and peserta_kelas.sync_at<peserta_kelas.updated_at, 'update', if(peserta_kelas.status_sync is not null and peserta_kelas.deleted_at is not null and peserta_kelas.sync_at<peserta_kelas.updated_at,'delete', null))) IS NOT NULL LIMIT 100")->getResult();
             foreach ($data as $key => $value) {
                 $item = [
                     'id_registrasi_mahasiswa' => $value->id_registrasi_mahasiswa,
@@ -295,6 +295,40 @@ class Sync extends BaseController
                 if ($value->set_sync == 'insert') {
                     $setData = (object) $item;
                     $result = $this->api->insertData('InsertPesertaKelasKuliah', $this->token, $setData);
+                    if ($result->error_code == "0") {
+                        $query = "UPDATE peserta_kelas SET sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $object->query($query);
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $record['gagal'][] = $value;
+                    }
+                }
+            }
+            return $this->respond($record);
+        } catch (\Throwable $th) {
+            return $this->fail($record);
+        }
+    }
+
+    function syncPerkuliahanMahasiswa()
+    {
+        $object = \Config\Database::connect();
+        $record = ['berhasil' => [], 'gagal' => []];
+        try {
+            $data = $object->query("SELECT perkuliahan_mahasiswa.*, riwayat_pendidikan_mahasiswa.id_registrasi_mahasiswa, (if(sync_at is null AND deleted_at is null, 'insert', if(sync_at is not null AND deleted_at is null and sync_at<updated_at, 'update', if(sync_at is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync
+            FROM peserta_kelas 
+            LEFT JOIN riwayat_pendidikan_mahasiswa on riwayat_pendidikan_mahasiswa.id=peserta_kelas.id_riwayat_pendidikan
+            LEFT JOIN mahasiswa on mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa
+            LEFT JOIN kelas_kuliah on kelas_kuliah.id=peserta_kelas.kelas_kuliah_id 
+            WHERE if(peserta_kelas.status_sync is null AND peserta_kelas.deleted_at is null, 'insert', if(peserta_kelas.status_sync is not null AND peserta_kelas.deleted_at is null and peserta_kelas.sync_at<peserta_kelas.updated_at, 'update', if(peserta_kelas.status_sync is not null and peserta_kelas.deleted_at is not null and peserta_kelas.sync_at<peserta_kelas.updated_at,'delete', null))) IS NOT NULL LIMIT 50")->getResult();
+            foreach ($data as $key => $value) {
+                $item = [
+                    'id_registrasi_mahasiswa' => $value->id_registrasi_mahasiswa,
+                    'id_kelas_kuliah' => $value->id_kelas_kuliah
+                ];
+                if ($value->set_sync == 'insert') {
+                    $setData = (object) $item;
+                    $result = $this->api->insertData('InsertPerkuliahanMahasiswa', $this->token, $setData);
                     if ($result->error_code == "0") {
                         $query = "UPDATE peserta_kelas SET sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
                         $object->query($query);
