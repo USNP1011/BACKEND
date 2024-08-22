@@ -187,7 +187,7 @@ class Sync extends BaseController
                     } else {
                         $record['gagal'][] = $item;
                     }
-                } else if($value->set_sync == 'update') {
+                } else if ($value->set_sync == 'update') {
                     $item = [
                         'id_mahasiswa' => $mahasiswa->id_mahasiswa,
                         'nim' => $value->nim,
@@ -270,6 +270,32 @@ class Sync extends BaseController
         }
     }
 
+    function syncDeleteKelasKuliah()
+    {
+        $object = \Config\Database::connect();
+        $record = ['berhasil' => [], 'gagal' => []];
+        try {
+            $data = $object->query("SELECT * FROM kelas_kuliah WHERE id_semester = '20241' AND kelas_id != '1'")->getResult();
+            foreach ($data as $key => $value) {
+                $item = [
+                    'id_kelas_kuliah' => $value->id_kelas_kuliah
+                ];
+                if (!is_null($value->id_kelas_kuliah)) {
+                    $setData = (object) $item;
+                    $result = $this->api->deleteData('DeleteKelasKuliah', $this->token, $setData);
+                    if ($result->error_code == "0") {
+                        $record['berhasil'][] = $value;
+                    } else {
+                        $record['gagal'][] = $item;
+                    }
+                }
+            }
+            return $this->respond($record);
+        } catch (\Throwable $th) {
+            return $this->fail($record);
+        }
+    }
+
     function syncPengajarKelas()
     {
         $object = \Config\Database::connect();
@@ -309,6 +335,42 @@ class Sync extends BaseController
         }
     }
 
+    function syncDeletePengajarKelas()
+    {
+        $object = \Config\Database::connect();
+        $record = ['berhasil' => [], 'gagal' => []];
+        try {
+            $data = $object->query("SELECT
+            `dosen_pengajar_kelas`.`id_aktivitas_mengajar`,
+            `kelas_kuliah`.`kelas_id`,
+            `dosen`.`nama_dosen`
+            FROM
+            `dosen_pengajar_kelas`
+            LEFT JOIN `kelas_kuliah` ON `dosen_pengajar_kelas`.`kelas_kuliah_id` =
+            `kelas_kuliah`.`id`
+            LEFT JOIN `penugasan_dosen` ON `dosen_pengajar_kelas`.`id_registrasi_dosen` =
+            `penugasan_dosen`.`id_registrasi_dosen`
+            LEFT JOIN `dosen` ON `penugasan_dosen`.`id_dosen` = `dosen`.`id_dosen`
+            WHERE id_semester='20241' AND kelas_id != '1' AND dosen.status='Dosen'")->getResult();
+
+            foreach ($data as $key => $value) {
+                $item = [
+                    'id_aktivitas_mengajar' => $value->id_aktivitas_mengajar
+                ];
+                $setData = (object) $item;
+                $result = $this->api->deleteData('DeleteDosenPengajarKelasKuliah', $this->token, $setData);
+                if ($result->error_code == "0") {
+                    $record['berhasil'][] = $value;
+                } else {
+                    $record['gagal'][] = $item;
+                }
+            }
+            return $this->respond($record);
+        } catch (\Throwable $th) {
+            return $this->fail($record);
+        }
+    }
+
     function syncPesertaKelas()
     {
         $object = \Config\Database::connect();
@@ -319,7 +381,7 @@ class Sync extends BaseController
             LEFT JOIN riwayat_pendidikan_mahasiswa on riwayat_pendidikan_mahasiswa.id=peserta_kelas.id_riwayat_pendidikan
             LEFT JOIN mahasiswa on mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa
             LEFT JOIN kelas_kuliah on kelas_kuliah.id=peserta_kelas.kelas_kuliah_id 
-            WHERE if(peserta_kelas.status_sync is null AND peserta_kelas.deleted_at is null, 'insert', if(peserta_kelas.status_sync is not null AND peserta_kelas.deleted_at is null and peserta_kelas.sync_at<peserta_kelas.updated_at, 'update', if(peserta_kelas.status_sync is not null and peserta_kelas.deleted_at is not null and peserta_kelas.sync_at<peserta_kelas.updated_at,'delete', null))) IS NOT NULL LIMIT 100")->getResult();
+            WHERE if(peserta_kelas.status_sync is null AND peserta_kelas.deleted_at is null, 'insert', if(peserta_kelas.status_sync is not null AND peserta_kelas.deleted_at is null and peserta_kelas.sync_at<peserta_kelas.updated_at, 'update', if(peserta_kelas.status_sync is not null and peserta_kelas.deleted_at is not null and peserta_kelas.sync_at<peserta_kelas.updated_at,'delete', null))) IS NOT NULL LIMIT 20")->getResult();
             foreach ($data as $key => $value) {
                 $item = [
                     'id_registrasi_mahasiswa' => $value->id_registrasi_mahasiswa,
@@ -328,13 +390,52 @@ class Sync extends BaseController
                 if ($value->set_sync == 'insert') {
                     $setData = (object) $item;
                     $result = $this->api->insertData('InsertPesertaKelasKuliah', $this->token, $setData);
-                    if ($result->error_code == "0") {
+                    if ($result->error_code == "0" || $result->error_code == "119") {
                         $query = "UPDATE peserta_kelas SET sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
                         $object->query($query);
                         $record['berhasil'][] = $item;
                     } else {
+                        $value->error = $result;
                         $record['gagal'][] = $value;
                     }
+                }
+            }
+            return $this->respond($record);
+        } catch (\Throwable $th) {
+            return $this->fail($record);
+        }
+    }
+
+    function syncDeletePesertaKelas()
+    {
+        $object = \Config\Database::connect();
+        $record = ['berhasil' => [], 'gagal' => []];
+        try {
+            $data = $object->query("SELECT
+            `peserta_kelas`.*,
+            `kelas_kuliah`.`id_kelas_kuliah`,
+            `riwayat_pendidikan_mahasiswa`.`id_registrasi_mahasiswa`
+            FROM
+            `peserta_kelas`
+            LEFT JOIN `kelas_kuliah` ON `peserta_kelas`.`kelas_kuliah_id` =
+            `kelas_kuliah`.`id`
+            LEFT JOIN `riwayat_pendidikan_mahasiswa`
+            ON `peserta_kelas`.`id_riwayat_pendidikan` =
+            `riwayat_pendidikan_mahasiswa`.`id`
+            WHERE id_semester='20241' AND kelas_kuliah.kelas_id != '1' AND peserta_kelas.status_sync='sudah sync' AND peserta_kelas.sync_at IS NOT NULL LIMIT 500")->getResult();
+            foreach ($data as $key => $value) {
+                $item = [
+                    'id_registrasi_mahasiswa' => $value->id_registrasi_mahasiswa,
+                    'id_kelas_kuliah' => $value->id_kelas_kuliah
+                ];
+                $setData = (object) $item;
+                $result = $this->api->deleteData('DeletePesertaKelasKuliah', $this->token, $setData);
+                if ($result->error_code == "0") {
+                    $query = "UPDATE peserta_kelas SET sync_at = null, status_sync=null WHERE id = '" . $value->id . "'";
+                    $object->query($query);
+                    $record['berhasil'][] = $item;
+                } else {
+                    $record['gagal'][] = $value;
                 }
             }
             return $this->respond($record);

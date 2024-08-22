@@ -387,8 +387,11 @@ $routes->group('sync', function($routes){
     $routes->get('mahasiswa', 'Sync::syncMahasiswa');
     $routes->get('riwayat_pendidikan', 'Sync::syncHistoryPendidikan');
     $routes->get('kelas_kuliah', 'Sync::syncKelasKuliah');
+    $routes->get('delete_kelas_kuliah', 'Sync::syncDeleteKelasKuliah');
     $routes->get('pengajar_kelas', 'Sync::syncPengajarKelas');
+    $routes->get('delete_pengajar_kelas', 'Sync::syncDeletePengajarKelas');
     $routes->get('peserta_kelas', 'Sync::syncPesertaKelas');
+    $routes->get('delete_peserta_kelas', 'Sync::syncDeletePesertaKelas');
     $routes->get('perkuliahan_mahasiswa', 'Sync::syncPerkuliahanMahasiswa');
 });
 
