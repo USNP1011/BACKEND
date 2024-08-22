@@ -506,4 +506,6 @@ class Sync extends BaseController
             return $this->fail($record);
         }
     }
+
+    
 }
