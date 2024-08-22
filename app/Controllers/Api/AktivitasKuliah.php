@@ -123,7 +123,7 @@ class AktivitasKuliah extends ResourceController
                     ->orLike('riwayat_pendidikan_mahasiswa.nim', $param->cari)
                     ->groupEnd()
                     ->where('perkuliahan_mahasiswa.id_semester', $semester->id_semester)
-                    ->orderBy(isset($param->order) && $param->order->field != "" ? $param->order->field : 'perkuliahan_mahasiswa.updated_at', isset($param->order) && $param->order->direction != "" ? $param->order->direction : 'desc')
+                    ->orderBy(isset($param->order) && $param->order->field != "" ? $param->order->field : 'perkuliahan_mahasiswa.updated_at', isset($param->order) && $param->order->direction != "" ? $param->order->direction : 'asc')
                     ->paginate($param->count, 'default', $param->page),
                 'pager' => $object->pager->getDetails()
             ];
