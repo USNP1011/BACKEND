@@ -87,6 +87,7 @@ class RiwayatPendidikanMahasiswa extends ResourceController
             $perkuliahan = new \App\Models\PerkuliahanMahasiswaModel();
             $modelPerkuliahan = new \App\Entities\AktivitasKuliahEntity();
             $semester = getSemesterAktif();
+            $biaya = new \App\Models\SettingBiayaModel();
             $itemKuliah = [
                 'id'=> Uuid::uuid4()->toString(),
                 'id_riwayat_pendidikan'=>$item->id,
@@ -96,7 +97,12 @@ class RiwayatPendidikanMahasiswa extends ResourceController
                 'nim'=>$item->nim,
                 'id_prodi'=>$item->id_prodi,
                 'id_status_mahasiswa'=>"N",
-
+                'ips'=>'0',
+                'ipk'=>'0',
+                'sks_semester'=>'0',
+                'sks_total'=>'0',
+                'id_pembiayaan'=>$item->id_pembiayaan,
+                'biaya_kuliah_smt'=>$biaya->where('id_prodi', $item->id_prodi)->where('angkatan', $item->angkatan)->first()->biaya
             ];
             $modelPerkuliahan->fill($itemKuliah);
             $perkuliahan->insert($modelPerkuliahan);

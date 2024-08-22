@@ -12,10 +12,12 @@ class Repair extends BaseController
         $pembiayaan = $biaya->findAll();
         $record = [];
         try {
-            $data = $object->where('id_semester', '20241')->where("sks_total IS NULL AND sks_semester='0'")->findAll();
+            $data = $object->where('id_semester', '20241')->where("sks_total", "0")->where('sks_semester > 0')->findAll();
             foreach ($data as $key => $value) {
                 $item = $object->where('id_riwayat_pendidikan', $value->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1,1)->first();
-                $object->update($value->id, ['sks_total'=>($item->sks_total+$value->sks_semester)]);
+                if(is_null($item)){
+                    $object->update($value->id, ['sks_total'=>($value->sks_semester)]);
+                }
             }
             // $kelas = new \App\Models\PesertaKelasModel();
             // $dataKelas = $kelas->select("peserta_kelas.*")
