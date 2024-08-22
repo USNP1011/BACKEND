@@ -162,26 +162,55 @@ class Sync extends BaseController
             $data = $object->query("SELECT riwayat_pendidikan_mahasiswa.*, (if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync FROM riwayat_pendidikan_mahasiswa WHERE if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL LIMIT 30")->getResult();
             foreach ($data as $key => $value) {
                 $mahasiswa = $object->query("SELECT mahasiswa.id, mahasiswa.id_mahasiswa FROM mahasiswa WHERE mahasiswa.id='" . $value->id_mahasiswa . "'")->getRowObject();
-                $item = [
-                    'id_mahasiswa' => $mahasiswa->id_mahasiswa,
-                    'nim' => $value->nim,
-                    'id_jenis_daftar' => $value->id_jenis_daftar,
-                    'id_jalur_daftar' => $value->id_jalur_daftar,
-                    'id_periode_masuk' => $value->id_periode_masuk,
-                    'tanggal_daftar' => $value->tanggal_daftar,
-                    'id_prodi' => $value->id_prodi,
-                    'id_perguruan_tinggi' => $value->id_perguruan_tinggi,
-                    'sks_diakui' => $value->sks_diakui,
-                    'id_perguruan_tinggi_asal' => $value->id_perguruan_tinggi_asal,
-                    'id_prodi_asal' => $value->id_prodi_asal,
-                    'id_pembiayaan' => $value->id_pembiayaan,
-                    'biaya_masuk' => $value->biaya_masuk,
-                ];
                 if ($value->set_sync == 'insert') {
+                    $item = [
+                        'id_mahasiswa' => $mahasiswa->id_mahasiswa,
+                        'nim' => $value->nim,
+                        'id_jenis_daftar' => $value->id_jenis_daftar,
+                        'id_jalur_daftar' => $value->id_jalur_daftar,
+                        'id_periode_masuk' => $value->id_periode_masuk,
+                        'tanggal_daftar' => $value->tanggal_daftar,
+                        'id_prodi' => $value->id_prodi,
+                        'id_perguruan_tinggi' => $value->id_perguruan_tinggi,
+                        'sks_diakui' => $value->sks_diakui,
+                        'id_perguruan_tinggi_asal' => $value->id_perguruan_tinggi_asal,
+                        'id_prodi_asal' => $value->id_prodi_asal,
+                        'id_pembiayaan' => $value->id_pembiayaan,
+                        'biaya_masuk' => $value->biaya_masuk,
+                    ];
                     $setData = (object) $item;
                     $result = $this->api->insertData('InsertRiwayatPendidikanMahasiswa', $this->token, $setData);
                     if ($result->error_code == "0") {
                         $query = "UPDATE riwayat_pendidikan_mahasiswa SET id_registrasi_mahasiswa='" . $result->data->id_registrasi_mahasiswa . "', sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $object->query($query);
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $record['gagal'][] = $item;
+                    }
+                } else if($value->set_sync == 'update') {
+                    $item = [
+                        'id_mahasiswa' => $mahasiswa->id_mahasiswa,
+                        'nim' => $value->nim,
+                        'id_jenis_daftar' => $value->id_jenis_daftar,
+                        'id_jalur_daftar' => $value->id_jalur_daftar,
+                        'id_periode_masuk' => $value->id_periode_masuk,
+                        'tanggal_daftar' => $value->tanggal_daftar,
+                        'id_prodi' => $value->id_prodi,
+                        'id_perguruan_tinggi' => $value->id_perguruan_tinggi,
+                        'sks_diakui' => $value->sks_diakui,
+                        'id_perguruan_tinggi_asal' => $value->id_perguruan_tinggi_asal,
+                        'id_prodi_asal' => $value->id_prodi_asal,
+                        'id_pembiayaan' => $value->id_pembiayaan,
+                        'biaya_masuk' => $value->biaya_masuk,
+                    ];
+                    $setData = (object) $item;
+                    $itemKey = [
+                        'id_registrasi_mahasiswa' => $value->id_registrasi_mahasiswa
+                    ];
+                    $setKey = (object) $itemKey;
+                    $result = $this->api->updateData('UpdateRiwayatPendidikanMahasiswa', $this->token, $setData, $setKey);
+                    if ($result->error_code == "0") {
+                        $query = "UPDATE riwayat_pendidikan_mahasiswa SET sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
                         $object->query($query);
                         $record['berhasil'][] = $item;
                     } else {
@@ -322,22 +351,46 @@ class Sync extends BaseController
             $data = $object->query("SELECT perkuliahan_mahasiswa.*, riwayat_pendidikan_mahasiswa.id_registrasi_mahasiswa, (if(perkuliahan_mahasiswa.sync_at is null AND perkuliahan_mahasiswa.deleted_at is null, 'insert', if(perkuliahan_mahasiswa.sync_at is not null AND perkuliahan_mahasiswa.deleted_at is null and perkuliahan_mahasiswa.sync_at<perkuliahan_mahasiswa.updated_at, 'update', if(perkuliahan_mahasiswa.sync_at is not null and perkuliahan_mahasiswa.deleted_at is not null and perkuliahan_mahasiswa.sync_at<perkuliahan_mahasiswa.updated_at,'delete', null)))) as set_sync
             FROM perkuliahan_mahasiswa 
             LEFT JOIN riwayat_pendidikan_mahasiswa on riwayat_pendidikan_mahasiswa.id=perkuliahan_mahasiswa.id_riwayat_pendidikan
-            WHERE if(perkuliahan_mahasiswa.status_sync is null AND perkuliahan_mahasiswa.deleted_at is null, 'insert', if(perkuliahan_mahasiswa.status_sync is not null AND perkuliahan_mahasiswa.deleted_at is null and perkuliahan_mahasiswa.sync_at<perkuliahan_mahasiswa.updated_at, 'update', if(perkuliahan_mahasiswa.status_sync is not null and perkuliahan_mahasiswa.deleted_at is not null and perkuliahan_mahasiswa.sync_at<perkuliahan_mahasiswa.updated_at,'delete', null))) IS NOT NULL LIMIT 100")->getResult();
+            WHERE if(perkuliahan_mahasiswa.status_sync is null AND perkuliahan_mahasiswa.deleted_at is null, 'insert', if(perkuliahan_mahasiswa.status_sync is not null AND perkuliahan_mahasiswa.deleted_at is null and perkuliahan_mahasiswa.sync_at<perkuliahan_mahasiswa.updated_at, 'update', if(perkuliahan_mahasiswa.status_sync is not null and perkuliahan_mahasiswa.deleted_at is not null and perkuliahan_mahasiswa.sync_at<perkuliahan_mahasiswa.updated_at,'delete', null))) IS NOT NULL")->getResult();
             foreach ($data as $key => $value) {
-                $item = [
-                    'id_registrasi_mahasiswa' => $value->id_registrasi_mahasiswa,
-                    'id_semester'=>$value->id_semester,
-                    'id_status_mahasiswa'=>$value->id_status_mahasiswa,
-                    'ips'=>$value->ips,
-                    'ipk'=>$value->ipk,
-                    'sks_semester'=>$value->sks_semester,
-                    'total_sks'=>$value->sks_total,
-                    'biaya_kuliah_smt'=>$value->biaya_kuliah_smt,
-                    'id_pembiayaan'=>$value->id_pembiayaan
-                ];
                 if ($value->set_sync == 'insert') {
+                    $item = [
+                        'id_registrasi_mahasiswa' => $value->id_registrasi_mahasiswa,
+                        'id_semester' => $value->id_semester,
+                        'id_status_mahasiswa' => $value->id_status_mahasiswa,
+                        'ips' => $value->ips,
+                        'ipk' => $value->ipk,
+                        'sks_semester' => $value->sks_semester,
+                        'total_sks' => $value->sks_total,
+                        'biaya_kuliah_smt' => $value->biaya_kuliah_smt,
+                        'id_pembiayaan' => $value->id_pembiayaan
+                    ];
                     $setData = (object) $item;
                     $result = $this->api->insertData('InsertPerkuliahanMahasiswa', $this->token, $setData);
+                    if ($result->error_code == "0") {
+                        $query = "UPDATE perkuliahan_mahasiswa SET sync_at = '" . date('Y-m-d H:i:s') . "', updated_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $object->query($query);
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $record['gagal'][] = $value;
+                    }
+                } else {
+                    $item = [
+                        'id_status_mahasiswa' => $value->id_status_mahasiswa,
+                        'ips' => $value->ips,
+                        'ipk' => $value->ipk,
+                        'sks_semester' => $value->sks_semester,
+                        'total_sks' => $value->sks_total,
+                        'biaya_kuliah_smt' => $value->biaya_kuliah_smt,
+                        'id_pembiayaan' => $value->id_pembiayaan
+                    ];
+                    $setData = (object) $item;
+                    $itemKey = [
+                        'id_registrasi_mahasiswa' => $value->id_registrasi_mahasiswa,
+                        'id_semester' => $value->id_semester
+                    ];
+                    $setKey = (object) $itemKey;
+                    $result = $this->api->updateData('UpdatePerkuliahanMahasiswa', $this->token, $setData, $setKey);
                     if ($result->error_code == "0") {
                         $query = "UPDATE perkuliahan_mahasiswa SET sync_at = '" . date('Y-m-d H:i:s') . "', updated_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
                         $object->query($query);
