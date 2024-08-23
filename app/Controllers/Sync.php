@@ -38,7 +38,7 @@ class Sync extends BaseController
 
         // Peserta Kelas
         $object = new \App\Models\PesertaKelasModel();
-        $data->peserta_kelas = $object->select("peserta_kelas.id, (if(status_sync is null AND deleted_at is null, 'insert', if(status_sync is not null AND deleted_at is null and sync_at<updated_at, 'update', if(status_sync is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(status_sync is null AND deleted_at is null, 'insert', if(status_sync is not null AND deleted_at is null and sync_at<updated_at, 'update', if(status_sync is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+        $data->peserta_kelas = $object->select("peserta_kelas.id, (if(status_sync is null AND deleted_at is null, 'insert', if(status_sync is not null AND deleted_at is null and sync_at<updated_at, 'update', if(status_sync is not null and deleted_at is null,'delete', null)))) as set_sync")->where("if(status_sync is null AND deleted_at is null, 'insert', if(status_sync is not null AND deleted_at is null and sync_at<updated_at, 'update', if(status_sync is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
 
         // Dosen Pengajar Kelas
         $object = new \App\Models\DosenPengajarKelasModel();
