@@ -101,7 +101,7 @@ class RiwayatPendidikanMahasiswa extends ResourceController
                 'ipk'=>'0',
                 'sks_semester'=>'0',
                 'sks_total'=>'0',
-                // 'id_pembiayaan'=>$item->id_pembiayaan,
+                'id_pembiayaan'=>'1',
                 'biaya_kuliah_smt'=>$biaya->where('id_prodi', $item->id_prodi)->where('angkatan', $item->angkatan)->first()->biaya
             ];
             $modelPerkuliahan->fill($itemKuliah);
