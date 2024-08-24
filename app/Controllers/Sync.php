@@ -38,7 +38,7 @@ class Sync extends BaseController
 
         // Peserta Kelas
         $object = new \App\Models\PesertaKelasModel();
-        $data->peserta_kelas = $object->select("peserta_kelas.id, (if(status_sync is null AND deleted_at is null, 'insert', if(status_sync is not null AND deleted_at is null and sync_at<updated_at, 'update', if(status_sync is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(status_sync is null AND deleted_at is null, 'insert', if(status_sync is not null AND deleted_at is null and sync_at<updated_at, 'update', if(status_sync is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+        $data->peserta_kelas = $object->select("peserta_kelas.id, (if(peserta_kelas.status_sync is null AND peserta_kelas.deleted_at is null, 'insert', if(peserta_kelas.status_sync is not null AND peserta_kelas.deleted_at is null and peserta_kelas.sync_at<peserta_kelas.updated_at, 'update', if(peserta_kelas.status_sync is not null and peserta_kelas.deleted_at is not null and peserta_kelas.sync_at<peserta_kelas.deleted_at,'delete', null)))) as set_sync")->where("if(peserta_kelas.status_sync is null AND peserta_kelas.deleted_at is null, 'insert', if(peserta_kelas.status_sync is not null AND peserta_kelas.deleted_at is null and peserta_kelas.sync_at<peserta_kelas.updated_at, 'update', if(peserta_kelas.status_sync is not null and peserta_kelas.deleted_at is not null and peserta_kelas.sync_at<peserta_kelas.deleted_at,'delete', null))) IS NOT NULL")->withDeleted()->findAll();
 
         // Dosen Pengajar Kelas
         $object = new \App\Models\DosenPengajarKelasModel();
@@ -185,6 +185,7 @@ class Sync extends BaseController
                         $object->query($query);
                         $record['berhasil'][] = $item;
                     } else {
+                        $item['error'] = $result;
                         $record['gagal'][] = $item;
                     }
                 } else if ($value->set_sync == 'update') {
@@ -214,6 +215,7 @@ class Sync extends BaseController
                         $object->query($query);
                         $record['berhasil'][] = $item;
                     } else {
+                        $item['error'] = $result;
                         $record['gagal'][] = $item;
                     }
                 }
@@ -376,12 +378,12 @@ class Sync extends BaseController
         $object = \Config\Database::connect();
         $record = ['berhasil' => [], 'gagal' => []];
         try {
-            $data = $object->query("SELECT peserta_kelas.*, kelas_kuliah.id_kelas_kuliah, riwayat_pendidikan_mahasiswa.id_registrasi_mahasiswa, mahasiswa.nama_mahasiswa, (if(peserta_kelas.status_sync is null AND peserta_kelas.deleted_at is null, 'insert', if(peserta_kelas.status_sync is not null AND peserta_kelas.deleted_at is null and peserta_kelas.sync_at<peserta_kelas.updated_at, 'update', if(peserta_kelas.status_sync is not null and peserta_kelas.deleted_at is not null and peserta_kelas.sync_at<peserta_kelas.updated_at,'delete', null)))) as set_sync 
+            $data = $object->query("SELECT peserta_kelas.*, kelas_kuliah.id_kelas_kuliah, riwayat_pendidikan_mahasiswa.id_registrasi_mahasiswa, mahasiswa.nama_mahasiswa, (if(peserta_kelas.status_sync is null AND peserta_kelas.deleted_at is null, 'insert', if(peserta_kelas.status_sync is not null AND peserta_kelas.deleted_at is null and peserta_kelas.sync_at<peserta_kelas.updated_at, 'update', if(peserta_kelas.status_sync is not null and peserta_kelas.deleted_at is not null and peserta_kelas.sync_at<peserta_kelas.deleted_at,'delete', null)))) as set_sync 
             FROM peserta_kelas 
             LEFT JOIN riwayat_pendidikan_mahasiswa on riwayat_pendidikan_mahasiswa.id=peserta_kelas.id_riwayat_pendidikan
             LEFT JOIN mahasiswa on mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa
             LEFT JOIN kelas_kuliah on kelas_kuliah.id=peserta_kelas.kelas_kuliah_id 
-            WHERE if(peserta_kelas.status_sync is null AND peserta_kelas.deleted_at is null, 'insert', if(peserta_kelas.status_sync is not null AND peserta_kelas.deleted_at is null and peserta_kelas.sync_at<peserta_kelas.updated_at, 'update', if(peserta_kelas.status_sync is not null and peserta_kelas.deleted_at is not null and peserta_kelas.sync_at<peserta_kelas.updated_at,'delete', null))) IS NOT NULL LIMIT 20")->getResult();
+            WHERE if(peserta_kelas.status_sync is null AND peserta_kelas.deleted_at is null, 'insert', if(peserta_kelas.status_sync is not null AND peserta_kelas.deleted_at is null and peserta_kelas.sync_at<peserta_kelas.updated_at, 'update', if(peserta_kelas.status_sync is not null and peserta_kelas.deleted_at is not null and peserta_kelas.sync_at<peserta_kelas.deleted_at,'delete', null))) IS NOT NULL")->getResult();
             foreach ($data as $key => $value) {
                 $item = [
                     'id_registrasi_mahasiswa' => $value->id_registrasi_mahasiswa,
@@ -392,6 +394,18 @@ class Sync extends BaseController
                     $result = $this->api->insertData('InsertPesertaKelasKuliah', $this->token, $setData);
                     if ($result->error_code == "0" || $result->error_code == "119") {
                         $query = "UPDATE peserta_kelas SET sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $object->query($query);
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $value->error = $result;
+                        $record['gagal'][] = $value;
+                    }
+                } else if ($value->set_sync == 'update') {
+                } else if ($value->set_sync == 'delete') {
+                    $setData = (object) $item;
+                    $result = $this->api->deleteData('DeletePesertaKelasKuliah', $this->token, $setData);
+                    if ($result->error_code == "0") {
+                        $query = "UPDATE peserta_kelas SET sync_at = null, status_sync=null WHERE id = '" . $value->id . "'";
                         $object->query($query);
                         $record['berhasil'][] = $item;
                     } else {
@@ -435,6 +449,7 @@ class Sync extends BaseController
                     $object->query($query);
                     $record['berhasil'][] = $item;
                 } else {
+                    $value->error = $result;
                     $record['gagal'][] = $value;
                 }
             }
@@ -468,11 +483,12 @@ class Sync extends BaseController
                     ];
                     $setData = (object) $item;
                     $result = $this->api->insertData('InsertPerkuliahanMahasiswa', $this->token, $setData);
-                    if ($result->error_code == "0") {
+                    if ($result->error_code == "0" || $result->error_code == "1260") {
                         $query = "UPDATE perkuliahan_mahasiswa SET sync_at = '" . date('Y-m-d H:i:s') . "', updated_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
                         $object->query($query);
                         $record['berhasil'][] = $item;
                     } else {
+                        $value->error = $result;
                         $record['gagal'][] = $value;
                     }
                 } else {
@@ -497,6 +513,7 @@ class Sync extends BaseController
                         $object->query($query);
                         $record['berhasil'][] = $item;
                     } else {
+                        $value->error = $result;
                         $record['gagal'][] = $value;
                     }
                 }
@@ -506,6 +523,4 @@ class Sync extends BaseController
             return $this->fail($record);
         }
     }
-
-    
 }
