@@ -123,7 +123,9 @@ class KelasKuliah extends ResourceController
         foreach ($data as $key => $value) {
             if(is_null($value->nama_dosen)){
                 $dosen = new \App\Models\DosenModel();
-                $value->nama_dosen = $dosen->where('id_dosen', $value->id_dosen)->first()->nama_dosen;
+                $itemDosen = $dosen->where('id_dosen', $value->id_dosen)->first();
+                $value->nama_dosen = $itemDosen->nama_dosen;
+                $value->nidn = $itemDosen->nidn;
             }
         }
         return $this->respond([
