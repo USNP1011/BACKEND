@@ -36,7 +36,9 @@ class Krsm extends ResourceController
                                 ->join('matakuliah', 'kelas_kuliah.matakuliah_id=matakuliah.id', 'left')
                                 ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id', 'left')
                                 ->join('kelas', 'kelas.id=kelas_kuliah.kelas_id', 'left')
-                                ->where('temp_krsm_id', $data->id)->findAll();
+                                ->where('temp_krsm_id', $data->id)
+                                ->where("dosen_pengajar_kelas.mengajar", '1')
+                                ->findAll();
                             $object = new \App\Models\TahapanModel();
                             return $this->respond([
                                 'status' => true,
