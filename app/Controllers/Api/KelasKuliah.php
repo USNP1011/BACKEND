@@ -113,15 +113,22 @@ class KelasKuliah extends ResourceController
     public function dosenPengajarKelas($id = null): object
     {
         $object = new DosenPengajarKelasModel();
+        $data = $object
+        ->select("dosen_pengajar_kelas.*, matakuliah.sks_mata_kuliah as sks_substansi_total, penugasan_dosen.nama_dosen, penugasan_dosen.nidn, jenis_evaluasi.nama_jenis_evaluasi")
+        ->join("penugasan_dosen", "penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen", "left")
+        ->join('kelas_kuliah', 'kelas_kuliah.id=dosen_pengajar_kelas.kelas_kuliah_id', 'left')
+        ->join('matakuliah', 'kelas_kuliah.matakuliah_id=matakuliah.id', 'left')
+        ->join('jenis_evaluasi', 'jenis_evaluasi.id_jenis_evaluasi=dosen_pengajar_kelas.id_jenis_evaluasi', 'left')
+        ->where('kelas_kuliah_id', $id)->findAll();
+        foreach ($data as $key => $value) {
+            if(is_null($value->nama_dosen)){
+                $dosen = new \App\Models\DosenModel();
+                $value->nama_dosen = $dosen->where('id_dosen', $value->id_dosen)->first()->nama_dosen;
+            }
+        }
         return $this->respond([
             'status' => true,
-            'data' => $object
-                ->select("dosen_pengajar_kelas.*, matakuliah.sks_mata_kuliah as sks_substansi_total, penugasan_dosen.nama_dosen, penugasan_dosen.nidn, jenis_evaluasi.nama_jenis_evaluasi")
-                ->join("penugasan_dosen", "penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen", "left")
-                ->join('kelas_kuliah', 'kelas_kuliah.id=dosen_pengajar_kelas.kelas_kuliah_id', 'left')
-                ->join('matakuliah', 'kelas_kuliah.matakuliah_id=matakuliah.id', 'left')
-                ->join('jenis_evaluasi', 'jenis_evaluasi.id_jenis_evaluasi=dosen_pengajar_kelas.id_jenis_evaluasi', 'left')
-                ->where('kelas_kuliah_id', $id)->findAll()
+            'data' => $data
         ]);
     }
 
