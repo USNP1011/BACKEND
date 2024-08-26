@@ -80,6 +80,7 @@ class Krsm extends ResourceController
                         ->join('kelas', 'kelas.id = kelas_kuliah.kelas_id', 'left')
                         ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)
                         ->where('kelas_kuliah.id_semester', $semester->id_semester)
+                        ->where("dosen_pengajar_kelas.mengajar", '1')
                         ->findAll();
                     $sks_semester = 0;
                     foreach ($items as $key => $value) {
