@@ -144,6 +144,7 @@ class Sync extends BaseController
                         $object->query($query);
                         $record['berhasil'][] = $item;
                     } else {
+                        $item['error'] = $result;
                         $record['gagal'][] = $item;
                     }
                 }

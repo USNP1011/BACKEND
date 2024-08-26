@@ -22,6 +22,15 @@ class Repair extends BaseController
         }
     }
 
+    // function dataKrsm() {
+    //     $prodi = new \App\Models\ProdiModel();
+    //     $conn = \Config\Database::connect();
+    //     $data = $prodi->findAll();
+    //     foreach ($data as $key => $value) {
+    //         $value->totalKRSAktif = $conn->query("")
+    //     }
+    // }
+
     // function getBiaya($array, $item) {
     //     foreach ($array as $key => $value) {
     //         if($value->id_prodi==$item->id_prodi && $value->angkatan==$item->angkatan){
