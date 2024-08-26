@@ -204,6 +204,58 @@ class Validation extends BaseConfig
         ]
     ];
 
+    public array $riwayat = [
+        "nim" => [
+            "label" => "nim",
+            "rules" => "required",
+            "errors" => [
+                "required" => "nim Tidak Boleh Kosong"
+            ]
+        ],
+        "id_jenis_daftar" => [
+            "label" => "id_jenis_daftar",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_jenis_daftar Tidak Boleh Kosong"
+            ]
+        ],
+        "id_jalur_daftar" => [
+            "label" => "id_jalur_daftar",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_jalur_daftar Tidak Boleh Kosong"
+            ]
+        ],
+        "id_periode_masuk" => [
+            "label" => "id_periode_masuk",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_periode_masuk Tidak Boleh Kosong"
+            ]
+        ],
+        "id_prodi" => [
+            "label" => "id_prodi",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_prodi Tidak Boleh Kosong"
+            ]
+        ],
+        "id_pembiayaan" => [
+            "label" => "id_pembiayaan",
+            "rules" => "required",
+            "errors" => [
+                "required" => "id_pembiayaan Tidak Boleh Kosong"
+            ]
+        ],
+        "biaya_masuk" => [
+            "label" => "biaya_masuk",
+            "rules" => "required",
+            "errors" => [
+                "required" => "biaya_masuk Tidak Boleh Kosong"
+            ]
+        ]
+    ];
+
     public array $pesertaKelas = [
         "id_riwayat_pendidikan" => [
             "label" => "id_riwayat_pendidikan",

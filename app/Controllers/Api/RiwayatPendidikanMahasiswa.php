@@ -56,6 +56,13 @@ class RiwayatPendidikanMahasiswa extends ResourceController
                 ];
                 return $this->failValidationErrors($result);
             }
+            if (!$this->validate('riwayat')) {
+                $result = [
+                    "status" => false,
+                    "message" => $this->validator->getErrors(),
+                ];
+                return $this->failValidationErrors($result);
+            }
 
             $userObject = auth()->getProvider();
             $userEntityObject = new User();
