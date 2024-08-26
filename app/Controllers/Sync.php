@@ -265,6 +265,17 @@ class Sync extends BaseController
                     } else {
                         $record['gagal'][] = $item;
                     }
+                }else if($value->set_sync == 'update'){
+                    $setData = (object) $item;
+                    $key = (object) ['id_kelas_kuliah'=>$value->id_kelas_kuliah];
+                    $result = $this->api->updateData('UpdateKelasKuliah', $this->token, $setData, $key);
+                    if ($result->error_code == "0") {
+                        $query = "UPDATE kelas_kuliah SET sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $object->query($query);
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $record['gagal'][] = $item;
+                    }
                 }
             }
             return $this->respond($record);
