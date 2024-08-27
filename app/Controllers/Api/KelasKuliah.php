@@ -112,26 +112,30 @@ class KelasKuliah extends ResourceController
 
     public function dosenPengajarKelas($id = null): object
     {
-        $object = new DosenPengajarKelasModel();
-        $data = $object
-        ->select("dosen_pengajar_kelas.*, matakuliah.sks_mata_kuliah as sks_substansi_total, penugasan_dosen.nama_dosen, penugasan_dosen.nidn, jenis_evaluasi.nama_jenis_evaluasi")
-        ->join("penugasan_dosen", "penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen", "left")
-        ->join('kelas_kuliah', 'kelas_kuliah.id=dosen_pengajar_kelas.kelas_kuliah_id', 'left')
-        ->join('matakuliah', 'kelas_kuliah.matakuliah_id=matakuliah.id', 'left')
-        ->join('jenis_evaluasi', 'jenis_evaluasi.id_jenis_evaluasi=dosen_pengajar_kelas.id_jenis_evaluasi', 'left')
-        ->where('kelas_kuliah_id', $id)->findAll();
-        foreach ($data as $key => $value) {
-            if(is_null($value->nama_dosen)){
-                $dosen = new \App\Models\DosenModel();
-                $itemDosen = $dosen->where('id_dosen', $value->id_dosen)->first();
-                $value->nama_dosen = $itemDosen->nama_dosen;
-                $value->nidn = $itemDosen->nidn;
+        try {
+            $object = new DosenPengajarKelasModel();
+            $data = $object
+                ->select("dosen_pengajar_kelas.*, matakuliah.sks_mata_kuliah as sks_substansi_total, penugasan_dosen.nama_dosen, penugasan_dosen.nidn, jenis_evaluasi.nama_jenis_evaluasi")
+                ->join("penugasan_dosen", "penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen", "left")
+                ->join('kelas_kuliah', 'kelas_kuliah.id=dosen_pengajar_kelas.kelas_kuliah_id', 'left')
+                ->join('matakuliah', 'kelas_kuliah.matakuliah_id=matakuliah.id', 'left')
+                ->join('jenis_evaluasi', 'jenis_evaluasi.id_jenis_evaluasi=dosen_pengajar_kelas.id_jenis_evaluasi', 'left')
+                ->where('kelas_kuliah_id', $id)->findAll();
+            foreach ($data as $key => $value) {
+                if (is_null($value->nama_dosen)) {
+                    $dosen = new \App\Models\DosenModel();
+                    $itemDosen = $dosen->where('id_dosen', $value->id_dosen)->first();
+                    $value->nama_dosen = $itemDosen->nama_dosen;
+                    $value->nidn = $itemDosen->nidn;
+                }
             }
+            return $this->respond([
+                'status' => true,
+                'data' => $data
+            ]);
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage());
         }
-        return $this->respond([
-            'status' => true,
-            'data' => $data
-        ]);
     }
 
     public function dosenAll($id = null): object
@@ -140,7 +144,7 @@ class KelasKuliah extends ResourceController
         return $this->respond([
             'status' => true,
             'data' => $object->select('dosen.*, penugasan_dosen.id_registrasi_dosen, penugasan_dosen.id_prodi, penugasan_dosen.nama_program_studi')
-            ->join('penugasan_dosen', 'penugasan_dosen.id_dosen=dosen.id_dosen', 'left')->findAll()
+                ->join('penugasan_dosen', 'penugasan_dosen.id_dosen=dosen.id_dosen', 'left')->findAll()
         ]);
     }
 
@@ -283,8 +287,9 @@ class KelasKuliah extends ResourceController
     {
         try {
             $object = new \App\Models\KelasKuliahModel();
+            $item = (array)$this->request->getJSON();
             $model = new \App\Entities\KelasKuliahEntity();
-            $model->fill((array)$this->request->getJSON());
+            $model->fill($item);
             $object->save($model);
             return $this->respond([
                 'status' => true,
@@ -328,7 +333,7 @@ class KelasKuliah extends ResourceController
                 $object = new \App\Models\PesertaKelasModel();
                 $model = new \App\Entities\PesertaKelasEntity();
                 $model->fill((array)$value);
-                $itemNilai[]=$model;
+                $itemNilai[] = $model;
             }
             $object->updateBatch($itemNilai);
             $conn->transComplete();
