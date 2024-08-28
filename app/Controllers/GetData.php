@@ -841,7 +841,7 @@ class GetData extends BaseController
             $value->mulai_surat_tugas = $value->mulai_surat_tugas != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
             $tanggal = explode('-', $value->tgl_create);
             $value->tgl_create = $value->tgl_create != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
-            $penugasan->insert($value);
+            $penugasan->save($value);
         }
     }
 
