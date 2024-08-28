@@ -822,7 +822,7 @@ class GetData extends BaseController
         foreach ($data->data as $key => $value) {
             $tanggal = explode('-', $value->tanggal_lahir);
             $value->tanggal_lahir = $value->tanggal_lahir != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
-            $dosen->insert($value);
+            $dosen->save($value);
         }
     }
 
