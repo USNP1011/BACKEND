@@ -63,7 +63,9 @@ class Perwalian extends ResourceController
                     ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id', 'left')
                     ->join('matakuliah_kurikulum', 'matakuliah_kurikulum.matakuliah_id=matakuliah.id', 'left')
                     ->where('temp_krsm_id', $id)
-                    ->where("dosen_pengajar_kelas.mengajar", '1')
+                    ->groupStart()
+                    ->where("dosen_pengajar_kelas.mengajar", '1')->orWhere("dosen_pengajar_kelas.mengajar", null)
+                    ->groupEnd()
                     ->findAll();
                 $itemTahapan = $tahapan->where('id', $itemMhs->id_tahapan)->first();
                 $object = new \App\Models\PerkuliahanMahasiswaModel();
