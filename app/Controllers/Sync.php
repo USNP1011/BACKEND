@@ -16,70 +16,76 @@ class Sync extends BaseController
     }
     public function getSync(): object
     {
-        $conn = \Config\Database::connect();
-        $semester = getSemesterAktif();
-        $data = new stdClass;
+        try {
+            $conn = \Config\Database::connect();
+            $semester = getSemesterAktif();
+            $data = new stdClass;
 
-        // Mahasiswa
-        $object = new \App\Models\MahasiswaModel();
-        $data->mahasiswa = $object->select("mahasiswa.id, (if(id_mahasiswa is null AND deleted_at is null, 'insert', if(id_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_mahasiswa is null AND deleted_at is null, 'insert', if(id_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+            // Mahasiswa
+            $object = new \App\Models\MahasiswaModel();
+            $data->mahasiswa = $object->select("mahasiswa.id, (if(id_mahasiswa is null AND deleted_at is null, 'insert', if(id_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_mahasiswa is null AND deleted_at is null, 'insert', if(id_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
 
-        // History
-        $object = new \App\Models\RiwayatPendidikanMahasiswaModel();
-        $data->riwayat_pendidikan = $object->select("riwayat_pendidikan_mahasiswa.id, (if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
-        // Nilai Transfer
-        $object = new \App\Models\NilaiTransferModel();
-        $data->nilai_transfer = $object->select("nilai_transfer.id, (if(id_transfer is null AND deleted_at is null, 'insert', if(id_transfer is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_transfer is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_transfer is null AND deleted_at is null, 'insert', if(id_transfer is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_transfer is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+            // History
+            $object = new \App\Models\RiwayatPendidikanMahasiswaModel();
+            $data->riwayat_pendidikan = $object->select("riwayat_pendidikan_mahasiswa.id, (if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+            // Nilai Transfer
+            $object = new \App\Models\NilaiTransferModel();
+            $data->nilai_transfer = $object->select("nilai_transfer.id, (if(id_transfer is null AND deleted_at is null, 'insert', if(id_transfer is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_transfer is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_transfer is null AND deleted_at is null, 'insert', if(id_transfer is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_transfer is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
 
-        // Kelas Kuliah
-        $object = new \App\Models\KelasKuliahModel();
-        $data->kelas_kuliah = $object->select("kelas_kuliah.id, kelas_kuliah.id_kelas_kuliah,kelas_kuliah.id_prodi,matakuliah_id,kelas_kuliah.id_semester,kelas_kuliah.nama_semester,kelas_kuliah.nama_program_studi,kelas_kuliah.kode_mata_kuliah,kelas_kuliah.nama_mata_kuliah,kelas_kuliah.bahasan,kelas_kuliah.tanggal_mulai_efektif,kelas_kuliah.tanggal_akhir_efektif,kelas_kuliah.lingkup,kelas_kuliah.mode,kelas_kuliah.kapasitas, (if(kelas_kuliah.id_kelas_kuliah is null AND deleted_at is null, 'insert', if(kelas_kuliah.id_kelas_kuliah is not null AND deleted_at is null and sync_at<updated_at, 'update', if(kelas_kuliah.id_kelas_kuliah is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(kelas_kuliah.id_kelas_kuliah is null AND deleted_at is null, 'insert', if(kelas_kuliah.id_kelas_kuliah is not null AND deleted_at is null and sync_at<updated_at, 'update', if(kelas_kuliah.id_kelas_kuliah is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")
-            ->findAll();
+            // Kelas Kuliah
+            $object = new \App\Models\KelasKuliahModel();
+            $data->kelas_kuliah = $object->select("kelas_kuliah.id, kelas_kuliah.id_kelas_kuliah,kelas_kuliah.id_prodi,matakuliah_id,kelas_kuliah.id_semester,kelas_kuliah.nama_semester,kelas_kuliah.nama_program_studi,kelas_kuliah.kode_mata_kuliah,kelas_kuliah.nama_mata_kuliah,kelas_kuliah.bahasan,kelas_kuliah.tanggal_mulai_efektif,kelas_kuliah.tanggal_akhir_efektif,kelas_kuliah.lingkup,kelas_kuliah.mode,kelas_kuliah.kapasitas, (if(kelas_kuliah.id_kelas_kuliah is null AND deleted_at is null, 'insert', if(kelas_kuliah.id_kelas_kuliah is not null AND deleted_at is null and sync_at<updated_at, 'update', if(kelas_kuliah.id_kelas_kuliah is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(kelas_kuliah.id_kelas_kuliah is null AND deleted_at is null, 'insert', if(kelas_kuliah.id_kelas_kuliah is not null AND deleted_at is null and sync_at<updated_at, 'update', if(kelas_kuliah.id_kelas_kuliah is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")
+                ->findAll();
 
-        // Peserta Kelas
-        $object = new \App\Models\PesertaKelasModel();
-        $data->peserta_kelas = $object->select("peserta_kelas.id, (if(peserta_kelas.status_sync is null AND peserta_kelas.deleted_at is null, 'insert', if(peserta_kelas.status_sync is not null AND peserta_kelas.deleted_at is null and peserta_kelas.sync_at<peserta_kelas.updated_at, 'update', if(peserta_kelas.status_sync is not null and peserta_kelas.deleted_at is not null and peserta_kelas.sync_at<peserta_kelas.deleted_at,'delete', null)))) as set_sync")->where("if(peserta_kelas.status_sync is null AND peserta_kelas.deleted_at is null, 'insert', if(peserta_kelas.status_sync is not null AND peserta_kelas.deleted_at is null and peserta_kelas.sync_at<peserta_kelas.updated_at, 'update', if(peserta_kelas.status_sync is not null and peserta_kelas.deleted_at is not null and peserta_kelas.sync_at<peserta_kelas.deleted_at,'delete', null))) IS NOT NULL")->withDeleted()->findAll();
+            // Peserta Kelas
+            $object = new \App\Models\PesertaKelasModel();
+            $data->peserta_kelas = $object->select("peserta_kelas.id, (if(peserta_kelas.status_sync is null AND peserta_kelas.deleted_at is null, 'insert', if(peserta_kelas.status_sync is not null AND peserta_kelas.deleted_at is null and peserta_kelas.sync_at<peserta_kelas.updated_at, 'update', if(peserta_kelas.status_sync is not null and peserta_kelas.deleted_at is not null and peserta_kelas.sync_at<peserta_kelas.deleted_at,'delete', null)))) as set_sync")->where("if(peserta_kelas.status_sync is null AND peserta_kelas.deleted_at is null, 'insert', if(peserta_kelas.status_sync is not null AND peserta_kelas.deleted_at is null and peserta_kelas.sync_at<peserta_kelas.updated_at, 'update', if(peserta_kelas.status_sync is not null and peserta_kelas.deleted_at is not null and peserta_kelas.sync_at<peserta_kelas.deleted_at,'delete', null))) IS NOT NULL")->withDeleted()->findAll();
 
-        // Dosen Pengajar Kelas
-        $object = new \App\Models\DosenPengajarKelasModel();
-        $data->dosen_pengajar_kelas = $object->select("dosen_pengajar_kelas.id, (if(id_aktivitas_mengajar is null AND dosen_pengajar_kelas.deleted_at is null, 'insert', if(id_aktivitas_mengajar is not null AND dosen_pengajar_kelas.deleted_at is null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at, 'update', if(id_aktivitas_mengajar is not null and dosen_pengajar_kelas.deleted_at is not null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at,'delete', null)))) as set_sync")
-            ->join('penugasan_dosen', 'penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen', 'left')
-            ->join('dosen', 'dosen.id_dosen=penugasan_dosen.id_dosen', 'left')
-            ->where("if(id_aktivitas_mengajar is null AND dosen_pengajar_kelas.deleted_at is null, 'insert', if(id_aktivitas_mengajar is not null AND dosen_pengajar_kelas.deleted_at is null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at, 'update', if(id_aktivitas_mengajar is not null and dosen_pengajar_kelas.deleted_at is not null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at,'delete', null))) IS NOT NULL AND dosen.status='Dosen'")->findAll();
+            // Dosen Pengajar Kelas
+            $object = new \App\Models\DosenPengajarKelasModel();
+            $data->dosen_pengajar_kelas = $object->select("dosen_pengajar_kelas.id, matakuliah.nama_mata_kuliah, matakuliah.kode_mata_kuliah, (if(id_aktivitas_mengajar is null AND dosen_pengajar_kelas.deleted_at is null, 'insert', if(id_aktivitas_mengajar is not null AND dosen_pengajar_kelas.deleted_at is null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at, 'update', if(id_aktivitas_mengajar is not null and dosen_pengajar_kelas.deleted_at is not null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at,'delete', null)))) as set_sync")
+                ->join('penugasan_dosen', 'penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen', 'left')
+                ->join('dosen', 'dosen.id_dosen=penugasan_dosen.id_dosen', 'left')
+                ->join('kelas_kuliah', 'kelas_kuliah.id=dosen_pengajar_kelas.kelas_kuliah_id', 'left')
+                ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
+                ->where("if(id_aktivitas_mengajar is null AND dosen_pengajar_kelas.deleted_at is null, 'insert', if(id_aktivitas_mengajar is not null AND dosen_pengajar_kelas.deleted_at is null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at, 'update', if(id_aktivitas_mengajar is not null and dosen_pengajar_kelas.deleted_at is not null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at,'delete', null))) IS NOT NULL AND dosen.status='Dosen'")->findAll();
 
-        // Aktivitas Mahasiswa
-        $object = new \App\Models\AktivitasMahasiswaModel();
-        $data->aktivitas_mahasiswa = $object->select("aktivitas_mahasiswa.id, (if(id_aktivitas is null AND deleted_at is null, 'insert', if(id_aktivitas is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_aktivitas is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_aktivitas is null AND deleted_at is null, 'insert', if(id_aktivitas is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_aktivitas is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+            // Aktivitas Mahasiswa
+            $object = new \App\Models\AktivitasMahasiswaModel();
+            $data->aktivitas_mahasiswa = $object->select("aktivitas_mahasiswa.id, (if(id_aktivitas is null AND deleted_at is null, 'insert', if(id_aktivitas is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_aktivitas is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_aktivitas is null AND deleted_at is null, 'insert', if(id_aktivitas is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_aktivitas is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
 
-        // Anggota Aktivitas Mahasiswa
-        $object = new \App\Models\AnggotaAktivitasModel();
-        $data->anggota_aktivitas_mahasiswa = $object->select("anggota_aktivitas.id, (if(id_anggota is null AND deleted_at is null, 'insert', if(id_anggota is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_anggota is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_anggota is null AND deleted_at is null, 'insert', if(id_anggota is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_anggota is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+            // Anggota Aktivitas Mahasiswa
+            $object = new \App\Models\AnggotaAktivitasModel();
+            $data->anggota_aktivitas_mahasiswa = $object->select("anggota_aktivitas.id, (if(id_anggota is null AND deleted_at is null, 'insert', if(id_anggota is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_anggota is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_anggota is null AND deleted_at is null, 'insert', if(id_anggota is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_anggota is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
 
-        // Bimbing Mahasiswa
-        $object = new \App\Models\BimbingMahasiswaModel();
-        $data->bimbing_mahasiswa = $object->select("bimbing_mahasiswa.id, (if(id_bimbing_mahasiswa is null AND deleted_at is null, 'insert', if(id_bimbing_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_bimbing_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_bimbing_mahasiswa is null AND deleted_at is null, 'insert', if(id_bimbing_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_bimbing_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+            // Bimbing Mahasiswa
+            $object = new \App\Models\BimbingMahasiswaModel();
+            $data->bimbing_mahasiswa = $object->select("bimbing_mahasiswa.id, (if(id_bimbing_mahasiswa is null AND deleted_at is null, 'insert', if(id_bimbing_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_bimbing_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_bimbing_mahasiswa is null AND deleted_at is null, 'insert', if(id_bimbing_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_bimbing_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
 
-        // Uji Mahasiswa
-        $object = new \App\Models\UjiMahasiswaModel();
-        $data->uji_mahasiswa = $object->select("uji_mahasiswa.id, (if(id_uji is null AND deleted_at is null, 'insert', if(id_uji is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_uji is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_uji is null AND deleted_at is null, 'insert', if(id_uji is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_uji is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+            // Uji Mahasiswa
+            $object = new \App\Models\UjiMahasiswaModel();
+            $data->uji_mahasiswa = $object->select("uji_mahasiswa.id, (if(id_uji is null AND deleted_at is null, 'insert', if(id_uji is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_uji is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_uji is null AND deleted_at is null, 'insert', if(id_uji is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_uji is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
 
-        // Mahasiswa Lulus DO
-        $object = new \App\Models\MahasiswaLulusDOModel();
-        $data->mahasiswa_lulus_do = $object->select("mahasiswa_lulus_do.id_riwayat_pendidikan, (if(sync_at is null AND deleted_at is null, 'insert', if(sync_at is not null AND deleted_at is null and sync_at<updated_at, 'update', if(sync_at is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(sync_at is null AND deleted_at is null, 'insert', if(sync_at is not null AND deleted_at is null and sync_at<updated_at, 'update', if(sync_at is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+            // Mahasiswa Lulus DO
+            $object = new \App\Models\MahasiswaLulusDOModel();
+            $data->mahasiswa_lulus_do = $object->select("mahasiswa_lulus_do.id_riwayat_pendidikan, (if(sync_at is null AND deleted_at is null, 'insert', if(sync_at is not null AND deleted_at is null and sync_at<updated_at, 'update', if(sync_at is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(sync_at is null AND deleted_at is null, 'insert', if(sync_at is not null AND deleted_at is null and sync_at<updated_at, 'update', if(sync_at is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
 
-        // Mahasiswa Lulus DO
-        $object = new \App\Models\TranskripModel();
-        $data->transkrip = $object->select("transkrip.id, (if(sync_at is null AND deleted_at is null, 'insert', if(sync_at is not null AND deleted_at is null and sync_at<updated_at, 'update', if(sync_at is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(sync_at is null AND deleted_at is null, 'insert', if(sync_at is not null AND deleted_at is null and sync_at<updated_at, 'update', if(sync_at is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+            // Mahasiswa Lulus DO
+            $object = new \App\Models\TranskripModel();
+            $data->transkrip = $object->select("transkrip.id, (if(sync_at is null AND deleted_at is null, 'insert', if(sync_at is not null AND deleted_at is null and sync_at<updated_at, 'update', if(sync_at is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(sync_at is null AND deleted_at is null, 'insert', if(sync_at is not null AND deleted_at is null and sync_at<updated_at, 'update', if(sync_at is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
 
-        // AKM
-        $object = new \App\Models\PerkuliahanMahasiswaModel();
-        $data->perkuliahan_mahasiswa = $object->select("perkuliahan_mahasiswa.id, mahasiswa_lulus_do.id_jenis_keluar, (if(perkuliahan_mahasiswa.sync_at is null AND perkuliahan_mahasiswa.deleted_at is null, 'insert', if(perkuliahan_mahasiswa.sync_at is not null AND perkuliahan_mahasiswa.deleted_at is null and perkuliahan_mahasiswa.sync_at<perkuliahan_mahasiswa.updated_at, 'update', if(perkuliahan_mahasiswa.sync_at is not null and perkuliahan_mahasiswa.deleted_at is not null and perkuliahan_mahasiswa.sync_at<perkuliahan_mahasiswa.updated_at,'delete', null)))) as set_sync")
-            ->join('mahasiswa_lulus_do', 'mahasiswa_lulus_do.id_riwayat_pendidikan=perkuliahan_mahasiswa.id_riwayat_pendidikan', 'left')
-            ->where("if(perkuliahan_mahasiswa.sync_at is null AND perkuliahan_mahasiswa.deleted_at is null, 'insert', if(perkuliahan_mahasiswa.sync_at is not null AND perkuliahan_mahasiswa.deleted_at is null and perkuliahan_mahasiswa.sync_at<perkuliahan_mahasiswa.updated_at, 'update', if(perkuliahan_mahasiswa.sync_at is not null and perkuliahan_mahasiswa.deleted_at is not null and perkuliahan_mahasiswa.sync_at<perkuliahan_mahasiswa.updated_at,'delete', null))) IS NOT NULL")
-            ->where('id_jenis_keluar IS NULL')
-            ->findAll();
+            // AKM
+            $object = new \App\Models\PerkuliahanMahasiswaModel();
+            $data->perkuliahan_mahasiswa = $object->select("perkuliahan_mahasiswa.id, mahasiswa_lulus_do.id_jenis_keluar, (if(perkuliahan_mahasiswa.sync_at is null AND perkuliahan_mahasiswa.deleted_at is null, 'insert', if(perkuliahan_mahasiswa.sync_at is not null AND perkuliahan_mahasiswa.deleted_at is null and perkuliahan_mahasiswa.sync_at<perkuliahan_mahasiswa.updated_at, 'update', if(perkuliahan_mahasiswa.sync_at is not null and perkuliahan_mahasiswa.deleted_at is not null and perkuliahan_mahasiswa.sync_at<perkuliahan_mahasiswa.updated_at,'delete', null)))) as set_sync")
+                ->join('mahasiswa_lulus_do', 'mahasiswa_lulus_do.id_riwayat_pendidikan=perkuliahan_mahasiswa.id_riwayat_pendidikan', 'left')
+                ->where("if(perkuliahan_mahasiswa.sync_at is null AND perkuliahan_mahasiswa.deleted_at is null, 'insert', if(perkuliahan_mahasiswa.sync_at is not null AND perkuliahan_mahasiswa.deleted_at is null and perkuliahan_mahasiswa.sync_at<perkuliahan_mahasiswa.updated_at, 'update', if(perkuliahan_mahasiswa.sync_at is not null and perkuliahan_mahasiswa.deleted_at is not null and perkuliahan_mahasiswa.sync_at<perkuliahan_mahasiswa.updated_at,'delete', null))) IS NOT NULL")
+                ->where('id_jenis_keluar IS NULL')
+                ->findAll();
 
-        return $this->respond($data);
+            return $this->respond($data);
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage());
+        }
     }
 
     function syncMahasiswa()
@@ -265,9 +271,9 @@ class Sync extends BaseController
                     } else {
                         $record['gagal'][] = $item;
                     }
-                }else if($value->set_sync == 'update'){
+                } else if ($value->set_sync == 'update') {
                     $setData = (object) $item;
-                    $key = (object) ['id_kelas_kuliah'=>$value->id_kelas_kuliah];
+                    $key = (object) ['id_kelas_kuliah' => $value->id_kelas_kuliah];
                     $result = $this->api->updateData('UpdateKelasKuliah', $this->token, $setData, $key);
                     if ($result->error_code == "0") {
                         $query = "UPDATE kelas_kuliah SET sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
