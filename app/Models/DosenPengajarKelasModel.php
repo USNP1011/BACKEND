@@ -23,6 +23,7 @@ class DosenPengajarKelasModel extends Model
 		'id_jenis_evaluasi',
         'nama_jenis_evaluasi',
         'mengajar',
+        'status_pengajar',
         'status_sync',
         'sync_at'
     ];

@@ -9,13 +9,16 @@ use App\Models\PenugasanDosenModel;
 use App\Models\PesertaKelasModel;
 use App\Models\RiwayatPendidikanMahasiswaModel;
 use CodeIgniter\RESTful\ResourceController;
+use PSpell\Config;
 use Ramsey\Uuid\Uuid;
 
 class KelasKuliah extends ResourceController
 {
+    protected $semester;
     public function __construct()
     {
         helper('semester');
+        $this->semester = getSemesterAktif();
     }
     /**
      * @param null $id
@@ -203,6 +206,11 @@ class KelasKuliah extends ResourceController
             $model = new \App\Entities\PesertaKelasEntity();
             $model->fill((array)$item);
             $object->insert($model);
+            $object = new \App\Models\KelasKuliahModel();
+            $kelasKuliah = $object->select('matakuliah.sks_mata_kuliah')->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')->where('kelas_kuliah.id', $item->kelas_kuliah_id)->first();
+            $object = new \App\Models\PerkuliahanMahasiswaModel();
+            $itemKuliah = $object->where('id_riwayat_pendidikan', $item->id_riwayat_pendidikan)->where('id_semester', $this->semester->id_semester)->first();
+            $object->update($itemKuliah->id, ['sks_semester' => $itemKuliah->sks_semester + $kelasKuliah->sks_mata_kuliah, 'sks_total' => $itemKuliah->sks_total + $kelasKuliah->sks_mata_kuliah]);
             if (is_null($data)) {
                 return $this->respond([
                     'status' => true,
@@ -387,9 +395,20 @@ class KelasKuliah extends ResourceController
 
     public function deleteMahasiswa($id = null)
     {
+        $conn = \Config\Database::connect();
         try {
+            $conn->transException(true)->transStart();
+            $object = new \App\Models\PesertaKelasModel();
+            $matakuliah = $object->select('matakuliah.sks_mata_kuliah, peserta_kelas.id_riwayat_pendidikan')
+                ->join('kelas_kuliah', 'kelas_kuliah.id=peserta_kelas.kelas_kuliah_id', 'left')
+                ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')->first();
+            $object = new \App\Models\PerkuliahanMahasiswaModel();
+            $itemKuliah = $object->where('id_riwayat_pendidikan', $matakuliah->id_riwayat_pendidikan)
+                ->where('id_semester', $this->semester->id_semester)->first();
+            $object->update($itemKuliah->id, ['sks_semester' => $itemKuliah->sks_semester + $matakuliah->sks_mata_kuliah, 'sks_total' => $itemKuliah->sks_total + $matakuliah->sks_mata_kuliah]);
             $object = new \App\Models\PesertaKelasModel();
             $object->delete($id);
+            $conn->transComplete();
             return $this->respondDeleted([
                 'status' => true,
                 'message' => 'successful deleted',
@@ -445,7 +464,10 @@ class KelasKuliah extends ResourceController
                 ->orLike('prodi.nama_program_studi', $param->cari)
                 ->groupEnd()
                 ->where('a_periode_aktif', '1')
+                ->groupStart()
                 ->where('dosen_pengajar_kelas.mengajar', '1')->orWhere('dosen_pengajar_kelas.mengajar IS NULL')
+                ->groupEnd()
+
                 ->orderBy(isset($param->order) && $param->order->field != "" ? $param->order->field : 'prodi.nama_program_studi', isset($param->order) && $param->order->direction != "" ? $param->order->direction : 'desc')
                 ->paginate($param->count, 'default', $param->page),
             'pager' => $object->pager->getDetails()

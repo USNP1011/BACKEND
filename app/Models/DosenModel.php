@@ -58,7 +58,6 @@ class DosenModel extends Model
 		'nama_pangkat_golongan',
 		'nama_sumber_gaji',
 		'nama_pekerjaan_suami_istri',
-		'status',
 		'id_user'
     ];
 }
