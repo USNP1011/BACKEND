@@ -43,7 +43,7 @@ class Sync extends BaseController
 
             // Dosen Pengajar Kelas
             $object = new \App\Models\DosenPengajarKelasModel();
-            $data->dosen_pengajar_kelas = $object->select("dosen_pengajar_kelas.id, matakuliah.nama_mata_kuliah, matakuliah.kode_mata_kuliah, dosen.nama_dosen, (if(id_aktivitas_mengajar is null AND dosen_pengajar_kelas.deleted_at is null, 'insert', if(id_aktivitas_mengajar is not null AND dosen_pengajar_kelas.deleted_at is null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at, 'update', if(id_aktivitas_mengajar is not null and dosen_pengajar_kelas.deleted_at is not null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at,'delete', null)))) as set_sync")
+            $data->dosen_pengajar_kelas = $object->select("dosen_pengajar_kelas.id, matakuliah.nama_mata_kuliah, matakuliah.kode_mata_kuliah, dosen.nama_dosen, kelas_kuliah.kelas_id, (if(id_aktivitas_mengajar is null AND dosen_pengajar_kelas.deleted_at is null, 'insert', if(id_aktivitas_mengajar is not null AND dosen_pengajar_kelas.deleted_at is null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at, 'update', if(id_aktivitas_mengajar is not null and dosen_pengajar_kelas.deleted_at is not null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at,'delete', null)))) as set_sync")
                 ->join('penugasan_dosen', 'penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen', 'left')
                 ->join('dosen', 'dosen.id_dosen=penugasan_dosen.id_dosen', 'left')
                 ->join('kelas_kuliah', 'kelas_kuliah.id=dosen_pengajar_kelas.kelas_kuliah_id', 'left')
