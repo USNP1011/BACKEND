@@ -405,7 +405,7 @@ class KelasKuliah extends ResourceController
             $object = new \App\Models\PerkuliahanMahasiswaModel();
             $itemKuliah = $object->where('id_riwayat_pendidikan', $matakuliah->id_riwayat_pendidikan)
                 ->where('id_semester', $this->semester->id_semester)->first();
-            $object->update($itemKuliah->id, ['sks_semester' => $itemKuliah->sks_semester + $matakuliah->sks_mata_kuliah, 'sks_total' => $itemKuliah->sks_total + $matakuliah->sks_mata_kuliah]);
+            $object->update($itemKuliah->id, ['sks_semester' => $itemKuliah->sks_semester - $matakuliah->sks_mata_kuliah, 'sks_total' => $itemKuliah->sks_total - $matakuliah->sks_mata_kuliah]);
             $object = new \App\Models\PesertaKelasModel();
             $object->delete($id);
             $conn->transComplete();
@@ -450,7 +450,7 @@ class KelasKuliah extends ResourceController
                 ->select("kelas_kuliah.id, kelas_kuliah.hari, kelas_kuliah.jam_mulai, kelas_kuliah.jam_selesai, ruangan.nama_ruangan, kelas_kuliah.status_sync, kelas.nama_kelas_kuliah, semester.nama_semester, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, prodi.nama_program_studi,
                 (if(dosen_pengajar_kelas.id_registrasi_dosen IS NOT NULL , (SELECT penugasan_dosen.nama_dosen FROM penugasan_dosen WHERE penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen LIMIT 1), (SELECT dosen.nama_dosen FROM dosen WHERE dosen.id_dosen = dosen_pengajar_kelas.id_dosen))) as nama_dosen,
                 matakuliah.sks_mata_kuliah, 
-                (SELECT COUNT(*) FROM peserta_kelas WHERE peserta_kelas.kelas_kuliah_id=kelas_kuliah.id)as peserta_kelas")
+                (SELECT COUNT(*) FROM peserta_kelas WHERE peserta_kelas.kelas_kuliah_id=kelas_kuliah.id AND peserta_kelas.deleted_at IS NOT NULL)as peserta_kelas")
                 ->join('semester', 'semester.id_semester=kelas_kuliah.id_semester', 'left')
                 ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id', 'left')
                 ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
