@@ -340,19 +340,32 @@ class Sync extends BaseController
                     'id_jenis_evaluasi' => $value->id_jenis_evaluasi,
                 ];
                 if ($value->set_sync == 'insert') {
-                    // if ($value->kelas_id == '1') {
-                    //     $setData = (object) $item;
-                    //     $result = $this->api->insertData('InsertDosenPengajarKelasKuliah', $this->token, $setData);
-                    //     if ($result->error_code == "0") {
-                    //         $query = "UPDATE dosen_pengajar_kelas SET id_aktivitas_mengajar='" . $result->data->id_aktivitas_mengajar . "', sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
-                    //         $object->query($query);
-                    //         $record['berhasil'][] = $item;
-                    //     } else {
-                    //         $record['gagal'][] = $item;
-                    //     }
-                    // } else {
-                    //     $item = $object->query("");
-                    // }
+                    if ($value->kelas_id == '1') {
+                        $setData = (object) $item;
+                        $result = $this->api->insertData('InsertDosenPengajarKelasKuliah', $this->token, $setData);
+                        if ($result->error_code == "0") {
+                            $query = "UPDATE dosen_pengajar_kelas SET id_aktivitas_mengajar='" . $result->data->id_aktivitas_mengajar . "', sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                            $object->query($query);
+                            $record['berhasil'][] = $item;
+                        } else {
+                            $record['gagal'][] = $item;
+                        }
+                    } else {
+                        $itemKelas = $object->query("SELECT
+                            `kelas_kuliah`.`id_kelas_kuliah`,
+                            `dosen_pengajar_kelas`.`id_aktivitas_mengajar`
+                            FROM
+                            `kelas_kuliah`
+                            LEFT JOIN `dosen_pengajar_kelas` ON `kelas_kuliah`.`id` =
+                            `dosen_pengajar_kelas`.`kelas_kuliah_id` WHERE id_kelas_kuliah = '" . $value->id_kelas_kuliah . "' AND kelas_id='1'")->getRow();
+                        if (!is_null($itemKelas) && !is_null($itemKelas->id_aktivitas_mengajar)) {
+                            $query = "UPDATE dosen_pengajar_kelas SET id_aktivitas_mengajar='" . $itemKelas->id_aktivitas_mengajar . "', sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                            $object->query($query);
+                            $record['berhasil'][] = $item;
+                        }else{
+                            $record['gagal'][] = $item;
+                        }
+                    }
                 } else if ($value->set_sync == 'update') {
                     $query = "UPDATE dosen_pengajar_kelas SET sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
                     $object->query($query);
