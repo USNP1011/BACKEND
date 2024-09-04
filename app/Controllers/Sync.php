@@ -238,6 +238,7 @@ class Sync extends BaseController
     {
         $object = \Config\Database::connect();
         $record = ['berhasil' => [], 'gagal' => []];
+        $semester = getSemesterAktif();
         try {
             $data = $object->query("SELECT kelas_kuliah.id, kelas_kuliah.id_kelas_kuliah,kelas_kuliah.id_prodi,matakuliah_id,kelas_kuliah.id_semester,kelas_kuliah.nama_semester,kelas_kuliah.nama_program_studi,kelas_kuliah.kode_mata_kuliah,kelas_kuliah.nama_mata_kuliah,kelas_kuliah.bahasan,kelas_kuliah.tanggal_mulai_efektif,kelas_kuliah.tanggal_akhir_efektif,kelas_kuliah.lingkup,kelas_kuliah.mode,kelas_kuliah.kapasitas, kelas.nama_kelas_kuliah, matakuliah.id_matkul, matakuliah.sks_mata_kuliah, matakuliah.sks_tatap_muka, matakuliah.sks_praktek, matakuliah.sks_praktek_lapangan, matakuliah.sks_simulasi, (if(kelas_kuliah.id_kelas_kuliah is null AND kelas_kuliah.deleted_at is null, 'insert', if(kelas_kuliah.id_kelas_kuliah is not null AND kelas_kuliah.deleted_at is null and kelas_kuliah.sync_at<kelas_kuliah.updated_at, 'update', if(kelas_kuliah.id_kelas_kuliah is not null and kelas_kuliah.deleted_at is not null and kelas_kuliah.sync_at<kelas_kuliah.updated_at,'delete', null)))) as set_sync 
             FROM kelas_kuliah 
@@ -263,25 +264,40 @@ class Sync extends BaseController
                     'kapasitas' => $value->kapasitas,
                 ];
                 if ($value->set_sync == 'insert') {
-                    $setData = (object) $item;
-                    $result = $this->api->insertData('InsertKelasKuliah', $this->token, $setData);
-                    if ($result->error_code == "0") {
-                        $query = "UPDATE kelas_kuliah SET id_kelas_kuliah='" . $result->data->id_kelas_kuliah . "', sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
-                        $object->query($query);
-                        $record['berhasil'][] = $item;
+                    if ($value->nama_kelas_kuliah == 'A') {
+                        $setData = (object) $item;
+                        $result = $this->api->insertData('InsertKelasKuliah', $this->token, $setData);
+                        if ($result->error_code == "0") {
+                            $query = "UPDATE kelas_kuliah SET id_kelas_kuliah='" . $result->data->id_kelas_kuliah . "', sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                            $object->query($query);
+                            $record['berhasil'][] = $item;
+                        } else {
+                            $record['gagal'][] = $item;
+                        }
                     } else {
-                        $record['gagal'][] = $item;
+                        $itemKelas = $object->query("SELECT * FROM kelas_kuliah WHERE matakuliah_id = '" . $value->matakuliah_id . "' AND kelas_id='1' AND id_semester = '" . $semester->id_semester . "'")->getRow();
+                        if(!is_null($itemKelas) && !is_null($itemKelas->id_kelas_kuliah)){
+                            $query = "UPDATE kelas_kuliah SET id_kelas_kuliah='" . $itemKelas->id_kelas_kuliah . "', sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                            $object->query($query);
+                            $record['berhasil'][] = $item;
+                        }
                     }
                 } else if ($value->set_sync == 'update') {
-                    $setData = (object) $item;
-                    $key = (object) ['id_kelas_kuliah' => $value->id_kelas_kuliah];
-                    $result = $this->api->updateData('UpdateKelasKuliah', $this->token, $setData, $key);
-                    if ($result->error_code == "0") {
+                    if ($value->nama_kelas_kuliah == 'A') {
+                        $setData = (object) $item;
+                        $key = (object) ['id_kelas_kuliah' => $value->id_kelas_kuliah];
+                        $result = $this->api->updateData('UpdateKelasKuliah', $this->token, $setData, $key);
+                        if ($result->error_code == "0") {
+                            $query = "UPDATE kelas_kuliah SET sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                            $object->query($query);
+                            $record['berhasil'][] = $item;
+                        } else {
+                            $record['gagal'][] = $item;
+                        }
+                    } else {
                         $query = "UPDATE kelas_kuliah SET sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
                         $object->query($query);
                         $record['berhasil'][] = $item;
-                    } else {
-                        $record['gagal'][] = $item;
                     }
                 }
             }
@@ -362,7 +378,7 @@ class Sync extends BaseController
                             $query = "UPDATE dosen_pengajar_kelas SET id_aktivitas_mengajar='" . $itemKelas->id_aktivitas_mengajar . "', sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
                             $object->query($query);
                             $record['berhasil'][] = $item;
-                        }else{
+                        } else {
                             $record['gagal'][] = $item;
                         }
                     }
