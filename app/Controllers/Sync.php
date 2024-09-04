@@ -465,7 +465,11 @@ class Sync extends BaseController
                         $query = "UPDATE peserta_kelas SET sync_at = null, status_sync=null WHERE id = '" . $value->id . "'";
                         $object->query($query);
                         $record['berhasil'][] = $item;
-                    } else {
+                    } else if($result->error_code == "117" || $result->error_code == "112") {
+                        $query = "UPDATE peserta_kelas SET sync_at = null, status_sync=null WHERE id = '" . $value->id . "'";
+                        $object->query($query);
+                        $record['berhasil'][] = $item;
+                    }else{
                         $value->error = $result;
                         $record['gagal'][] = $value;
                     }
