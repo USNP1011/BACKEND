@@ -68,7 +68,8 @@ class Krsm extends ResourceController
                     $items = $object->select("kelas_kuliah.id, kelas_kuliah.id as kelas_kuliah_id,id_kelas_kuliah,kelas_kuliah.id_prodi,matakuliah_id,id_semester,nama_semester,kelas_kuliah.kelas_id,bahasan,lingkup,mode,kapasitas,hari,jam_mulai,jam_selesai,ruangan_id,kelas_kuliah.sync_at,kelas_kuliah.status_sync, kelas.nama_kelas_kuliah, 
                     matakuliah.kode_mata_kuliah, 
                     matakuliah.nama_mata_kuliah, 
-                    matakuliah.sks_mata_kuliah, 
+                    matakuliah.sks_mata_kuliah,
+                    peserta_kelas.id as peserta_id, 
                     (if(dosen_pengajar_kelas.id_registrasi_dosen IS NOT NULL , (SELECT penugasan_dosen.nidn FROM penugasan_dosen WHERE penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen LIMIT 1), (SELECT dosen.nidn FROM dosen WHERE dosen.id_dosen = dosen_pengajar_kelas.id_dosen))) as nidn, 
                     (if(dosen_pengajar_kelas.id_registrasi_dosen IS NOT NULL , (SELECT penugasan_dosen.nama_dosen FROM penugasan_dosen WHERE penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen LIMIT 1), (SELECT dosen.nama_dosen FROM dosen WHERE dosen.id_dosen = dosen_pengajar_kelas.id_dosen))) as nama_dosen, 
                     ruangan.nama_ruangan")
