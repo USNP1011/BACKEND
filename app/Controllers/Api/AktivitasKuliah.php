@@ -70,12 +70,23 @@ class AktivitasKuliah extends ResourceController
         try {
             $param = $this->request->getJSON();
             $object = new \App\Models\PerkuliahanMahasiswaModel();
-            // $model = new \App\Entities\AktivitasKuliahEntity();
-            // $model->fill((array)$this->request->getJSON());
-            $object->update($param->id, $param);
+            $model = new \App\Entities\AktivitasKuliahEntity();
+            $model->fill([
+                'id'=>$param->id,
+                'id_riwayat_pendidikan'=>$param->id_riwayat_pendidikan,
+                'id_semester'=>$param->id_semester,
+                'id_status_mahasiswa'=>$param->id_status_mahasiswa,
+                'ips'=>$param->ips,
+                'ipk'=>$param->ipk,
+                'sks_semester'=>$param->sks_semester,
+                'sks_total'=>$param->sks_total,
+                'biaya_kuliah_smt'=>$param->biaya_kuliah_smt,
+                'id_pembiayaan'=>$param->id_pembiayaan
+            ]);
+            $object->save($model);
             return $this->respond([
                 'status' => true,
-                'data' => $param
+                'data' => $model
             ]);
         } catch (\Throwable $th) {
             return $this->fail([
@@ -112,7 +123,7 @@ class AktivitasKuliah extends ResourceController
             $object = new PerkuliahanMahasiswaModel();
             $item = [
                 'status' => true,
-                'data' => $object->select("perkuliahan_mahasiswa.id, perkuliahan_mahasiswa.id_riwayat_pendidikan, perkuliahan_mahasiswa.id_semester, perkuliahan_mahasiswa.id_status_mahasiswa, perkuliahan_mahasiswa.ips, perkuliahan_mahasiswa.ipk,perkuliahan_mahasiswa.sks_semester, perkuliahan_mahasiswa.sks_total, perkuliahan_mahasiswa.biaya_kuliah_smt,perkuliahan_mahasiswa.id_pembiayaan, perkuliahan_mahasiswa.sync_at, perkuliahan_mahasiswa.status_sync, mahasiswa.nama_mahasiswa, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.id_mahasiswa as mahasiswa_id, prodi.nama_program_studi, semester.nama_semester, status_mahasiswa.nama_status_mahasiswa, nama_pembiayaan")
+                'data' => $object->select("perkuliahan_mahasiswa.*, mahasiswa.nama_mahasiswa, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.id_mahasiswa as mahasiswa_id, prodi.nama_program_studi, semester.nama_semester, status_mahasiswa.nama_status_mahasiswa, nama_pembiayaan")
                     ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=perkuliahan_mahasiswa.id_riwayat_pendidikan', 'left')
                     ->join('mahasiswa', 'mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa', 'left')
                     ->join('prodi', 'prodi.id_prodi=riwayat_pendidikan_mahasiswa.id_prodi', 'left')
