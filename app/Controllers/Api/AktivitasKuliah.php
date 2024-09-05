@@ -68,13 +68,14 @@ class AktivitasKuliah extends ResourceController
     public function update($id = null)
     {
         try {
+            $param = $this->request->getJSON();
             $object = new \App\Models\PerkuliahanMahasiswaModel();
-            $model = new \App\Entities\AktivitasKuliahEntity();
-            $model->fill((array)$this->request->getJSON());
-            $object->update($model->id, $model);
+            // $model = new \App\Entities\AktivitasKuliahEntity();
+            // $model->fill((array)$this->request->getJSON());
+            $object->update($param->id, $param);
             return $this->respond([
                 'status' => true,
-                'data' => $model
+                'data' => $param
             ]);
         } catch (\Throwable $th) {
             return $this->fail([
