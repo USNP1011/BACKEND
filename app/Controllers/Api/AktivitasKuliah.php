@@ -71,7 +71,7 @@ class AktivitasKuliah extends ResourceController
             $object = new \App\Models\PerkuliahanMahasiswaModel();
             $model = new \App\Entities\AktivitasKuliahEntity();
             $model->fill((array)$this->request->getJSON());
-            $object->save($model);
+            $object->update($model->id, $model);
             return $this->respond([
                 'status' => true,
                 'data' => $model
