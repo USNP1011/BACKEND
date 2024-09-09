@@ -181,8 +181,10 @@ class KelasKuliah extends ResourceController
 
     public function createMahasiswa($data = null)
     {
+        $conn = \Config\Database::connect();
         try {
             if (is_null($data)) {
+                $conn->transException(true)->transStart();
                 $item = $this->request->getJSON();
                 if (!$this->validate('pesertaKelas')) {
                     $result = [
@@ -210,8 +212,9 @@ class KelasKuliah extends ResourceController
             $kelasKuliah = $object->select('matakuliah.sks_mata_kuliah')->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')->where('kelas_kuliah.id', $item->kelas_kuliah_id)->first();
             $object = new \App\Models\PerkuliahanMahasiswaModel();
             $itemKuliah = $object->where('id_riwayat_pendidikan', $item->id_riwayat_pendidikan)->where('id_semester', $this->semester->id_semester)->first();
-            $object->update($itemKuliah->id, ['sks_semester' => $itemKuliah->sks_semester + $kelasKuliah->sks_mata_kuliah, 'sks_total' => $itemKuliah->sks_total + $kelasKuliah->sks_mata_kuliah]);
+            $object->update($itemKuliah->id, ['sks_semester' => $itemKuliah->sks_semester + $kelasKuliah->sks_mata_kuliah, 'sks_total' => $itemKuliah->sks_total + $kelasKuliah->sks_mata_kuliah, 'id_status_mahasiswa'=>'A']);
             if (is_null($data)) {
+                $conn->transComplete();
                 return $this->respond([
                     'status' => true,
                     'data' => $model
@@ -233,7 +236,7 @@ class KelasKuliah extends ResourceController
         $object = new \App\Models\PesertaKelasModel();
         try {
             $dataParam = $this->request->getJSON();
-            $conn->transBegin();
+            $conn->transException(true)->transStart();
             foreach ($dataParam as $key => $value) {
                 try {
                     if ($value->checked == true) {
@@ -244,14 +247,13 @@ class KelasKuliah extends ResourceController
                             ->delete();
                     }
                 } catch (\Throwable $th) {
-                    $conn->transRollback();
                     return $this->fail([
                         'status' => false,
                         'message' => $th->getMessage()
                     ]);
                 }
             }
-            $conn->transCommit();
+            $conn->transComplete();
             return $this->respond([
                 'status' => true
             ]);
