@@ -871,16 +871,23 @@ class GetData extends BaseController
         $pengajar = new \App\Models\DosenPengajarKelasModel();
         $kelasKuliah = new \App\Models\KelasKuliahModel();
 
-        $data = $this->api->getData('GetDosenPengajarKelasKuliah', $this->token, "");
+        $data = $this->api->getData('GetDosenPengajarKelasKuliah', $this->token, "id_semester='20233'");
         if ($data->error_code == 100) {
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetDosenPengajarKelasKuliah', $this->token);
         }
-        foreach ($data->data as $key => $value) {
-            $value->id = Uuid::uuid4()->toString();
-            $value->status_sync = 'sudah sync';
-            $value->kelas_kuliah_id = $kelasKuliah->where('id_kelas_kuliah', $value->id_kelas_kuliah)->first()->id;
-            $pengajar->insert($value);
+        $item = [];
+        try {
+            foreach ($data->data as $key => $value) {
+                $value->id = Uuid::uuid4()->toString();
+                $value->status_sync = 'sudah sync';
+                $value->kelas_kuliah_id = $kelasKuliah->where('id_kelas_kuliah', $value->id_kelas_kuliah)->first()->id;
+                $pengajar->insert($value);
+                $item[] = $value;
+            }
+            return $this->respond($item);
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage());
         }
     }
 
@@ -892,6 +899,7 @@ class GetData extends BaseController
         $matakuliah = new \App\Models\MatakuliahModel();
         $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
         $model = new \App\Entities\PesertaKelasEntity();
+        $conn = \Config\Database::connect();
 
         $data = $this->api->getData('GetPesertaKelasKuliah', $this->token, "");
         if ($data->error_code == 100) {
@@ -916,6 +924,48 @@ class GetData extends BaseController
             }
         }
         $pesertaKelas->insertBatch($dataSet);
+        
+
+        // return response()->setJSON($data);
+    }
+
+    public function peserta_kelas_bykelas()
+    {
+        $pesertaKelas = new \App\Models\PesertaKelasModel();
+        $mahasiswa = new \App\Models\MahasiswaModel();
+        $kelasKuliah = new \App\Models\KelasKuliahModel();
+        $matakuliah = new \App\Models\MatakuliahModel();
+        $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
+        $model = new \App\Entities\PesertaKelasEntity();
+        $conn = \Config\Database::connect();
+
+        $dataKelas = $this->api->getData('GetDetailKelasKuliah', $this->token, "id_semester='20233'");
+        $dataSimpan = [];
+        try {
+            $conn->transException(true)->transStart();
+            $data = $this->api->getData('GetPesertaKelasKuliah', $this->token, "");
+            foreach ($dataKelas->data as $keyKelas => $kelas) {
+                $dataSet = [];
+                $where = "id_kelas_kuliah='".$kelas->id_kelas_kuliah."'";
+                $data = $this->api->getData('GetPesertaKelasKuliah', $this->token, $where);
+                foreach ($data->data as $key => $value) {
+                    if ($kelasKuliah->where('id_kelas_kuliah', $value->id_kelas_kuliah)->countAllResults() > 0) {
+                            $value->id = Uuid::uuid4()->toString();
+                            $value->id_riwayat_pendidikan = $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first()->id;
+                            $value->kelas_kuliah_id =  $kelasKuliah->where('id_kelas_kuliah', $value->id_kelas_kuliah)->first()->id;
+                            $value->mahasiswa_id = $mahasiswa->where('id_mahasiswa', $value->id_mahasiswa)->first()->id;
+                            $value->matakuliah_id = $matakuliah->where('id_matkul', $value->id_matkul)->first()->id;
+                            $dataSet[] = $value;
+                            $dataSimpan[] = $value;
+                    }
+                }
+                $pesertaKelas->insertBatch($dataSet);
+            }
+            $conn->transComplete();
+            return $this->respond($dataSimpan);
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage());
+        }
 
         // return response()->setJSON($data);
     }
