@@ -975,7 +975,7 @@ class GetData extends BaseController
         $pesertaKelas = new \App\Models\PesertaKelasModel();
         $conn = \Config\Database::connect();
         try {
-            $data = $this->api->getData('GetDetailNilaiPerkuliahanKelas', $this->token, "id_semester='20232'");
+            $data = $this->api->getData('GetDetailNilaiPerkuliahanKelas', $this->token, "id_semester='20233'");
             $conn->transException(true)->transStart();
             $dataUpdate = [];
             foreach ($data->data as $key => $value) {
