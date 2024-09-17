@@ -792,24 +792,31 @@ class GetData extends BaseController
     {
         $kelas = new \App\Models\KelasKuliahModel();
         $matakuliah = new \App\Models\MatakuliahModel();
-        $item = [];
-        $data = $this->api->getData('GetDetailKelasKuliah', $this->token, "id_semester='20233'");
-        if ($data->error_code == 100) {
-            $this->token = $this->api->getToken()->data->token;
-            $data = $this->api->getData('GetDetailKelasKuliah', $this->token);
+        $conn = \Config\Database::connect();
+        try {
+            $conn->transException(true)->transStart();
+            $item = [];
+            $data = $this->api->getData('GetDetailKelasKuliah', $this->token, "id_semester='20233'");
+            if ($data->error_code == 100) {
+                $this->token = $this->api->getToken()->data->token;
+                $data = $this->api->getData('GetDetailKelasKuliah', $this->token);
+            }
+            foreach ($data->data as $key => $value) {
+                $value->id = Uuid::uuid4()->toString();
+                $tanggal = explode('-', $value->tanggal_mulai_efektif);
+                $value->tanggal_mulai_efektif = $value->tanggal_mulai_efektif != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
+                $tanggal = explode('-', $value->tanggal_akhir_efektif);
+                $value->tanggal_akhir_efektif = $value->tanggal_akhir_efektif != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
+                $value->matakuliah_id = $matakuliah->where('id_matkul', $value->id_matkul)->first()->id;
+                $value->status_sync = "sudah sync";
+                $kelas->insert($value);
+                $item[] = $value;
+            }
+            $conn->transComplete();
+            return $item;
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage());
         }
-        foreach ($data->data as $key => $value) {
-            $value->id = Uuid::uuid4()->toString();
-            $tanggal = explode('-', $value->tanggal_mulai_efektif);
-            $value->tanggal_mulai_efektif = $value->tanggal_mulai_efektif != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
-            $tanggal = explode('-', $value->tanggal_akhir_efektif);
-            $value->tanggal_akhir_efektif = $value->tanggal_akhir_efektif != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
-            $value->matakuliah_id = $matakuliah->where('id_matkul', $value->id_matkul)->first()->id;
-            $value->status_sync = "sudah sync";
-            $kelas->insert($value);
-            $item[] = $value;
-        }
-        return $item;
     }
 
     public function dosen()
