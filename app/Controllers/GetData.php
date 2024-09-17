@@ -427,17 +427,24 @@ class GetData extends BaseController
         $aktivitasMahasiswa = new \App\Models\PerkuliahanMahasiswaModel();
         $riwayatPendidikan = new \App\Models\RiwayatPendidikanMahasiswaModel();
         $mahasiswa = new \App\Models\MahasiswaModel();
+        $conn = \Config\Database::connect();
 
-        $data = $this->api->getData('GetAktivitasKuliahMahasiswa', $this->token);
+        $data = $this->api->getData('GetAktivitasKuliahMahasiswa', $this->token, "id_semester='20233' AND id_status_mahasiswa ='A'");
         if ($data->error_code == 100) {
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetAktivitasKuliahMahasiswa', $this->token);
         }
-        foreach ($data->data as $key => $value) {
-            $value->id = Uuid::uuid4()->toString();
-            $value->id_riwayat_pendidikan = $riwayatPendidikan->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first()->id;
-            $value->id_mahasiswa = $mahasiswa->where('id_mahasiswa', $value->id_mahasiswa)->first()->id;
-            $aktivitasMahasiswa->insert($value);
+        try {
+            $conn->transException(true)->transStart();
+            foreach ($data->data as $key => $value) {
+                $value->id = Uuid::uuid4()->toString();
+                $value->id_riwayat_pendidikan = $riwayatPendidikan->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first()->id;
+                $value->id_mahasiswa = $mahasiswa->where('id_mahasiswa', $value->id_mahasiswa)->first()->id;
+                $aktivitasMahasiswa->insert($value);
+            }
+            $conn->transComplete();
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage());
         }
     }
 
