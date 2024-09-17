@@ -792,7 +792,7 @@ class GetData extends BaseController
     {
         $kelas = new \App\Models\KelasKuliahModel();
         $matakuliah = new \App\Models\MatakuliahModel();
-
+        $item = [];
         $data = $this->api->getData('GetDetailKelasKuliah', $this->token, "id_semester='20233'");
         if ($data->error_code == 100) {
             $this->token = $this->api->getToken()->data->token;
@@ -807,7 +807,9 @@ class GetData extends BaseController
             $value->matakuliah_id = $matakuliah->where('id_matkul', $value->id_matkul)->first()->id;
             $value->status_sync = "sudah sync";
             $kelas->insert($value);
+            $item[] = $value;
         }
+        return $item;
     }
 
     public function dosen()
