@@ -1125,7 +1125,7 @@ class GetData extends BaseController
         $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
         $conn = \Config\Database::connect();
         try {
-            $data = $this->api->getData('GetTranskripMahasiswa', $this->token, "", "id_registrasi_mahasiswa", 5000, 5000);
+            $data = $this->api->getData('GetTranskripMahasiswa', $this->token, "", "id_registrasi_mahasiswa", 10000, 10000);
             $conn->transException(true)->transStart();
             $dataUpdate = [];
             foreach ($data->data as $key => $value) {
