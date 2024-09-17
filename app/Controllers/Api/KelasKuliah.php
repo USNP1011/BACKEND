@@ -466,10 +466,10 @@ class KelasKuliah extends ResourceController
                 ->orLike('prodi.nama_program_studi', $param->cari)
                 ->groupEnd()
                 ->where('a_periode_aktif', '1')
+                ->where('kelas_kuliah.deleted_at IS NULL')
                 ->groupStart()
                 ->where('dosen_pengajar_kelas.mengajar', '1')->orWhere('dosen_pengajar_kelas.mengajar IS NULL')
                 ->groupEnd()
-
                 ->orderBy(isset($param->order) && $param->order->field != "" ? $param->order->field : 'prodi.nama_program_studi', isset($param->order) && $param->order->direction != "" ? $param->order->direction : 'desc')
                 ->paginate($param->count, 'default', $param->page),
             'pager' => $object->pager->getDetails()
