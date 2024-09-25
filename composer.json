@@ -17,8 +17,7 @@
         "codeigniterext/maintenancemode": "^0.0.2",
         "firebase/php-jwt": "^6.10",
         "paragonie/sodium_compat": "^2.0",
-        "ramsey/uuid": "^4.7",
-        "zircote/swagger-php": "^4.10"
+        "ramsey/uuid": "^4.7"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9",
