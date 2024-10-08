@@ -464,6 +464,7 @@ class KelasKuliah extends ResourceController
                 ->orLike('matakuliah.kode_mata_kuliah', $param->cari)
                 ->orLike('matakuliah.nama_mata_kuliah', $param->cari)
                 ->orLike('prodi.nama_program_studi', $param->cari)
+                ->orLike('kelas_kuliah.hari', $param->cari)
                 ->groupEnd()
                 ->where('a_periode_aktif', '1')
                 ->groupStart()
