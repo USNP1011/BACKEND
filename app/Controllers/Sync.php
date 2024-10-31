@@ -11,8 +11,15 @@ class Sync extends BaseController
     protected $api;
     public function __construct()
     {
-        $this->api = new Rest();
-        $this->token = $this->api->getToken()->data->token;
+        try {
+            $this->api = new Rest();
+            $this->token = $this->api->getToken()->data->token;
+        } catch (\Throwable $th) {
+            return $this->fail([
+                'status' => false,
+                'message' => "Server feeder sedang tidak aktif"
+            ]);
+        }
     }
     public function getSync(): object
     {
