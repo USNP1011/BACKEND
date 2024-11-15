@@ -204,8 +204,8 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->group('riwayat_pendidikan_mahasiswa', ['filter' => 'auth'], function($routes){
         $routes->get('', 'RiwayatPendidikanMahasiswa::show');
         $routes->get('(:hash)', 'RiwayatPendidikanMahasiswa::show/$1');
-        $routes->get('perguruan_tinggi/(:hash)', 'RiwayatPendidikanMahasiswa::perguruanTinggi/$i');
-        $routes->get('prodi/(:hash)', 'RiwayatPendidikanMahasiswa::prodi/$i');
+        $routes->get('perguruan_tinggi/(:hash)', 'RiwayatPendidikanMahasiswa::perguruanTinggi/$1');
+        $routes->get('prodi/(:hash)', 'RiwayatPendidikanMahasiswa::prodi/$1');
         $routes->post('', 'RiwayatPendidikanMahasiswa::create');
         $routes->put('', 'RiwayatPendidikanMahasiswa::update');
         $routes->delete('(:hash)', 'RiwayatPendidikanMahasiswa::delete/$1');
