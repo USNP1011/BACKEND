@@ -3,6 +3,7 @@
 namespace App\Controllers\Api;
 
 use App\Entities\Mahasiswa as EntitiesMahasiswa;
+use App\Libraries\Rest;
 use App\Models\MahasiswaModel;
 use App\Models\RiwayatPendidikanMahasiswaModel;
 use App\Models\UserRoleModel;
@@ -46,7 +47,7 @@ class RiwayatPendidikanMahasiswa extends ResourceController
             $item = $this->request->getJSON();
             $itemUser = [
                 'username' => $item->nim,
-                'email' => $item->nim.'@usn-papua.ac.id',
+                'email' => $item->nim . '@usn-papua.ac.id',
                 'password' => $item->nim,
             ];
             if (!$this->validateData($itemUser, 'userMahasiswa')) {
@@ -75,7 +76,7 @@ class RiwayatPendidikanMahasiswa extends ResourceController
             $itemData->activate();
 
             $mhs = new \App\Models\MahasiswaModel();
-            $mhs->update($item->id_mahasiswa, ['id_user'=>$item->id_user]);
+            $mhs->update($item->id_mahasiswa, ['id_user' => $item->id_user]);
 
             $role = [
                 'users_id' => $item->id_user,
@@ -85,7 +86,7 @@ class RiwayatPendidikanMahasiswa extends ResourceController
             $userRole->insert($role);
 
             $item->id = Uuid::uuid4()->toString();
-            $item->angkatan = substr($item->nim,0,4);
+            $item->angkatan = substr($item->nim, 0, 4);
             $object = new \App\Models\RiwayatPendidikanMahasiswaModel();
             $model = new \App\Entities\RiwayatPendidikanMahasiswa();
             $model->fill((array)$item);
@@ -96,20 +97,20 @@ class RiwayatPendidikanMahasiswa extends ResourceController
             $semester = getSemesterAktif();
             $biaya = new \App\Models\SettingBiayaModel();
             $itemKuliah = [
-                'id'=> Uuid::uuid4()->toString(),
-                'id_riwayat_pendidikan'=>$item->id,
-                'id_mahasiswa'=>$item->id_mahasiswa,
-                'id_semester'=>$semester->id_semester,
-                'nama_semester'=>$semester->nama_semester,
-                'nim'=>$item->nim,
-                'id_prodi'=>$item->id_prodi,
-                'id_status_mahasiswa'=>"N",
-                'ips'=>'0',
-                'ipk'=>'0',
-                'sks_semester'=>'0',
-                'sks_total'=>'0',
-                'id_pembiayaan'=>'1',
-                'biaya_kuliah_smt'=>$biaya->where('id_prodi', $item->id_prodi)->where('angkatan', $item->angkatan)->first()->biaya
+                'id' => Uuid::uuid4()->toString(),
+                'id_riwayat_pendidikan' => $item->id,
+                'id_mahasiswa' => $item->id_mahasiswa,
+                'id_semester' => $semester->id_semester,
+                'nama_semester' => $semester->nama_semester,
+                'nim' => $item->nim,
+                'id_prodi' => $item->id_prodi,
+                'id_status_mahasiswa' => "N",
+                'ips' => '0',
+                'ipk' => '0',
+                'sks_semester' => '0',
+                'sks_total' => '0',
+                'id_pembiayaan' => '1',
+                'biaya_kuliah_smt' => $biaya->where('id_prodi', $item->id_prodi)->where('angkatan', $item->angkatan)->first()->biaya
             ];
             $modelPerkuliahan->fill($itemKuliah);
             $perkuliahan->insert($modelPerkuliahan);
@@ -118,7 +119,7 @@ class RiwayatPendidikanMahasiswa extends ResourceController
             return $this->respond([
                 'status' => true,
                 'data' => $model
-            ]); 
+            ]);
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,
@@ -138,6 +139,27 @@ class RiwayatPendidikanMahasiswa extends ResourceController
     {
         //
     }
+    public function perguruanTinggi($param = null)
+    {
+        $api = new Rest();
+        $token = $api->getToken()->data->token;
+        $data = $api->getData('GetAllPT', $token, "nama_perguruan_tinggi LIKE '%".$param."%'", "", "5");
+        return $this->respond([
+            'status' => true,
+            'data' => $data
+        ]);
+    }
+
+    public function prodi($param = null)
+    {
+        $api = new Rest();
+        $token = $api->getToken()->data->token;
+        $data = $api->getData('GetAllProdi', $token, "id_perguruan_tinggi='".$param."'");
+        return $this->respond([
+            'status' => true,
+            'data' => $data
+        ]);
+    }
 
     /**
      * Add or update a model resource, from "posted" properties.
@@ -156,7 +178,7 @@ class RiwayatPendidikanMahasiswa extends ResourceController
             return $this->respond([
                 'status' => true,
                 'data' => $model
-            ]); 
+            ]);
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,
@@ -180,8 +202,8 @@ class RiwayatPendidikanMahasiswa extends ResourceController
             return $this->respondDeleted([
                 'status' => true,
                 'message' => 'successful deleted',
-                'data'=>[]
-            ]); 
+                'data' => []
+            ]);
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,
