@@ -259,6 +259,13 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
         $routes->delete('dosen/(:hash)', 'KelasKuliah::deleteDosen/$1', ['filter' => 'auth']);
     });
 
+    $routes->group('nilai_kelas', ['filter' => 'general'], function($routes){
+        $routes->get('kelas/(:hash)', 'NilaiPesertaKelas::kelas/$1');
+        $routes->get('skala_nilai/(:hash)', 'NilaiPesertaKelas::skala/$1');
+        $routes->get('mahasiswa/(:hash)', 'NilaiPesertaKelas::show/$1');
+        $routes->post('', 'NilaiPesertaKelas::create');
+    });
+
     $routes->group('kurikulum', ['filter' => 'auth'], function($routes){
         $routes->get('', 'Kurikulum::show');
         $routes->get('(:hash)', 'Kurikulum::show/$1');

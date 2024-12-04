@@ -561,4 +561,35 @@ class Validation extends BaseConfig
             'rules' => 'required|matches[password]',
         ],
     ];
+
+    public array $nilaiKelas = [
+        "nilai_angka" => [
+            "label" => "Nilai Angka",
+            "rules" => "required",
+            "errors" => [
+                "required" => "Nilai Angka Tidak Boleh Kosong"
+            ]
+        ],
+        "nilai_huruf" => [
+            "label" => "Nilai Huruf",
+            "rules" => "required",
+            "errors" => [
+                "required" => "Nilai huruf Tidak Boleh Kosong"
+            ]
+        ],
+        "nilai_indeks" => [
+            "label" => "Nilai Indeks",
+            "rules" => "required",
+            "errors" => [
+                "required" => "Nilai huruf Tidak Boleh Kosong"
+            ]
+        ],
+        "peserta_kelas_id" => [
+            "label" => "peserta_kelas_id",
+            "rules" => "required",
+            "errors" => [
+                "required" => "peserta_kelas_id Tidak Boleh Kosong"
+            ]
+        ],
+    ];
 }

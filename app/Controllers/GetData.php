@@ -745,7 +745,7 @@ class GetData extends BaseController
             $conn->transComplete();
             return $this->respond([
                 'status' => true,
-                'data'=>$result
+                'data' => $result
             ]);
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage());
@@ -800,24 +800,33 @@ class GetData extends BaseController
         $kelas = new \App\Models\KelasKuliahModel();
         $matakuliah = new \App\Models\MatakuliahModel();
         $conn = \Config\Database::connect();
+        $data_kelas = $kelas->where('id_semester', '20241')->where('id_prodi', '8f929cec-0d9e-4d9a-8dfb-795fd50363d6')->findAll();
         try {
             $conn->transException(true)->transStart();
             $item = [];
-            $data = $this->api->getData('GetDetailKelasKuliah', $this->token, "id_semester='20233'");
+            $data = $this->api->getData('GetDetailKelasKuliah', $this->token, "id_semester='20241' AND id_prodi='8f929cec-0d9e-4d9a-8dfb-795fd50363d6'");
             if ($data->error_code == 100) {
                 $this->token = $this->api->getToken()->data->token;
-                $data = $this->api->getData('GetDetailKelasKuliah', $this->token);
+                $data = $this->api->getData('GetDetailKelasKuliah', $this->token, "id_semester='20241' AND id_prodi='8f929cec-0d9e-4d9a-8dfb-795fd50363d6'");
             }
             foreach ($data->data as $key => $value) {
-                $value->id = Uuid::uuid4()->toString();
-                $tanggal = explode('-', $value->tanggal_mulai_efektif);
-                $value->tanggal_mulai_efektif = $value->tanggal_mulai_efektif != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
-                $tanggal = explode('-', $value->tanggal_akhir_efektif);
-                $value->tanggal_akhir_efektif = $value->tanggal_akhir_efektif != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
-                $value->matakuliah_id = $matakuliah->where('id_matkul', $value->id_matkul)->first()->id;
-                $value->status_sync = "sudah sync";
-                $kelas->insert($value);
-                $item[] = $value;
+                $cek = false;
+                foreach ($data_kelas as $key => $itemKelas) {
+                    if ($value->id_kelas_kuliah == $itemKelas->id_kelas_kuliah)
+                        $cek = true;
+                }
+                if(!$cek){
+                    $value->id = Uuid::uuid4()->toString();
+                    $tanggal = explode('-', $value->tanggal_mulai_efektif);
+                    $value->tanggal_mulai_efektif = $value->tanggal_mulai_efektif != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
+                    $tanggal = explode('-', $value->tanggal_akhir_efektif);
+                    $value->tanggal_akhir_efektif = $value->tanggal_akhir_efektif != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
+                    $value->matakuliah_id = $matakuliah->where('id_matkul', $value->id_matkul)->first()->id;
+                    $value->status_sync = "sudah sync";
+                    $value->sync_at = date('Y-m-d H:i:s');
+                    $kelas->insert($value);
+                    $item[] = $value;
+                }
             }
             $conn->transComplete();
             return $item;
@@ -878,7 +887,7 @@ class GetData extends BaseController
         $pengajar = new \App\Models\DosenPengajarKelasModel();
         $kelasKuliah = new \App\Models\KelasKuliahModel();
 
-        $data = $this->api->getData('GetDosenPengajarKelasKuliah', $this->token, "id_semester='20233'");
+        $data = $this->api->getData('GetDosenPengajarKelasKuliah', $this->token, "id_kelas_kuliah='00733a83-2d8d-46e4-b2a5-15416f5ea2ed'");
         if ($data->error_code == 100) {
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetDosenPengajarKelasKuliah', $this->token);
@@ -888,6 +897,7 @@ class GetData extends BaseController
             foreach ($data->data as $key => $value) {
                 $value->id = Uuid::uuid4()->toString();
                 $value->status_sync = 'sudah sync';
+                $value->sync_at = date('Y-m-d H:i:s');
                 $value->kelas_kuliah_id = $kelasKuliah->where('id_kelas_kuliah', $value->id_kelas_kuliah)->first()->id;
                 $pengajar->insert($value);
                 $item[] = $value;
@@ -908,7 +918,7 @@ class GetData extends BaseController
         $model = new \App\Entities\PesertaKelasEntity();
         $conn = \Config\Database::connect();
 
-        $data = $this->api->getData('GetPesertaKelasKuliah', $this->token, "");
+        $data = $this->api->getData('GetPesertaKelasKuliah', $this->token, "id_kelas_kuliah='8fec6dda-6539-4292-b2bb-695920c7f6d1'");
         if ($data->error_code == 100) {
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetPesertaKelasKuliah', $this->token);
@@ -922,6 +932,8 @@ class GetData extends BaseController
                     $value->kelas_kuliah_id =  $kelasKuliah->where('id_kelas_kuliah', $value->id_kelas_kuliah)->first()->id;
                     $value->mahasiswa_id = $mahasiswa->where('id_mahasiswa', $value->id_mahasiswa)->first()->id;
                     $value->matakuliah_id = $matakuliah->where('id_matkul', $value->id_matkul)->first()->id;
+                    $value->status_sync = 'sudah sync';
+                    $value->sync_at = date('Y-m-d H:i:s');
                     $dataSet[] = $value;
                     // $model->fill((array) $value);
                     // $pesertaKelas->insert($model);
@@ -931,7 +943,7 @@ class GetData extends BaseController
             }
         }
         $pesertaKelas->insertBatch($dataSet);
-        
+
 
         // return response()->setJSON($data);
     }
@@ -953,17 +965,17 @@ class GetData extends BaseController
             $data = $this->api->getData('GetPesertaKelasKuliah', $this->token, "");
             foreach ($dataKelas->data as $keyKelas => $kelas) {
                 $dataSet = [];
-                $where = "id_kelas_kuliah='".$kelas->id_kelas_kuliah."'";
+                $where = "id_kelas_kuliah='" . $kelas->id_kelas_kuliah . "'";
                 $data = $this->api->getData('GetPesertaKelasKuliah', $this->token, $where);
                 foreach ($data->data as $key => $value) {
                     if ($kelasKuliah->where('id_kelas_kuliah', $value->id_kelas_kuliah)->countAllResults() > 0) {
-                            $value->id = Uuid::uuid4()->toString();
-                            $value->id_riwayat_pendidikan = $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first()->id;
-                            $value->kelas_kuliah_id =  $kelasKuliah->where('id_kelas_kuliah', $value->id_kelas_kuliah)->first()->id;
-                            $value->mahasiswa_id = $mahasiswa->where('id_mahasiswa', $value->id_mahasiswa)->first()->id;
-                            $value->matakuliah_id = $matakuliah->where('id_matkul', $value->id_matkul)->first()->id;
-                            $dataSet[] = $value;
-                            $dataSimpan[] = $value;
+                        $value->id = Uuid::uuid4()->toString();
+                        $value->id_riwayat_pendidikan = $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first()->id;
+                        $value->kelas_kuliah_id =  $kelasKuliah->where('id_kelas_kuliah', $value->id_kelas_kuliah)->first()->id;
+                        $value->mahasiswa_id = $mahasiswa->where('id_mahasiswa', $value->id_mahasiswa)->first()->id;
+                        $value->matakuliah_id = $matakuliah->where('id_matkul', $value->id_matkul)->first()->id;
+                        $dataSet[] = $value;
+                        $dataSimpan[] = $value;
                     }
                 }
                 $pesertaKelas->insertBatch($dataSet);
