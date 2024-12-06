@@ -2,20 +2,30 @@
 
 namespace App\Controllers;
 
-
+use Ramsey\Uuid\Uuid;
 class Repair extends BaseController
 {
     public function repair()
     {
-        $object = new \App\Models\KelasKuliahModel();
-        $data = $object->where('kelas_id', '1')->where('id_semester', '20241')->findAll();
+        $peserta = new \App\Models\PesertaKelasModel();
+        $dataPeserta = $peserta->where('nilai_indeks IS NOT NULL')->findAll();
+        $object = new \App\Models\NilaiPesertaKelasModel();
+        $dataInsert =[];
+        foreach ($dataPeserta as $key => $value) {
+            $item = [
+                'id_nilai_kelas'=>Uuid::uuid4()->toString(),
+                'nilai_angka'=>$value->nilai_angka,
+                'nilai_huruf'=>$value->nilai_huruf,
+                'nilai_indeks'=>$value->nilai_indeks,
+                'status_sync'=>'sudah sync',
+                'peserta_kelas_id'=>$value->id,
+            ];
+            $dataInsert[] = $item;
+        }
         $conn = \Config\Database::connect();
         try {
             $conn->transException(true)->transStart();
-            foreach ($data as $key => $value) {
-                $query = "UPDATE kelas_kuliah SET id_kelas_kuliah='".$value->id_kelas_kuliah."' WHERE matakuliah_id='".$value->matakuliah_id."' AND id_semester='20241' AND kelas_id != '1'";
-                $conn->query($query);
-            }
+            $object->insertBatch($dataInsert);
             $conn->transComplete();
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage());
