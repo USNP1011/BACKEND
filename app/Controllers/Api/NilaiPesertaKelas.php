@@ -3,7 +3,6 @@
 namespace App\Controllers\Api;
 
 use CodeIgniter\RESTful\ResourceController;
-use Ramsey\Uuid\Uuid;
 
 class NilaiPesertaKelas extends ResourceController
 {
@@ -88,7 +87,6 @@ class NilaiPesertaKelas extends ResourceController
                 ];
                 return $this->failValidationErrors($result);
             }
-            $item->id_nilai_kelas = Uuid::uuid4()->toString();
             $object = new \App\Models\NilaiPesertaKelasModel();
             $model = new \App\Entities\NilaiKelasEntity();
             $model->fill((array)$item);

@@ -11,6 +11,7 @@ class NilaiPesertaKelasModel extends Model
     protected $useSoftDeletes   = true;
     protected $protectFields    = true;
     protected $allowedFields = [
+        'id_nilai_kelas',
         'nilai_angka',
         'nilai_huruf',
         'nilai_indeks',

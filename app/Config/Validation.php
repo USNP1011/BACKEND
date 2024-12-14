@@ -563,13 +563,6 @@ class Validation extends BaseConfig
     ];
 
     public array $nilaiKelas = [
-        "nilai_angka" => [
-            "label" => "Nilai Angka",
-            "rules" => "required",
-            "errors" => [
-                "required" => "Nilai Angka Tidak Boleh Kosong"
-            ]
-        ],
         "nilai_huruf" => [
             "label" => "Nilai Huruf",
             "rules" => "required",
