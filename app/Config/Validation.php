@@ -574,7 +574,7 @@ class Validation extends BaseConfig
             "label" => "Nilai Indeks",
             "rules" => "required",
             "errors" => [
-                "required" => "Nilai huruf Tidak Boleh Kosong"
+                "required" => "Nilai indeks Tidak Boleh Kosong"
             ]
         ],
         "id_nilai_kelas" => [
