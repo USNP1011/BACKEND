@@ -25,7 +25,7 @@ class Dosen extends ResourceController
         $profile = getProfile();
         $semester = getSemesterAktif();
         if ($profile->status == 'Dosen') {
-            $data = $object->select("kelas_kuliah.id, kelas_kuliah.matakuliah_id, kelas_kuliah.hari, kelas_kuliah.jam_mulai, kelas_kuliah.jam_selesai, ruangan.nama_ruangan, kelas.nama_kelas_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, matakuliah.kode_mata_kuliah, matakuliah_kurikulum.semester, prodi.id_prodi, prodi.nama_program_studi, (SELECT COUNT(id) FROM peserta_kelas WHERE kelas_kuliah_id=kelas_kuliah.id) as total_peserta")
+            $data = $object->select("kelas_kuliah.id, kelas_kuliah.matakuliah_id, kelas_kuliah.hari, kelas_kuliah.jam_mulai, kelas_kuliah.jam_selesai, ruangan.nama_ruangan, kelas.nama_kelas_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, matakuliah.kode_mata_kuliah, matakuliah_kurikulum.semester, prodi.nama_program_studi, (SELECT COUNT(id) FROM peserta_kelas WHERE kelas_kuliah_id=kelas_kuliah.id) as total_peserta")
                 ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
                 ->join('prodi', 'prodi.id_prodi=kelas_kuliah.id_prodi', 'left')
                 ->join('matakuliah_kurikulum', 'matakuliah_kurikulum.matakuliah_id=matakuliah.id', 'left')
@@ -61,7 +61,7 @@ class Dosen extends ResourceController
         $object = new \App\Models\KelasKuliahModel();
         $profile = getProfile();
         $semester = getSemesterAktif();
-        $data = $object->select("kelas_kuliah.id, kelas_kuliah.matakuliah_id, kelas_kuliah.hari, kelas_kuliah.jam_mulai, kelas_kuliah.jam_selesai, ruangan.nama_ruangan, kelas.nama_kelas_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, matakuliah.kode_mata_kuliah, matakuliah_kurikulum.semester, prodi.nama_program_studi")
+        $data = $object->select("kelas_kuliah.id, kelas_kuliah.matakuliah_id, kelas_kuliah.hari, kelas_kuliah.jam_mulai, kelas_kuliah.jam_selesai, ruangan.nama_ruangan, kelas.nama_kelas_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, matakuliah.kode_mata_kuliah, matakuliah_kurikulum.semester, prodi.id_prodi, prodi.nama_program_studi")
             ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
             ->join('prodi', 'prodi.id_prodi=kelas_kuliah.id_prodi', 'left')
             ->join('matakuliah_kurikulum', 'matakuliah_kurikulum.matakuliah_id=matakuliah.id', 'left')
