@@ -31,7 +31,7 @@ class NilaiPesertaKelas extends ResourceController
     public function skala($id = null): object
     {
         $skala = new \App\Models\SkalaNilaiModel();
-        $dataSkala = $skala->where('id_prodi', $id)->findAll();
+        $dataSkala = $skala->where('id_prodi', $id)->orderBy('nilai_indeks', 'asc')->findAll();
         return $this->respond([
             'status' => true,
             'data' => $dataSkala
