@@ -25,7 +25,7 @@ class Khsm extends ResourceController
             $itemPerkuliahan->nama_kaprodi = getKaprodi($profile->id_prodi)->nama_dosen;
             $itemPerkuliahan->dosen_wali = $profile->dosen_wali;
             $object = new \App\Models\PesertaKelasModel();
-            $itemPerkuliahan->detail = $object->select("nilai_kelas.nilai_angka, nilai_kelas.nilai_huruf, nilai_kelas.nilai_indeks, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, matakuliah_kurikulum.semester, (matakuliah.sks_mata_kuliah*nilai_kelas.nilai_indeks) as nxsks, if(nilai_indeks>=2,'L', 'TL') as ket")
+            $itemPerkuliahan->detail = $object->select("nilai_kelas.nilai_angka, nilai_kelas.nilai_huruf, nilai_kelas.nilai_indeks, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, matakuliah_kurikulum.semester, (matakuliah.sks_mata_kuliah*nilai_kelas.nilai_indeks) as nxsks, if(nilai_kelas.nilai_indeks>=2,'L', 'TL') as ket")
                 ->join('nilai_kelas', 'nilai_kelas.id_nilai_kelas=peserta_kelas.id', 'left')
                 ->join('kelas_kuliah', 'kelas_kuliah.id=peserta_kelas.kelas_kuliah_id', 'left')
                 ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
