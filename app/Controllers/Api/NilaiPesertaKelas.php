@@ -42,9 +42,22 @@ class NilaiPesertaKelas extends ResourceController
     public function show($id = null): object
     {
         try {
+            $object = new \App\Models\KelasKuliahModel();
+            $data = $object->select("kelas_kuliah.id, kelas_kuliah.matakuliah_id, kelas_kuliah.hari, kelas_kuliah.jam_mulai, kelas_kuliah.jam_selesai, ruangan.nama_ruangan, kelas.nama_kelas_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, matakuliah.kode_mata_kuliah, matakuliah_kurikulum.semester, prodi.id_prodi, prodi.nama_program_studi")
+                ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
+                ->join('prodi', 'prodi.id_prodi=kelas_kuliah.id_prodi', 'left')
+                ->join('matakuliah_kurikulum', 'matakuliah_kurikulum.matakuliah_id=matakuliah.id', 'left')
+                ->join('kelas', 'kelas.id=kelas_kuliah.kelas_id', 'left')
+                ->join('ruangan', 'ruangan.id=kelas_kuliah.ruangan_id', 'left')
+                ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id', 'left')
+                ->join('penugasan_dosen', 'penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen', 'left')
+                ->join('dosen', 'dosen.id_dosen=penugasan_dosen.id_dosen', 'left')
+                ->where('kelas_kuliah.id', $id)
+                ->first();
+
             $object = new \App\Models\PesertaKelasModel();
             $kelas = new \App\Models\KelasKuliahModel();
-            $dataPeserta = $object
+            $data->pesertaKelas = $object
                 ->select('nilai_kelas.*, peserta_kelas.id as id_nilai_kelas, peserta_kelas.id_riwayat_pendidikan, peserta_kelas.kelas_kuliah_id, riwayat_pendidikan_mahasiswa.nim, mahasiswa.nama_mahasiswa')
                 ->join('nilai_kelas', 'nilai_kelas.id_nilai_kelas = peserta_kelas.id', 'left')
                 ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = peserta_kelas.id_riwayat_pendidikan', 'left')
@@ -53,7 +66,7 @@ class NilaiPesertaKelas extends ResourceController
                 ->findAll();
             return $this->respond([
                 'status' => true,
-                'data' => $dataPeserta
+                'data' => $data
             ]);
         } catch (\Throwable $th) {
             return $this->fail([

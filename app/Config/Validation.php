@@ -584,7 +584,7 @@ class Validation extends BaseConfig
                 "required" => "Nilai huruf Tidak Boleh Kosong"
             ]
         ],
-        "peserta_kelas_id" => [
+        "id_nilai_kelas" => [
             "label" => "peserta_kelas_id",
             "rules" => "required",
             "errors" => [
