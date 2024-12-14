@@ -45,10 +45,11 @@ class NilaiPesertaKelas extends ResourceController
             $object = new \App\Models\PesertaKelasModel();
             $kelas = new \App\Models\KelasKuliahModel();
             $dataPeserta = $object
-                ->select('nilai_kelas.*,peserta_kelas.id as peserta_kelas_id, peserta_kelas.id_riwayat_pendidikan, peserta_kelas.kelas_kuliah_id, riwayat_pendidikan_mahasiswa.nim, mahasiswa.nama_mahasiswa')
-                ->join('nilai_kelas', 'nilai_kelas.peserta_kelas_id = peserta_kelas.id', 'left')->where('kelas_kuliah_id', $id)
+                ->select('nilai_kelas.*, peserta_kelas.id as id_nilai_kelas, peserta_kelas.id_riwayat_pendidikan, peserta_kelas.kelas_kuliah_id, riwayat_pendidikan_mahasiswa.nim, mahasiswa.nama_mahasiswa')
+                ->join('nilai_kelas', 'nilai_kelas.id_nilai_kelas = peserta_kelas.id', 'left')
                 ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = peserta_kelas.id_riwayat_pendidikan', 'left')
                 ->join('mahasiswa', 'mahasiswa.id = riwayat_pendidikan_mahasiswa.id_mahasiswa', 'left')
+                ->where('kelas_kuliah_id', $id)
                 ->findAll();
             return $this->respond([
                 'status' => true,
