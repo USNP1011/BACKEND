@@ -15,8 +15,7 @@ class NilaiPesertaKelasModel extends Model
         'nilai_huruf',
         'nilai_indeks',
         'sync_at',
-        'status_sync',
-        'peserta_kelas_id'
+        'status_sync'
     ];
     protected bool $allowEmptyInserts = false;
 
