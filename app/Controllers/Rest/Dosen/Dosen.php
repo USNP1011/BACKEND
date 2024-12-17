@@ -19,13 +19,13 @@ class Dosen extends ResourceController
         ]);
     }
 
-    public function jadwalMenajar()
+    public function jadwalMengajar()
     {
         $object = new \App\Models\KelasKuliahModel();
         $profile = getProfile();
         $semester = getSemesterAktif();
         if ($profile->status == 'Dosen') {
-            $data = $object->select("kelas_kuliah.id, kelas_kuliah.matakuliah_id, kelas_kuliah.hari, kelas_kuliah.jam_mulai, kelas_kuliah.jam_selesai, ruangan.nama_ruangan, kelas.nama_kelas_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, matakuliah.kode_mata_kuliah, matakuliah_kurikulum.semester, prodi.id_prodi, prodi.nama_program_studi, (SELECT COUNT(id) FROM peserta_kelas WHERE kelas_kuliah_id=kelas_kuliah.id) as total_peserta")
+            $data = $object->select("kelas_kuliah.id, kelas_kuliah.matakuliah_id, kelas_kuliah.hari, kelas_kuliah.jam_mulai, kelas_kuliah.jam_selesai, ruangan.nama_ruangan, kelas.nama_kelas_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, matakuliah.kode_mata_kuliah, matakuliah_kurikulum.semester, prodi.id_prodi, prodi.nama_program_studi, (SELECT COUNT(id) FROM peserta_kelas WHERE kelas_kuliah_id=kelas_kuliah.id) as total_peserta, (SELECT COUNT(*) FROM nilai_kelas LEFT JOIN peserta_kelas on nilai_kelas.id_nilai_kelas=peserta_kelas.id WHERE peserta_kelas.kelas_kuliah_id=kelas_kuliah.id AND nilai_kelas.nilai_indeks IS NOT NULL) as peserta_dinilai")
                 ->join('matakuliah', 'matakuliah.id=kelas_kuliah.matakuliah_id', 'left')
                 ->join('prodi', 'prodi.id_prodi=kelas_kuliah.id_prodi', 'left')
                 ->join('matakuliah_kurikulum', 'matakuliah_kurikulum.matakuliah_id=matakuliah.id', 'left')
