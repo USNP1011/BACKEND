@@ -3,6 +3,7 @@
 namespace App\Controllers\Api;
 
 use App\Entities\Mahasiswa as EntitiesMahasiswa;
+use App\Libraries\Rest;
 use App\Models\AnggotaAktivitasModel;
 use App\Models\MahasiswaLulusDOModel;
 use App\Models\MahasiswaModel;
@@ -19,6 +20,8 @@ use CodeIgniter\Database\Exceptions\DatabaseException;
 
 class Mahasiswa extends ResourceController
 {
+    protected $api;
+    protected $token;
     public function __construct()
     {
         helper('semester');
@@ -131,6 +134,7 @@ class Mahasiswa extends ResourceController
             ->where('id_jenis_aktivitas_mahasiswa', '2')
             ->first();
         $item->nomor_ijazah = $itemLulus->nomor_ijazah;
+        $item->nama_program_studi = $itemMahasiswa->nama_program_studi;
         $item->jenjang = $itemMahasiswa->jenjang;
         $item->nama_mahasiswa = $itemMahasiswa->nama_mahasiswa;
         $item->tempat_lahir = $itemMahasiswa->tempat_lahir;
@@ -168,8 +172,68 @@ class Mahasiswa extends ResourceController
         ]);
     }
 
-    public function pelengkap($id = null)
+    public function updateTranskrip($id = null)
     {
+        $this->api = new Rest();
+        $this->token = $this->api->getToken()->data->token;
+
+        
+        $object = new \App\Models\TranskripModel();
+        $matakuliah = new \App\Models\MatakuliahModel();
+        $transfer = new \App\Models\NilaiTransferModel();
+        $kelas = new \App\Models\KelasKuliahModel();
+        $konversi = new \App\Models\KonversiKampusMerdekaModel();
+        $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
+        $conn = \Config\Database::connect();
+        try {
+            $data = $this->api->getData('GetTranskripMahasiswa', $this->token, "", "id_registrasi_mahasiswa", 10000, 10000);
+            $conn->transException(true)->transStart();
+            $dataUpdate = [];
+            foreach ($data->data as $key => $value) {
+                $itemMatakuliah = $matakuliah->where('id_matkul', $value->id_matkul)->first();
+                $itemRiwayat = $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
+                $itemUpdate = [
+                    'id' => Uuid::uuid4()->toString(),
+                    'id_riwayat_pendidikan' => $itemRiwayat->id,
+                    'matakuliah_id' => $itemMatakuliah->id,
+                    'nilai_angka' => $value->nilai_angka,
+                    'nilai_indeks' => $value->nilai_indeks,
+                    'nilai_huruf' => $value->nilai_huruf,
+                    'status_sync' => 'sudah sync'
+
+                ];
+                if (!is_null($value->id_kelas_kuliah)) {
+                    $item = $kelas->where('id_kelas_kuliah', $value->id_kelas_kuliah)->first();
+                    if (!is_null($item)) {
+                        $itemUpdate['kelas_kuliah_id'] = $item->id;
+                        $itemUpdate['konversi_kampus_merdeka_id'] = null;
+                        $itemUpdate['nilai_transfer_id'] = null;
+                    }
+                } else if (!is_null($value->id_konversi_aktivitas)) {
+                    $item = $konversi->where('id_konversi_aktivitas', $value->id_konversi_aktivitas)->first();
+                    if (!is_null($item)) {
+                        $itemUpdate['konversi_kampus_merdeka_id'] = $item->id;
+                        $itemUpdate['kelas_kuliah_id'] = null;
+                        $itemUpdate['nilai_transfer_id'] = null;
+                    }
+                } else if (!is_null($value->id_nilai_transfer)) {
+                    $item = $transfer->where('id_transfer', $value->id_nilai_transfer)->first();
+                    if (!is_null($item)) {
+                        $itemUpdate['nilai_transfer_id'] = $item->id;
+                        $itemUpdate['konversi_kampus_merdeka_id'] = null;
+                        $itemUpdate['kelas_kuliah_id'] = null;
+                    }
+                }
+                $model = new \App\Entities\TranskripEntity();
+                $model->fill($itemUpdate);
+                $object->insert($model);
+            }
+            $conn->transComplete();
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage());
+        }
+
+
         $aktivitas = new AnggotaAktivitasModel();
         $mahasiswa = new RiwayatPendidikanMahasiswaModel();
         $lulus = new MahasiswaLulusDOModel();
