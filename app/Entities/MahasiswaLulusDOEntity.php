@@ -3,7 +3,6 @@
 namespace App\Entities;
 
 use CodeIgniter\Entity\Entity;
-use Ramsey\Uuid\Uuid;
 
 class MahasiswaLulusDOEntity extends Entity
 {
@@ -12,5 +11,4 @@ class MahasiswaLulusDOEntity extends Entity
     ];
     protected $dates   = ['tanggal_keluar', 'tanggal_sk_yudisium', 'bulan_awal_bimbingan', 'bulan_akhir_bimbingan', 'sync_at', 'created_at', 'updated_at', 'deleted_at'];
     protected $casts   = [];
-    
 }

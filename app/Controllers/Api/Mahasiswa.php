@@ -3,6 +3,8 @@
 namespace App\Controllers\Api;
 
 use App\Entities\Mahasiswa as EntitiesMahasiswa;
+use App\Models\AnggotaAktivitasModel;
+use App\Models\MahasiswaLulusDOModel;
 use App\Models\MahasiswaModel;
 use App\Models\MatakuliahKurikulumModel;
 use App\Models\NilaiTransferModel;
@@ -141,6 +143,26 @@ class Mahasiswa extends ResourceController
         return $this->respond([
             'status' => true,
             'data' => $itemMatakuliah
+        ]);
+    }
+
+    public function pelengkap($id=null) {
+        $aktivitas = new AnggotaAktivitasModel();
+        $mahasiswa = new RiwayatPendidikanMahasiswaModel();
+        $lulus = new MahasiswaLulusDOModel();
+        $itemMahasiswa = $mahasiswa->where('id_mahasiswa', $id)->first();
+        $itemLulus = $lulus->where('id_riwayat_pendidikan', $itemMahasiswa->id)->first();
+        $item = $aktivitas->select("aktivitas_mahasiswa.judul")->join("aktivitas_mahasiswa", "aktivitas_mahasiswa.id=anggota_aktivitas.aktivitas_mahasiswa_id", "LEFT")
+        ->where("id_riwayat_pendidikan", $itemMahasiswa->id)
+        ->where('id_jenis_aktivitas_mahasiswa', '2')
+        ->first();
+        $item->nomor_ijazah = $itemLulus->nomor_ijazah;
+        $item->tanggal_keluar = $itemLulus->tanggal_keluar;
+        $item->warek = "JIM LAHALLO, ST., M.M.S.I";
+        $item->nidn = "1418058001";
+        return $this->respond([
+            'status' => true,
+            'data' => $item
         ]);
     }
 

@@ -11,7 +11,7 @@ use App\Libraries\Rest;
 use App\Models\PerguruanTinggiModel;
 use Ramsey\Uuid\Uuid;
 use CodeIgniter\HTTP\ResponseInterface;
-
+use DateTime;
 
 class GetData extends BaseController
 {
@@ -458,11 +458,13 @@ class GetData extends BaseController
             $data = $this->api->getData('GetListAktivitasMahasiswa', $this->token);
         }
         foreach ($data->data as $key => $value) {
-            $value->id = Uuid::uuid4()->toString();
-            $value->id_jenis_aktivitas_mahasiswa = $value->id_jenis_aktivitas;
-            $tanggal = explode('-', $value->tanggal_sk_tugas);
-            $value->tanggal_sk_tugas = $value->tanggal_sk_tugas != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
-            $aktivitasMahasiswa->insert($value);
+            if ($aktivitasMahasiswa->where('id_aktivitas', $value->id_aktivitas)->countAllResults() == 0) {
+                $value->id = Uuid::uuid4()->toString();
+                $value->id_jenis_aktivitas_mahasiswa = $value->id_jenis_aktivitas;
+                $tanggal = explode('-', $value->tanggal_sk_tugas);
+                $value->tanggal_sk_tugas = $value->tanggal_sk_tugas != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
+                $aktivitasMahasiswa->insert($value);
+            }
         }
     }
 
@@ -483,7 +485,9 @@ class GetData extends BaseController
                 $value->aktivitas_mahasiswa_id = $itemAktivitas->id;
                 $itemRiwayat = $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
                 $value->id_riwayat_pendidikan = $itemRiwayat->id;
-                $anggotaAktivitasMahasiswa->insert($value);
+                if ($anggotaAktivitasMahasiswa->where('aktivitas_mahasiswa_id', $itemAktivitas->id)->where("id_riwayat_pendidikan", $itemRiwayat->id)->where('jenis_peran', $value->jenis_peran)->countAllResults() == 0) {
+                    $anggotaAktivitasMahasiswa->insert($value);
+                }
             }
         } catch (\Throwable $th) {
             echo $th->getMessage();
@@ -500,10 +504,12 @@ class GetData extends BaseController
             $data = $this->api->getData('GetListBimbingMahasiswa', $this->token);
         }
         foreach ($data->data as $key => $value) {
-            $value->id = Uuid::uuid4()->toString();
-            $itemAktivitas = $aktivitas->where('id_aktivitas', $value->id_aktivitas)->first();
-            $value->aktivitas_mahasiswa_id = $itemAktivitas->id;
-            $bimbingMahasiswa->insert($value);
+            if($bimbingMahasiswa->where('id_bimbing_mahasiswa', $value->id_bimbing_mahasiswa)->countAllResults()==0){
+                $value->id = Uuid::uuid4()->toString();
+                $itemAktivitas = $aktivitas->where('id_aktivitas', $value->id_aktivitas)->first();
+                $value->aktivitas_mahasiswa_id = $itemAktivitas->id;
+                $bimbingMahasiswa->insert($value);
+            }
         }
     }
 
@@ -517,10 +523,12 @@ class GetData extends BaseController
             $data = $this->api->getData('GetListUjiMahasiswa', $this->token);
         }
         foreach ($data->data as $key => $value) {
-            $value->id = Uuid::uuid4()->toString();
-            $itemAktivitas = $aktivitas->where('id_aktivitas', $value->id_aktivitas)->first();
-            $value->aktivitas_mahasiswa_id = $itemAktivitas->id;
-            $ujiMahasiswa->insert($value);
+            if($ujiMahasiswa->where('id_uji', $value->id_uji)->countAllResults()==0){
+                $value->id = Uuid::uuid4()->toString();
+                $itemAktivitas = $aktivitas->where('id_aktivitas', $value->id_aktivitas)->first();
+                $value->aktivitas_mahasiswa_id = $itemAktivitas->id;
+                $ujiMahasiswa->insert($value);
+            }
         }
     }
 
@@ -815,7 +823,7 @@ class GetData extends BaseController
                     if ($value->id_kelas_kuliah == $itemKelas->id_kelas_kuliah)
                         $cek = true;
                 }
-                if(!$cek){
+                if (!$cek) {
                     $value->id = Uuid::uuid4()->toString();
                     $tanggal = explode('-', $value->tanggal_mulai_efektif);
                     $value->tanggal_mulai_efektif = $value->tanggal_mulai_efektif != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
@@ -1050,7 +1058,7 @@ class GetData extends BaseController
         $mhs = new \App\Models\MahasiswaLulusDOModel();
         $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
         $dataRiwayat = $riwayat->findAll();
-        $data = $this->api->getData('GetDetailMahasiswaLulusDO', $this->token, "");
+        $data = $this->api->getData('GetDetailMahasiswaLulusDO', $this->token,"");
         $tempArray = [];
         foreach ($data->data as $obj) {
             $tempArray[$obj->{'id_registrasi_mahasiswa'}] = $obj;
@@ -1063,7 +1071,10 @@ class GetData extends BaseController
             foreach ($dataRiwayat as $key => $value) {
                 if ($valueLulus->id_registrasi_mahasiswa == $value->id_registrasi_mahasiswa) {
                     $valueLulus->id_riwayat_pendidikan =  $value->id;
-                    $mhs->insert($valueLulus);
+                    $tanggal = DateTime::createFromFormat('d-m-Y', $valueLulus->tanggal_keluar);
+                    $valueLulus->tanggal_keluar = $tanggal->format('Y-m-d');
+                    $valueLulus->tanggal_sk_yudisium = $valueLulus->tanggal_keluar;
+                    $mhs->save($valueLulus);
                 }
             }
         }
