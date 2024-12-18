@@ -151,8 +151,9 @@ class Mahasiswa extends ResourceController
         $kurikulum = new MatakuliahKurikulumModel();
         $itemMatakuliah = $kurikulum
             ->select("matakuliah_kurikulum.matakuliah_id, matakuliah_kurikulum.kode_mata_kuliah, matakuliah_kurikulum.nama_mata_kuliah, matakuliah_kurikulum.sks_mata_kuliah")
+            ->join('kurikulum', 'kurikulum.id=matakuliah_kurikulum.kurikulum_id', 'left')
             ->orderBy('matakuliah_kurikulum.semester', 'asc')
-            ->where('id_prodi', $itemMahasiswa->id_prodi)->findAll();
+            ->where('kurikulum.id_prodi', $itemMahasiswa->id_prodi)->findAll();
         $object = new TranskripModel();
         $nilai = $object->select('matakuliah.id, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, transkrip.nilai_angka, transkrip.nilai_huruf, transkrip.nilai_indeks, (matakuliah.sks_mata_kuliah*transkrip.nilai_indeks) as nxsks')->join('matakuliah', 'matakuliah.id=transkrip.matakuliah_id', 'left')->where('id_riwayat_pendidikan', $itemMahasiswa->id)->findAll();
         foreach ($itemMatakuliah as $key => $matakuliah) {
@@ -167,7 +168,7 @@ class Mahasiswa extends ResourceController
                 }
             }
         }
-        $item->detail = $nilai;
+        $item->detail = $itemMatakuliah;
         return $this->respond([
             'status' => true,
             'data' => $item
@@ -236,7 +237,7 @@ class Mahasiswa extends ResourceController
             $conn->transComplete();
 
 
-            
+
             $aktivitas = new AnggotaAktivitasModel();
             $lulus = new MahasiswaLulusDOModel();
             $mahasiswa = new RiwayatPendidikanMahasiswaModel();
