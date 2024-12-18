@@ -119,7 +119,7 @@ class Mahasiswa extends ResourceController
         $itemMahasiswa = $mahasiswa->where('id_mahasiswa', $id)->first();
         $kurikulum = new MatakuliahKurikulumModel();
         $itemMatakuliah = $kurikulum
-            ->select("matakuliah_kurikulum.matakuliah_id, matakuliah_kurikulum.kode_mata_kuliah, matakuliah_kurikulum.nama_mata_kuliah, matakuliah_kurikulum.sks_mata_kuliah")
+            ->select("matakuliah_kurikulum.matakuliah_id, matakuliah_kurikulum.kode_mata_kuliah, matakuliah_kurikulum.nama_mata_kuliah, matakuliah_kurikulum.sks_mata_kuliah")->orderBy('matakuliah_kurikulum.kode_mata_kuliah', 'asc')
             ->where('id_prodi', $itemMahasiswa->id_prodi)->findAll();
         // if (is_null($id)) $profile = getProfile();
         // else $profile = getProfileByMahasiswa($id);
