@@ -234,7 +234,60 @@ class Mahasiswa extends ResourceController
                 $object->insert($model);
             }
             $conn->transComplete();
-            $this->transkrip($id);
+
+
+            
+            $aktivitas = new AnggotaAktivitasModel();
+            $lulus = new MahasiswaLulusDOModel();
+            $mahasiswa = new RiwayatPendidikanMahasiswaModel();
+            $itemMahasiswa = $mahasiswa
+                ->select("riwayat_pendidikan_mahasiswa.*, mahasiswa.tempat_lahir, mahasiswa.tanggal_lahir, mahasiswa.nama_mahasiswa, prodi.nama_program_studi, prodi.jenjang")
+                ->join("mahasiswa", "mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa", "LEFT")
+                ->join("prodi", "prodi.id_prodi=riwayat_pendidikan_mahasiswa.id_prodi", "left")
+                ->where('riwayat_pendidikan_mahasiswa.id_mahasiswa', $id)->first();
+            $itemLulus = $lulus->where('id_riwayat_pendidikan', $itemMahasiswa->id)->first();
+            $item = $aktivitas->select("aktivitas_mahasiswa.judul")->join("aktivitas_mahasiswa", "aktivitas_mahasiswa.id=anggota_aktivitas.aktivitas_mahasiswa_id", "LEFT")
+                ->where("id_riwayat_pendidikan", $itemMahasiswa->id)
+                ->where('id_jenis_aktivitas_mahasiswa', '2')
+                ->first();
+            if (is_null($item)) {
+                $item = new stdClass();
+            }
+            $item->nomor_ijazah = !is_null($itemLulus) ? $itemLulus->nomor_ijazah : null;
+            $item->nama_program_studi = $itemMahasiswa->nama_program_studi;
+            $item->jenjang = $itemMahasiswa->jenjang;
+            $item->nama_mahasiswa = $itemMahasiswa->nama_mahasiswa;
+            $item->tempat_lahir = $itemMahasiswa->tempat_lahir;
+            $item->tanggal_lahir = $itemMahasiswa->tanggal_lahir;
+            $item->nim = $itemMahasiswa->nim;
+            $item->tanggal_keluar = !is_null($itemLulus) ? $itemLulus->tanggal_keluar : date('Y-m-d');
+            $item->warek = "JIM LAHALLO, ST., M.M.S.I";
+            $item->nidn = "1418058001";
+
+            $kurikulum = new MatakuliahKurikulumModel();
+            // $itemMatakuliah = $kurikulum
+            //     ->select("matakuliah_kurikulum.matakuliah_id, matakuliah_kurikulum.kode_mata_kuliah, matakuliah_kurikulum.nama_mata_kuliah, matakuliah_kurikulum.sks_mata_kuliah")
+            //     ->orderBy('matakuliah_kurikulum.semester', 'asc')
+            //     ->where('id_prodi', $itemMahasiswa->id_prodi)->findAll();
+            $object = new TranskripModel();
+            $nilai = $object->select('matakuliah.id, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, transkrip.nilai_angka, transkrip.nilai_huruf, transkrip.nilai_indeks, (matakuliah.sks_mata_kuliah*transkrip.nilai_indeks) as nxsks')->join('matakuliah', 'matakuliah.id=transkrip.matakuliah_id', 'left')->where('id_riwayat_pendidikan', $itemMahasiswa->id)->findAll();
+            // foreach ($itemMatakuliah as $key => $matakuliah) {
+            //     $matakuliah->nilai_angka = null;
+            //     $matakuliah->nilai_huruf = null;
+            //     $matakuliah->nilai_indeks = null;
+            //     foreach ($nilai as $key => $value) {
+            //         if ($matakuliah->matakuliah_id == $value->id) {
+            //             $matakuliah->nilai_angka = $value->nilai_angka;
+            //             $matakuliah->nilai_huruf = $value->nilai_huruf;
+            //             $matakuliah->nilai_indeks = $value->nilai_indeks;
+            //         }
+            //     }
+            // }
+            $item->detail = $nilai;
+            return $this->respond([
+                'status' => true,
+                'data' => $item
+            ]);
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage());
         }
