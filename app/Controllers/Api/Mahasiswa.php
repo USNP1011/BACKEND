@@ -119,15 +119,18 @@ class Mahasiswa extends ResourceController
         $itemMahasiswa = $mahasiswa->where('id_mahasiswa', $id)->first();
         $kurikulum = new MatakuliahKurikulumModel();
         $itemMatakuliah = $kurikulum
-        ->select("matakuliah_kurikulum.kode_mata_kuliah, matakuliah_kurikulum.nama_mata_kuliah, matakuliah_kurikulum.sks_mata_kuliah")
-        ->where('id_prodi', $itemMahasiswa->id_prodi)->findAll();
+            ->select("matakuliah_kurikulum.matakuliah_id, matakuliah_kurikulum.kode_mata_kuliah, matakuliah_kurikulum.nama_mata_kuliah, matakuliah_kurikulum.sks_mata_kuliah")
+            ->where('id_prodi', $itemMahasiswa->id_prodi)->findAll();
         // if (is_null($id)) $profile = getProfile();
         // else $profile = getProfileByMahasiswa($id);
         $object = new TranskripModel();
-        $nilai = $object->select('matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, transkrip.nilai_angka, transkrip.nilai_huruf, transkrip.nilai_indeks, (matakuliah.sks_mata_kuliah*transkrip.nilai_indeks) as nxsks')->join('matakuliah', 'matakuliah.id=transkrip.matakuliah_id', 'left')->where('id_riwayat_pendidikan', $itemMahasiswa->id)->findAll();
+        $nilai = $object->select('matakuliah.id, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, transkrip.nilai_angka, transkrip.nilai_huruf, transkrip.nilai_indeks, (matakuliah.sks_mata_kuliah*transkrip.nilai_indeks) as nxsks')->join('matakuliah', 'matakuliah.id=transkrip.matakuliah_id', 'left')->where('id_riwayat_pendidikan', $itemMahasiswa->id)->findAll();
         foreach ($itemMatakuliah as $key => $matakuliah) {
+            $matakuliah->nilai_angka = null;
+            $matakuliah->nilai_huruf = null;
+            $matakuliah->nilai_indeks = null;
             foreach ($nilai as $key => $value) {
-                if($matakuliah->matakuliah_id == $value->matakuliah_id){
+                if ($matakuliah->matakuliah_id == $value->id) {
                     $matakuliah->nilai_angka = $value->nilai_angka;
                     $matakuliah->nilai_huruf = $value->nilai_huruf;
                     $matakuliah->nilai_indeks = $value->nilai_indeks;
@@ -257,7 +260,7 @@ class Mahasiswa extends ResourceController
                 ->orLike('prodi.nama_program_studi', $param->cari)
                 ->groupEnd()
                 ->orderBy(isset($param->order) && $param->order->field != "" ? $param->order->field : 'mahasiswa.created_at', isset($param->order) && $param->order->field != "" ? $param->order->direction : 'desc')
-                
+
                 ->paginate($param->count, 'default', $param->page),
             'pager' => $object->pager->getDetails()
         ];
