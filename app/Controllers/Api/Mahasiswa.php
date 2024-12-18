@@ -4,16 +4,16 @@ namespace App\Controllers\Api;
 
 use App\Entities\Mahasiswa as EntitiesMahasiswa;
 use App\Models\MahasiswaModel;
+use App\Models\MatakuliahKurikulumModel;
 use App\Models\NilaiTransferModel;
 use App\Models\PerkuliahanMahasiswaModel;
 use App\Models\PesertaKelasModel;
 use App\Models\RiwayatPendidikanMahasiswaModel;
-use App\Models\UserRoleModel;
+use App\Models\TranskripModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use Ramsey\Uuid\Uuid;
 use CodeIgniter\Database\Exceptions\DatabaseException;
-use CodeIgniter\Shield\Entities\User;
 
 class Mahasiswa extends ResourceController
 {
@@ -110,6 +110,33 @@ class Mahasiswa extends ResourceController
                 ->join("prodi", "riwayat_pendidikan_mahasiswa.id_prodi=prodi.id_prodi", "LEFT")
                 ->join("jenis_transportasi", "jenis_transportasi.id_alat_transportasi=mahasiswa.id_alat_transportasi", "LEFT")
                 ->where('id_user', $id)->first()
+        ]);
+    }
+
+    public function transkrip($id = null)
+    {
+        $mahasiswa = new RiwayatPendidikanMahasiswaModel();
+        $itemMahasiswa = $mahasiswa->where('id_mahasiswa', $id)->first();
+        $kurikulum = new MatakuliahKurikulumModel();
+        $itemMatakuliah = $kurikulum
+        ->select("matakuliah_kurikulum.kode_mata_kuliah, matakuliah_kurikulum.nama_mata_kuliah, matakuliah_kurikulum.sks_mata_kuliah")
+        ->where('id_prodi', $itemMahasiswa->id_prodi)->findAll();
+        // if (is_null($id)) $profile = getProfile();
+        // else $profile = getProfileByMahasiswa($id);
+        $object = new TranskripModel();
+        $nilai = $object->select('matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, transkrip.nilai_angka, transkrip.nilai_huruf, transkrip.nilai_indeks, (matakuliah.sks_mata_kuliah*transkrip.nilai_indeks) as nxsks')->join('matakuliah', 'matakuliah.id=transkrip.matakuliah_id', 'left')->where('id_riwayat_pendidikan', $itemMahasiswa->id)->findAll();
+        foreach ($itemMatakuliah as $key => $matakuliah) {
+            foreach ($nilai as $key => $value) {
+                if($matakuliah->matakuliah_id == $value->matakuliah_id){
+                    $matakuliah->nilai_angka = $value->nilai_angka;
+                    $matakuliah->nilai_huruf = $value->nilai_huruf;
+                    $matakuliah->nilai_indeks = $value->nilai_indeks;
+                }
+            }
+        }
+        return $this->respond([
+            'status' => true,
+            'data' => $itemMatakuliah
         ]);
     }
 
