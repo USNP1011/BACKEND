@@ -117,8 +117,29 @@ class Mahasiswa extends ResourceController
 
     public function transkrip($id = null)
     {
+        $aktivitas = new AnggotaAktivitasModel();
+        $lulus = new MahasiswaLulusDOModel();
         $mahasiswa = new RiwayatPendidikanMahasiswaModel();
-        $itemMahasiswa = $mahasiswa->where('id_mahasiswa', $id)->first();
+        $itemMahasiswa = $mahasiswa
+            ->select("riwayat_pendidikan_mahasiswa.*, mahasiswa.tempat_lahir, mahasiswa.tanggal_lahir, mahasiswa.nama_mahasiswa, prodi.nama_program_studi, prodi.jenjang")
+            ->join("mahasiswa", "mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa", "LEFT")
+            ->join("prodi", "prodi.id_prodi=riwayat_pendidikan_mahasiswa.id_prodi", "left")
+            ->where('riwayat_pendidikan_mahasiswa.id_mahasiswa', $id)->first();
+        $itemLulus = $lulus->where('id_riwayat_pendidikan', $itemMahasiswa->id)->first();
+        $item = $aktivitas->select("aktivitas_mahasiswa.judul")->join("aktivitas_mahasiswa", "aktivitas_mahasiswa.id=anggota_aktivitas.aktivitas_mahasiswa_id", "LEFT")
+            ->where("id_riwayat_pendidikan", $itemMahasiswa->id)
+            ->where('id_jenis_aktivitas_mahasiswa', '2')
+            ->first();
+        $item->nomor_ijazah = $itemLulus->nomor_ijazah;
+        $item->jenjang = $itemMahasiswa->jenjang;
+        $item->nama_mahasiswa = $itemMahasiswa->nama_mahasiswa;
+        $item->tempat_lahir = $itemMahasiswa->tempat_lahir;
+        $item->tanggal_lahir = $itemMahasiswa->tanggal_lahir;
+        $item->nim = $itemMahasiswa->nim;
+        $item->tanggal_keluar = $itemLulus->tanggal_keluar;
+        $item->warek = "JIM LAHALLO, ST., M.M.S.I";
+        $item->nidn = "1418058001";
+
         $kurikulum = new MatakuliahKurikulumModel();
         $itemMatakuliah = $kurikulum
             ->select("matakuliah_kurikulum.matakuliah_id, matakuliah_kurikulum.kode_mata_kuliah, matakuliah_kurikulum.nama_mata_kuliah, matakuliah_kurikulum.sks_mata_kuliah")
@@ -140,22 +161,24 @@ class Mahasiswa extends ResourceController
                 }
             }
         }
+        $item->detail = $itemMatakuliah;
         return $this->respond([
             'status' => true,
-            'data' => $itemMatakuliah
+            'data' => $item
         ]);
     }
 
-    public function pelengkap($id=null) {
+    public function pelengkap($id = null)
+    {
         $aktivitas = new AnggotaAktivitasModel();
         $mahasiswa = new RiwayatPendidikanMahasiswaModel();
         $lulus = new MahasiswaLulusDOModel();
         $itemMahasiswa = $mahasiswa->where('id_mahasiswa', $id)->first();
         $itemLulus = $lulus->where('id_riwayat_pendidikan', $itemMahasiswa->id)->first();
         $item = $aktivitas->select("aktivitas_mahasiswa.judul")->join("aktivitas_mahasiswa", "aktivitas_mahasiswa.id=anggota_aktivitas.aktivitas_mahasiswa_id", "LEFT")
-        ->where("id_riwayat_pendidikan", $itemMahasiswa->id)
-        ->where('id_jenis_aktivitas_mahasiswa', '2')
-        ->first();
+            ->where("id_riwayat_pendidikan", $itemMahasiswa->id)
+            ->where('id_jenis_aktivitas_mahasiswa', '2')
+            ->first();
         $item->nomor_ijazah = $itemLulus->nomor_ijazah;
         $item->tanggal_keluar = $itemLulus->tanggal_keluar;
         $item->warek = "JIM LAHALLO, ST., M.M.S.I";
