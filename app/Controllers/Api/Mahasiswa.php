@@ -167,7 +167,7 @@ class Mahasiswa extends ResourceController
                 }
             }
         }
-        $item->detail = $itemMatakuliah;
+        $item->detail = $nilai;
         return $this->respond([
             'status' => true,
             'data' => $item
