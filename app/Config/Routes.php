@@ -186,6 +186,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
         $routes->get('(:hash)/krsm', 'Mahasiswa::krsm/$1', ['filter' => 'auth']);
         $routes->get('(:hash)/aktivitas_kuliah', 'Mahasiswa::aktivitasKuliah/$1', ['filter' => 'auth']);
         $routes->get('(:hash)/transkrip', 'Mahasiswa::transkrip/$1', ['filter' => 'general']);
+        $routes->get('(:hash)/update_transkrip', 'Mahasiswa::updateTranskrip/$1', ['filter' => 'general']);
         $routes->post('', 'Mahasiswa::create', ['filter' => 'auth']);
         $routes->put('', 'Mahasiswa::update', ['filter' => 'auth']);
         $routes->delete('(:hash)', 'Mahasiswa::delete/$1', ['filter' => 'auth']);

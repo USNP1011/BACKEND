@@ -16,6 +16,7 @@ class ProdiModel extends Model
 		'status',
 		'id_jenjang_pendidikan',
 		'id_perguruan_tinggi',
-		'nama_jenjang_pendidikan'
+		'nama_jenjang_pendidikan',
+        'jenjang'
     ];
 }

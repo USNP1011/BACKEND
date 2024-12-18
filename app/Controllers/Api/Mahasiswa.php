@@ -17,6 +17,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use Ramsey\Uuid\Uuid;
 use CodeIgniter\Database\Exceptions\DatabaseException;
+use stdClass;
 
 class Mahasiswa extends ResourceController
 {
@@ -133,14 +134,17 @@ class Mahasiswa extends ResourceController
             ->where("id_riwayat_pendidikan", $itemMahasiswa->id)
             ->where('id_jenis_aktivitas_mahasiswa', '2')
             ->first();
-        $item->nomor_ijazah = $itemLulus->nomor_ijazah;
+        if (is_null($item)) {
+            $item = new stdClass();
+        }
+        $item->nomor_ijazah = !is_null($itemLulus) ? $itemLulus->nomor_ijazah : null;
         $item->nama_program_studi = $itemMahasiswa->nama_program_studi;
         $item->jenjang = $itemMahasiswa->jenjang;
         $item->nama_mahasiswa = $itemMahasiswa->nama_mahasiswa;
         $item->tempat_lahir = $itemMahasiswa->tempat_lahir;
         $item->tanggal_lahir = $itemMahasiswa->tanggal_lahir;
         $item->nim = $itemMahasiswa->nim;
-        $item->tanggal_keluar = $itemLulus->tanggal_keluar;
+        $item->tanggal_keluar = !is_null($itemLulus) ? $itemLulus->tanggal_keluar : date('Y-m-d');
         $item->warek = "JIM LAHALLO, ST., M.M.S.I";
         $item->nidn = "1418058001";
 
@@ -149,8 +153,6 @@ class Mahasiswa extends ResourceController
             ->select("matakuliah_kurikulum.matakuliah_id, matakuliah_kurikulum.kode_mata_kuliah, matakuliah_kurikulum.nama_mata_kuliah, matakuliah_kurikulum.sks_mata_kuliah")
             ->orderBy('matakuliah_kurikulum.semester', 'asc')
             ->where('id_prodi', $itemMahasiswa->id_prodi)->findAll();
-        // if (is_null($id)) $profile = getProfile();
-        // else $profile = getProfileByMahasiswa($id);
         $object = new TranskripModel();
         $nilai = $object->select('matakuliah.id, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, transkrip.nilai_angka, transkrip.nilai_huruf, transkrip.nilai_indeks, (matakuliah.sks_mata_kuliah*transkrip.nilai_indeks) as nxsks')->join('matakuliah', 'matakuliah.id=transkrip.matakuliah_id', 'left')->where('id_riwayat_pendidikan', $itemMahasiswa->id)->findAll();
         foreach ($itemMatakuliah as $key => $matakuliah) {
@@ -177,7 +179,9 @@ class Mahasiswa extends ResourceController
         $this->api = new Rest();
         $this->token = $this->api->getToken()->data->token;
 
-        
+        $mahasiswa = new RiwayatPendidikanMahasiswaModel();
+        $itemMahasiswa = $mahasiswa->where('id_mahasiswa', $id)->first();
+
         $object = new \App\Models\TranskripModel();
         $matakuliah = new \App\Models\MatakuliahModel();
         $transfer = new \App\Models\NilaiTransferModel();
@@ -186,9 +190,10 @@ class Mahasiswa extends ResourceController
         $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
         $conn = \Config\Database::connect();
         try {
-            $data = $this->api->getData('GetTranskripMahasiswa', $this->token, "", "id_registrasi_mahasiswa", 10000, 10000);
+            $data = $this->api->getData('GetTranskripMahasiswa', $this->token, "id_registrasi_mahasiswa='" . $itemMahasiswa->id_registrasi_mahasiswa . "'");
             $conn->transException(true)->transStart();
             $dataUpdate = [];
+            $object->where("id_riwayat_pendidikan", $itemMahasiswa->id)->delete();
             foreach ($data->data as $key => $value) {
                 $itemMatakuliah = $matakuliah->where('id_matkul', $value->id_matkul)->first();
                 $itemRiwayat = $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
