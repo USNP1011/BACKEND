@@ -11,7 +11,7 @@ class Sync extends BaseController
     protected $api;
     public function __construct()
     {
-        set_time_limit(3600);
+        set_time_limit(0);
         try {
             $this->api = new Rest();
             $this->token = $this->api->getToken()->data->token;
@@ -637,7 +637,7 @@ class Sync extends BaseController
             LEFT JOIN mahasiswa on mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa
             LEFT JOIN kelas_kuliah on kelas_kuliah.id=peserta_kelas.kelas_kuliah_id 
             WHERE if(nilai_kelas.status_sync is null AND nilai_kelas.deleted_at is null, 'insert', if(nilai_kelas.status_sync is not null AND nilai_kelas.deleted_at is null and nilai_kelas.sync_at<nilai_kelas.updated_at, 'update', if(nilai_kelas.status_sync is not null and nilai_kelas.deleted_at is not null and nilai_kelas.sync_at<nilai_kelas.deleted_at,'delete', null))) IS NOT NULL")->getResult();
-            $batchSize = 100; // Ukuran batch yang lebih kecil
+            $batchSize = 20; // Ukuran batch yang lebih kecil
             foreach (array_chunk($data, $batchSize) as $batch) {
                 foreach ($batch as $key => $value) {
                     $key = (object) [
@@ -651,7 +651,7 @@ class Sync extends BaseController
                     ];
                     $result = $this->api->updateData('UpdateNilaiPerkuliahanKelas', $this->token, $setData, $key);
                     if ($result->error_code == "0") {
-                        $query = "UPDATE nilai_kelas SET sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id_nilai_kelas . "'";
+                        $query = "UPDATE nilai_kelas SET sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id_nilai_kelas = '" . $value->id_nilai_kelas . "'";
                         $object->query($query);
                         $record['berhasil'][] = $key;
                     } else {
