@@ -396,9 +396,33 @@ class Sync extends BaseController
                         }
                     }
                 } else if ($value->set_sync == 'update') {
-                    $query = "UPDATE dosen_pengajar_kelas SET sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
-                    $object->query($query);
-                    $record['berhasil'][] = $item;
+                    if ($value->kelas_id == '1') {
+                        $setData = (object) $item;
+                        $key = (object) ['id_aktivitas_mengajar' => $value->id_aktivitas_mengajar];
+                        $result = $this->api->updateData('UpdateDosenPengajarKelasKuliah', $this->token, $setData, $key);
+                        if ($result->error_code == "0") {
+                            $query = "UPDATE dosen_pengajar_kelas SET sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                            $object->query($query);
+                            $record['berhasil'][] = $item;
+                        } else {
+                            $record['gagal'][] = $item;
+                        }
+                    } else {
+                        $itemKelas = $object->query("SELECT
+                            `kelas_kuliah`.`id_kelas_kuliah`,
+                            `dosen_pengajar_kelas`.`id_aktivitas_mengajar`
+                            FROM
+                            `kelas_kuliah`
+                            LEFT JOIN `dosen_pengajar_kelas` ON `kelas_kuliah`.`id` =
+                            `dosen_pengajar_kelas`.`kelas_kuliah_id` WHERE id_kelas_kuliah = '" . $value->id_kelas_kuliah . "' AND kelas_id='1'")->getRow();
+                        if (!is_null($itemKelas) && !is_null($itemKelas->id_aktivitas_mengajar)) {
+                            $query = "UPDATE dosen_pengajar_kelas SET sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                            $object->query($query);
+                            $record['berhasil'][] = $item;
+                        } else {
+                            $record['gagal'][] = $item;
+                        }
+                    }
                 }
             }
             return $this->respond($record);
