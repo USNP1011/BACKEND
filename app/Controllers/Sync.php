@@ -11,6 +11,7 @@ class Sync extends BaseController
     protected $api;
     public function __construct()
     {
+        set_time_limit(3600);
         try {
             $this->api = new Rest();
             $this->token = $this->api->getToken()->data->token;
