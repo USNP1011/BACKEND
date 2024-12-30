@@ -20,6 +20,7 @@ class GetData extends BaseController
     protected $token;
     public function __construct()
     {
+        set_time_limit(3600);
         $this->api = new Rest();
         $this->pt = new PerguruanTinggiModel();
         try {
