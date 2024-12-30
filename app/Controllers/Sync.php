@@ -59,7 +59,7 @@ class Sync extends BaseController
                 ->join('matakuliah_kurikulum', 'matakuliah_kurikulum.matakuliah_id=matakuliah.id', 'left')
                 ->where("if(id_aktivitas_mengajar is null AND dosen_pengajar_kelas.deleted_at is null, 'insert', if(id_aktivitas_mengajar is not null AND dosen_pengajar_kelas.deleted_at is null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at, 'update', if(id_aktivitas_mengajar is not null and dosen_pengajar_kelas.deleted_at is not null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at,'delete', null))) IS NOT NULL AND dosen_pengajar_kelas.status_pengajar='Dosen'")->findAll();
 
-                // Nilai Peserta Kelas
+            // Nilai Peserta Kelas
             $object = new \App\Models\NilaiPesertaKelasModel();
             $data->nilai_peserta_kelas = $object->select("nilai_kelas.id_nilai_kelas, (if(nilai_kelas.status_sync is null AND nilai_kelas.deleted_at is null, 'insert', if(nilai_kelas.status_sync is not null AND nilai_kelas.deleted_at is null and nilai_kelas.sync_at<nilai_kelas.updated_at, 'update', if(nilai_kelas.status_sync is not null and nilai_kelas.deleted_at is not null and nilai_kelas.sync_at<nilai_kelas.deleted_at,'delete', null)))) as set_sync")->where("if(nilai_kelas.status_sync is null AND nilai_kelas.deleted_at is null, 'insert', if(nilai_kelas.status_sync is not null AND nilai_kelas.deleted_at is null and nilai_kelas.sync_at<nilai_kelas.updated_at, 'update', if(nilai_kelas.status_sync is not null and nilai_kelas.deleted_at is not null and nilai_kelas.sync_at<nilai_kelas.deleted_at,'delete', null))) IS NOT NULL")->withDeleted()->findAll();
 
@@ -289,7 +289,7 @@ class Sync extends BaseController
                         }
                     } else {
                         $itemKelas = $object->query("SELECT * FROM kelas_kuliah WHERE matakuliah_id = '" . $value->matakuliah_id . "' AND kelas_id='1' AND id_semester = '" . $semester->id_semester . "'")->getRow();
-                        if(!is_null($itemKelas) && !is_null($itemKelas->id_kelas_kuliah)){
+                        if (!is_null($itemKelas) && !is_null($itemKelas->id_kelas_kuliah)) {
                             $query = "UPDATE kelas_kuliah SET id_kelas_kuliah='" . $itemKelas->id_kelas_kuliah . "', sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
                             $object->query($query);
                             $record['berhasil'][] = $item;
@@ -471,6 +471,9 @@ class Sync extends BaseController
                         $record['gagal'][] = $value;
                     }
                 } else if ($value->set_sync == 'update') {
+                    $query = "UPDATE peserta_kelas SET sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                    $object->query($query);
+                    $record['berhasil'][] = $item;
                 } else if ($value->set_sync == 'delete') {
                     $setData = (object) $item;
                     $result = $this->api->deleteData('DeletePesertaKelasKuliah', $this->token, $setData);
@@ -478,11 +481,11 @@ class Sync extends BaseController
                         $query = "UPDATE peserta_kelas SET sync_at = null, status_sync=null WHERE id = '" . $value->id . "'";
                         $object->query($query);
                         $record['berhasil'][] = $item;
-                    } else if($result->error_code == "117" || $result->error_code == "112") {
+                    } else if ($result->error_code == "117" || $result->error_code == "112") {
                         $query = "UPDATE peserta_kelas SET sync_at = null, status_sync=null WHERE id = '" . $value->id . "'";
                         $object->query($query);
                         $record['berhasil'][] = $item;
-                    }else{
+                    } else {
                         $value->error = $result;
                         $record['gagal'][] = $value;
                     }
