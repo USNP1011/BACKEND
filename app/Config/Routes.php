@@ -406,7 +406,7 @@ $routes->group('sync', function($routes){
     $routes->get('peserta_kelas', 'Sync::syncPesertaKelas');
     $routes->get('delete_peserta_kelas', 'Sync::syncDeletePesertaKelas');
     $routes->get('perkuliahan_mahasiswa', 'Sync::syncPerkuliahanMahasiswa');
-    $routes->get('nilai_peserta_kelas', 'Sync::syncNilaiPesertaKelas');
+    $routes->post('nilai_peserta_kelas', 'Sync::syncNilaiPesertaKelas');
 });
 
 $routes->group('repair', function($routes){
