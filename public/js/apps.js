@@ -7,7 +7,7 @@ angular.module('apps', [
 ])
     .controller('indexController', indexController)
 
-function indexController($scope, $http, helperServices, dashboardServices, AuthService) {
+function indexController($scope, helperServices, dashboardServices) {
     $scope.titleHeader = "Booking Foto";
     $scope.header = "";
     $scope.proses = false;
@@ -24,36 +24,22 @@ function indexController($scope, $http, helperServices, dashboardServices, AuthS
 
     $scope.sync = (data, set) => {
         var cek = [];
-        var controller = helperServices.url + 'sync/';
         $scope.proses = true;
         $.LoadingOverlay('show');
         const batches = $scope.batchArray(data, 10);
         batches.forEach((element, index) => {
-            setTimeout(() => {
-                $http({
-                    method: 'post',
-                    url: controller + set,
-                    data: element,
-                    headers: AuthService.getHeader()
-                }).then(
-                    (res) => {
-                        $scope.hasil.nilai_peserta_kelas_berhasil += res.berhasil.length
-                        $scope.hasil.nilai_peserta_kelas_gagal += res.gagal.length
-                        console.log(res);
-                        element.forEach(elementData => {
-                            cek.push(elementData);
-                        });
-                        if(cek.length==data.length){
-                            $.LoadingOverlay('hide');
-                            $scope.proses = true;
-                        }
-                    },
-                    (err) => {
-                        console.log(err);
-                        
-                    }
-                );
-            }, 10000);
+            dashboardServices.sync(element, set).then(res => {
+                $scope.hasil.nilai_peserta_kelas_berhasil += res.berhasil.length
+                $scope.hasil.nilai_peserta_kelas_gagal += res.gagal.length
+                console.log(res);
+                element.forEach(elementData => {
+                    cek.push(elementData);
+                });
+                if(cek.length==data.length){
+                    $.LoadingOverlay('hide');
+                    $scope.proses = true;
+                }
+            })
         });
     }
 
