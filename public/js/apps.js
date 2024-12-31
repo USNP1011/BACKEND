@@ -33,7 +33,7 @@ function indexController($scope, $http, helperServices, dashboardServices) {
                 $http({
                     method: 'post',
                     url: controller + set,
-                    data: param,
+                    data: element,
                     headers: AuthService.getHeader()
                 }).then(
                     (res) => {
