@@ -53,7 +53,7 @@ function indexController($scope, $http, helperServices, dashboardServices) {
                         def.reject(err);
                     }
                 );
-            }, 1000);
+            }, 2000);
         });
     }
 
