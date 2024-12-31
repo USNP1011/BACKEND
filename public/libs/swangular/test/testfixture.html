@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Swangular Tests</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body ng-app="swangularApp">
+
+<div id="controller" ng-controller="AppCtrl as vm">
+
+    <p>{{vm.test}}</p>
+
+    <p>{{vm.preConfirmContent}}</p>
+
+    <button id="btn1" ng-click="vm.openModal1()">
+        Click me!
+    </button>
+
+    <button id="btn2" ng-click="vm.openModal2()">
+        Click me!
+    </button>
+
+    <button id="btn3" ng-click="vm.openModal3()">
+        Click me!
+    </button>
+
+    <button id="btn4" ng-click="vm.openModal4()">
+        Click me!
+    </button>
+
+    <button id="btn5" ng-click="vm.openModal5()">
+        Click me!
+    </button>
+
+    <button id="btn6" ng-click="vm.openModal6()">
+        Click me!
+    </button>
+
+    <button id="btn7" ng-click="vm.openModal7()">
+        Click me!
+    </button>
+
+    <button id="btn8" ng-click="vm.openModal8()">
+        Click me!
+    </button>
+
+    <div id="parentController" ng-controller="ParentCtrl as parent">
+        <button id="btn9" ng-click="parent.openModal9()">
+            Click me!
+        </button>
+    </div>
+
+</div>
+
+<script src="angular/angular.js"></script>
+<script src="sweetalert2/dist/sweetalert2.js"></script>
+<script src="swangular.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>

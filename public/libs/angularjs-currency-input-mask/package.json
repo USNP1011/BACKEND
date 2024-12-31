@@ -1,0 +1,68 @@
+{
+  "_from": "angularjs-currency-input-mask",
+  "_id": "angularjs-currency-input-mask@1.1.2",
+  "_inBundle": false,
+  "_integrity": "sha512-xEfoyUawKt6Wozh7ArKGZ9nKISPYXv4voeiJ+XPoazXuxaaaPSL07ZwclGl/vQavnrU/QME5r/iROryMw7jT3w==",
+  "_location": "/angularjs-currency-input-mask",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "angularjs-currency-input-mask",
+    "name": "angularjs-currency-input-mask",
+    "escapedName": "angularjs-currency-input-mask",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/angularjs-currency-input-mask/-/angularjs-currency-input-mask-1.1.2.tgz",
+  "_shasum": "9dbece4db753294f599fa9c25d9c81cae5796468",
+  "_spec": "angularjs-currency-input-mask",
+  "_where": "E:\\project\\pemesanancatering",
+  "author": {
+    "name": "iangoop@gmail.com"
+  },
+  "bugs": {
+    "url": "https://github.com/iangoop/angularjs-currency-input-mask/issues"
+  },
+  "bundleDependencies": false,
+  "deprecated": false,
+  "description": "AngularJS Multiple pattern currency input mask",
+  "devDependencies": {
+    "angular": "^1.8.0",
+    "angular-mocks": "^1.8.0",
+    "gulp": "^4.0.2",
+    "gulp-header": "^2.0.9",
+    "gulp-plumber": "^1.2.1",
+    "gulp-rename": "^2.0.0",
+    "gulp-sourcemaps": "^2.6.5",
+    "gulp-uglify": "^3.0.2",
+    "jasmine-core": "^3.6.0",
+    "karma": "^5.2.0",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-jasmine": "^4.0.1"
+  },
+  "homepage": "https://github.com/iangoop/angularjs-currency-input-mask#readme",
+  "keywords": [
+    "input",
+    "mask",
+    "currency",
+    "angularjs"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "name": "angularjs-currency-input-mask",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iangoop/angularjs-currency-input-mask.git"
+  },
+  "scripts": {
+    "build": "gulp build",
+    "test": "karma start --single-run"
+  },
+  "version": "1.1.2"
+}

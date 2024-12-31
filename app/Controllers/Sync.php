@@ -22,6 +22,10 @@ class Sync extends BaseController
             ]);
         }
     }
+    public function index() {
+        return view('sync');
+    }
+    
     public function getSync(): object
     {
         try {
