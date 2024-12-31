@@ -7,7 +7,7 @@ angular.module('apps', [
 ])
     .controller('indexController', indexController)
 
-function indexController($scope, helperServices, dashboardServices) {
+function indexController($scope, $http, helperServices, dashboardServices) {
     $scope.titleHeader = "Booking Foto";
     $scope.header = "";
     $scope.proses = false;
