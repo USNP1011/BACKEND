@@ -24,23 +24,35 @@ function indexController($scope, helperServices, dashboardServices) {
 
     $scope.sync = (data, set) => {
         var cek = [];
+        var controller = helperServices.url + 'sync/';
         $scope.proses = true;
         $.LoadingOverlay('show');
         const batches = $scope.batchArray(data, 10);
         batches.forEach((element, index) => {
             setTimeout(() => {
-                dashboardServices.sync(element, set).then(res => {
-                    $scope.hasil.nilai_peserta_kelas_berhasil += res.berhasil.length
-                    $scope.hasil.nilai_peserta_kelas_gagal += res.gagal.length
-                    console.log(res);
-                    element.forEach(elementData => {
-                        cek.push(elementData);
-                    });
-                    if(cek.length==data.length){
-                        $.LoadingOverlay('hide');
-                        $scope.proses = true;
+                $http({
+                    method: 'post',
+                    url: controller + set,
+                    data: param,
+                    headers: AuthService.getHeader()
+                }).then(
+                    (res) => {
+                        $scope.hasil.nilai_peserta_kelas_berhasil += res.berhasil.length
+                        $scope.hasil.nilai_peserta_kelas_gagal += res.gagal.length
+                        console.log(res);
+                        element.forEach(elementData => {
+                            cek.push(elementData);
+                        });
+                        if(cek.length==data.length){
+                            $.LoadingOverlay('hide');
+                            $scope.proses = true;
+                        }
+                        def.resolve(res.data);
+                    },
+                    (err) => {
+                        def.reject(err);
                     }
-                })
+                );
             }, 1000);
         });
     }
