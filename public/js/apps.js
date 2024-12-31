@@ -28,18 +28,20 @@ function indexController($scope, helperServices, dashboardServices) {
         $.LoadingOverlay('show');
         const batches = $scope.batchArray(data, 10);
         batches.forEach((element, index) => {
-            dashboardServices.sync(element, set).then(res => {
-                $scope.hasil.nilai_peserta_kelas_berhasil += res.berhasil.length
-                $scope.hasil.nilai_peserta_kelas_gagal += res.gagal.length
-                console.log(res);
-                element.forEach(elementData => {
-                    cek.push(elementData);
-                });
-                if(cek.length==data.length){
-                    $.LoadingOverlay('hide');
-                    $scope.proses = true;
-                }
-            })
+            setTimeout(() => {
+                dashboardServices.sync(element, set).then(res => {
+                    $scope.hasil.nilai_peserta_kelas_berhasil += res.berhasil.length
+                    $scope.hasil.nilai_peserta_kelas_gagal += res.gagal.length
+                    console.log(res);
+                    element.forEach(elementData => {
+                        cek.push(elementData);
+                    });
+                    if(cek.length==data.length){
+                        $.LoadingOverlay('hide');
+                        $scope.proses = true;
+                    }
+                })
+            }, 1000);
         });
     }
 
