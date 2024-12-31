@@ -47,10 +47,10 @@ function indexController($scope, $http, helperServices, dashboardServices, AuthS
                             $.LoadingOverlay('hide');
                             $scope.proses = true;
                         }
-                        def.resolve(res.data);
                     },
                     (err) => {
-                        def.reject(err);
+                        console.log(err);
+                        
                     }
                 );
             }, 2000);
