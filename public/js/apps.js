@@ -15,5 +15,6 @@ function indexController($scope, helperServices, dashboardServices) {
     $scope.warning = 0;
     dashboardServices.get().then(res=>{
         console.log(res);
+        $scope.datas = res;
     })
 }

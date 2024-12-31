@@ -27,13 +27,66 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>No</th>
                     <th>Data</th>
-                    <th>Jumlah</th>
+                    <th>Jumlah Data</th>
                     <th>Jumlah Berhasil</th>
                     <th>Jumlah Gagal</th>
                 </tr>
             </thead>
+            <tbody>
+                <tr ng-if="datas.mahasiswa.length > 0">
+                    <td>Mahasiswa</td>
+                    <td>{{datas.mahasiswa.length}}</td>
+                </tr>
+                <tr ng-if="datas.riwayat_pendidikan.length > 0">
+                    <td>Riwayat Pendidikan</td>
+                    <td>{{datas.riwayat_pendidikan.length}}</td>
+                </tr>
+                <tr ng-if="datas.nilai_transfer.length > 0">
+                    <td>Nilai Transfer</td>
+                    <td>{{datas.nilai_transfer.length}}</td>
+                </tr>
+                <tr ng-if="datas.kelas_kuliah.length > 0">
+                    <td>Kelas Kuliah</td>
+                    <td>{{datas.kelas_kuliah.length}}</td>
+                </tr>
+                <tr ng-if="datas.peserta_kelas.length > 0">
+                    <td>Peserta Kelas</td>
+                    <td>{{datas.peserta_kelas.length}}</td>
+                </tr>
+                <tr ng-if="datas.dosen_pengajar_kelas.length > 0">
+                    <td>Dosen Pengajar Kelas</td>
+                    <td>{{datas.dosen_pengajar_kelas.length}}</td>
+                </tr>
+                <tr ng-if="datas.nilai_peserta_kelas.length > 0">
+                    <td>Nilai Peserta Kelas</td>
+                    <td>{{datas.nilai_peserta_kelas.length}}</td>
+                </tr>
+                <tr ng-if="datas.aktivitas_mahasiswa.length > 0">
+                    <td>Aktivitas Mahasiswa</td>
+                    <td>{{datas.aktivitas_mahasiswa.length}}</td>
+                </tr>
+                <tr ng-if="datas.anggota_aktivitas_mahasiswa.length > 0">
+                    <td>Anggota Aktivitas Mahasiswa</td>
+                    <td>{{datas.anggota_aktivitas_mahasiswa.length}}</td>
+                </tr>
+                <tr ng-if="datas.bimbing_mahasiswa.length > 0">
+                    <td>Bimbing Mahasiswa</td>
+                    <td>{{datas.bimbing_mahasiswa.length}}</td>
+                </tr>
+                <tr ng-if="datas.uji_mahasiswa.length > 0">
+                    <td>Uji Mahasiswa</td>
+                    <td>{{datas.uji_mahasiswa.length}}</td>
+                </tr>
+                <tr ng-if="datas.mahasiswa_lulus_do.length > 0">
+                    <td>Mahasiswa Lulus DO</td>
+                    <td>{{datas.mahasiswa_lulus_do.length}}</td>
+                </tr>
+                <tr ng-if="datas.perkuliahan_mahasiswa.length > 0">
+                    <td>Perkuliahan Mahasiswa</td>
+                    <td>{{datas.perkuliahan_mahasiswa.length}}</td>
+                </tr>
+            </tbody>
         </table>
     </main>
     <footer>

@@ -25,12 +25,13 @@ class Sync extends BaseController
     public function index() {
         return view('sync');
     }
-    
+
     public function getSync(): object
     {
         try {
             $conn = \Config\Database::connect();
             $semester = getSemesterAktif();
+            $array = [];
             $data = new stdClass;
 
             // Mahasiswa

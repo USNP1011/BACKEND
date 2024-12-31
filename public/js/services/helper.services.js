@@ -5,7 +5,8 @@ function helperServices($location) {
     service.url = $location.$$protocol + '://' + $location.$$host;
     if ($location.$$port) {
         // service.url = service.url + ':' + $location.$$port + '/wisatasorong/';
-        service.url = 'https://rest.usn-papua.ac.id/';
+        service.url = service.url + ':' + $location.$$port + '/';
+        // service.url = 'https://rest.usn-papua.ac.id/';
     }
 
     // '    http://localhost:5000';
