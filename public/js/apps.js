@@ -26,7 +26,7 @@ function indexController($scope, helperServices, dashboardServices) {
         var cek = [];
         $scope.proses = true;
         $.LoadingOverlay('show');
-        const batches = $scope.batchArray(data, 10);
+        const batches = $scope.batchArray(data, 2);
         batches.forEach((element, index) => {
             dashboardServices.sync(element, set).then(res => {
                 $scope.hasil.nilai_peserta_kelas_berhasil += res.berhasil.length
