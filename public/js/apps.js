@@ -53,7 +53,7 @@ function indexController($scope, $http, helperServices, dashboardServices, AuthS
                         
                     }
                 );
-            }, 2000);
+            }, 10000);
         });
     }
 
