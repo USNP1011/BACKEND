@@ -86,7 +86,7 @@ class Sync extends BaseController
                 'index' => 2,
                 'target' => 'nilai_peserta_kelas',
                 'displayName' => 'Nilai Peserta Kelas',
-                'data' => $data->nilai_peseta_kelas
+                'data' => $data->nilai_peserta_kelas
             ];
 
 
