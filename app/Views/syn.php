@@ -14,7 +14,7 @@
         <!-- place navbar here -->
     </header>
     <main>
-        <h3>Data Sync</h3>
+        <h3>Data Syncs</h3>
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -23,7 +23,7 @@
                     <th>Jumlah Berhasil</th>
                     <th>Jumlah Gagal</th>
                     <th><i class="fas fa-cogs"></i></th>
-                </tr>
+                </tr>   
             </thead>
             <tbody>
                 <tr ng-if="datas.mahasiswa.length > 0">
