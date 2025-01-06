@@ -38,6 +38,13 @@ class Sync extends BaseController
             // Mahasiswa
             $object = new \App\Models\MahasiswaModel();
             $data->mahasiswa = $object->select("mahasiswa.id, (if(id_mahasiswa is null AND deleted_at is null, 'insert', if(id_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_mahasiswa is null AND deleted_at is null, 'insert', if(id_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+            $array[] = [
+                'index' => 1,
+                'target' => 'mahasiswa',
+                'displayName' => 'Mahasiswa',
+                'data' => $data->mahasiswa
+            ];
+
 
             // History
             $object = new \App\Models\RiwayatPendidikanMahasiswaModel();
@@ -75,6 +82,14 @@ class Sync extends BaseController
             LEFT JOIN kelas_kuliah on kelas_kuliah.id=peserta_kelas.kelas_kuliah_id 
             WHERE if(nilai_kelas.status_sync is null AND nilai_kelas.deleted_at is null, 'insert', if(nilai_kelas.status_sync is not null AND nilai_kelas.deleted_at is null and nilai_kelas.sync_at<nilai_kelas.updated_at, 'update', if(nilai_kelas.status_sync is not null and nilai_kelas.deleted_at is not null and nilai_kelas.sync_at<nilai_kelas.deleted_at,'delete', null))) IS NOT NULL")->getResult();
 
+            $array[] = [
+                'index' => 2,
+                'target' => 'nilai_peserta_kelas',
+                'displayName' => 'Nilai Peserta Kelas',
+                'data' => $data->nilai_peseta_kelas
+            ];
+
+
 
             // Aktivitas Mahasiswa
             $object = new \App\Models\AktivitasMahasiswaModel();
@@ -108,7 +123,7 @@ class Sync extends BaseController
                 ->where('id_jenis_keluar IS NULL')
                 ->findAll();
 
-            return $this->respond($data);
+            return $this->respond($array);
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage());
         }
