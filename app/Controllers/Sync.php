@@ -49,6 +49,13 @@ class Sync extends BaseController
             // History
             $object = new \App\Models\RiwayatPendidikanMahasiswaModel();
             $data->riwayat_pendidikan = $object->select("riwayat_pendidikan_mahasiswa.id, (if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+            $array[] = [
+                'index' => 2,
+                'target' => 'riwayat_pendidikan',
+                'displayName' => 'Riwayat Pendidikan Mahasiswa',
+                'data' => $data->riwayat_pendidikan
+            ];
+
             // Nilai Transfer
             $object = new \App\Models\NilaiTransferModel();
             $data->nilai_transfer = $object->select("nilai_transfer.id, (if(id_transfer is null AND deleted_at is null, 'insert', if(id_transfer is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_transfer is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_transfer is null AND deleted_at is null, 'insert', if(id_transfer is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_transfer is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
@@ -57,6 +64,13 @@ class Sync extends BaseController
             $object = new \App\Models\KelasKuliahModel();
             $data->kelas_kuliah = $object->select("kelas_kuliah.id, kelas_kuliah.id_kelas_kuliah,kelas_kuliah.id_prodi,matakuliah_id,kelas_kuliah.id_semester,kelas_kuliah.nama_semester,kelas_kuliah.nama_program_studi,kelas_kuliah.kode_mata_kuliah,kelas_kuliah.nama_mata_kuliah, kelas_kuliah.kelas_id, kelas_kuliah.bahasan,kelas_kuliah.tanggal_mulai_efektif,kelas_kuliah.tanggal_akhir_efektif,kelas_kuliah.lingkup,kelas_kuliah.mode,kelas_kuliah.kapasitas, (if(kelas_kuliah.id_kelas_kuliah is null AND deleted_at is null, 'insert', if(kelas_kuliah.id_kelas_kuliah is not null AND deleted_at is null and sync_at<updated_at, 'update', if(kelas_kuliah.id_kelas_kuliah is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(kelas_kuliah.id_kelas_kuliah is null AND deleted_at is null, 'insert', if(kelas_kuliah.id_kelas_kuliah is not null AND deleted_at is null and sync_at<updated_at, 'update', if(kelas_kuliah.id_kelas_kuliah is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")
                 ->findAll();
+
+            $array[] = [
+                'index' => 3,
+                'target' => 'kelas_kuliah',
+                'displayName' => 'Kelas Perkuliahan',
+                'data' => $data->kelas_kuliah
+            ];
 
             // Peserta Kelas
             $object = new \App\Models\PesertaKelasModel();
@@ -83,7 +97,7 @@ class Sync extends BaseController
             WHERE if(nilai_kelas.status_sync is null AND nilai_kelas.deleted_at is null, 'insert', if(nilai_kelas.status_sync is not null AND nilai_kelas.deleted_at is null and nilai_kelas.sync_at<nilai_kelas.updated_at, 'update', if(nilai_kelas.status_sync is not null and nilai_kelas.deleted_at is not null and nilai_kelas.sync_at<nilai_kelas.deleted_at,'delete', null))) IS NOT NULL")->getResult();
 
             $array[] = [
-                'index' => 2,
+                'index' => 4,
                 'target' => 'nilai_peserta_kelas',
                 'displayName' => 'Nilai Peserta Kelas',
                 'data' => $data->nilai_peserta_kelas
@@ -674,6 +688,7 @@ class Sync extends BaseController
                     $object->query($query);
                     $record['berhasil'][] = $key;
                 } else {
+                    $key->error = $result;
                     $record['gagal'][] = $key;
                 }
             }
