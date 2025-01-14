@@ -75,6 +75,12 @@ class Sync extends BaseController
             // Peserta Kelas
             $object = new \App\Models\PesertaKelasModel();
             $data->peserta_kelas = $object->select("peserta_kelas.id, (if(peserta_kelas.status_sync is null AND peserta_kelas.deleted_at is null, 'insert', if(peserta_kelas.status_sync is not null AND peserta_kelas.deleted_at is null and peserta_kelas.sync_at<peserta_kelas.updated_at, 'update', if(peserta_kelas.status_sync is not null and peserta_kelas.deleted_at is not null and peserta_kelas.sync_at<peserta_kelas.deleted_at,'delete', null)))) as set_sync")->where("if(peserta_kelas.status_sync is null AND peserta_kelas.deleted_at is null, 'insert', if(peserta_kelas.status_sync is not null AND peserta_kelas.deleted_at is null and peserta_kelas.sync_at<peserta_kelas.updated_at, 'update', if(peserta_kelas.status_sync is not null and peserta_kelas.deleted_at is not null and peserta_kelas.sync_at<peserta_kelas.deleted_at,'delete', null))) IS NOT NULL")->withDeleted()->findAll();
+            $array[] = [
+                'index' => 4,
+                'target' => 'peserta_kelas',
+                'displayName' => 'Peserta Kelas',
+                'data' => $data->peserta_kelas
+            ];
 
             // Dosen Pengajar Kelas
             $object = new \App\Models\DosenPengajarKelasModel();
@@ -97,7 +103,7 @@ class Sync extends BaseController
             WHERE if(nilai_kelas.status_sync is null AND nilai_kelas.deleted_at is null, 'insert', if(nilai_kelas.status_sync is not null AND nilai_kelas.deleted_at is null and nilai_kelas.sync_at<nilai_kelas.updated_at, 'update', if(nilai_kelas.status_sync is not null and nilai_kelas.deleted_at is not null and nilai_kelas.sync_at<nilai_kelas.deleted_at,'delete', null))) IS NOT NULL")->getResult();
 
             $array[] = [
-                'index' => 4,
+                'index' => 5,
                 'target' => 'nilai_peserta_kelas',
                 'displayName' => 'Nilai Peserta Kelas',
                 'data' => $data->nilai_peserta_kelas
