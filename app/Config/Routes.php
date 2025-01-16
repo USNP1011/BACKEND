@@ -401,7 +401,7 @@ $routes->group('sync', function($routes){
     $routes->post('riwayat_pendidikan', 'Sync::syncHistoryPendidikan');
     $routes->get('kelas_kuliah', 'Sync::syncKelasKuliah');
     $routes->get('delete_kelas_kuliah', 'Sync::syncDeleteKelasKuliah');
-    $routes->get('pengajar_kelas', 'Sync::syncPengajarKelas');
+    $routes->post('pengajar_kelas', 'Sync::syncPengajarKelas');
     $routes->get('delete_pengajar_kelas', 'Sync::syncDeletePengajarKelas');
     $routes->get('peserta_kelas', 'Sync::syncPesertaKelas');
     $routes->get('delete_peserta_kelas', 'Sync::syncDeletePesertaKelas');

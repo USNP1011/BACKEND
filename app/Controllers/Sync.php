@@ -407,13 +407,7 @@ class Sync extends BaseController
         $object = \Config\Database::connect();
         $record = ['berhasil' => [], 'gagal' => []];
         try {
-            $data = $object->query("SELECT kelas_kuliah.id_kelas_kuliah, kelas_kuliah.matakuliah_id, matakuliah.nama_mata_kuliah, kelas_kuliah.kelas_id, dosen_pengajar_kelas.*, (if(id_aktivitas_mengajar is null AND dosen_pengajar_kelas.deleted_at is null, 'insert', if(id_aktivitas_mengajar is not null AND dosen_pengajar_kelas.deleted_at is null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at, 'update', if(id_aktivitas_mengajar is not null and dosen_pengajar_kelas.deleted_at is not null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at,'delete', null)))) as set_sync 
-            FROM dosen_pengajar_kelas 
-            LEFT JOIN penugasan_dosen on penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen
-            LEFT JOIN dosen on dosen.id_dosen=penugasan_dosen.id_dosen 
-            LEFT JOIN kelas_kuliah on kelas_kuliah.id=dosen_pengajar_kelas.kelas_kuliah_id 
-            LEFT JOIN matakuliah on matakuliah.id = kelas_kuliah.matakuliah_id
-            WHERE if(id_aktivitas_mengajar is null AND dosen_pengajar_kelas.deleted_at is null, 'insert', if(id_aktivitas_mengajar is not null AND dosen_pengajar_kelas.deleted_at is null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at, 'update', if(id_aktivitas_mengajar is not null and dosen_pengajar_kelas.deleted_at is not null and dosen_pengajar_kelas.sync_at<dosen_pengajar_kelas.updated_at,'delete', null))) IS NOT NULL AND dosen_pengajar_kelas.status_pengajar='Dosen' ORDER BY id_kelas_kuliah, kelas_id LIMIT 50")->getResult();
+            $data = $this->request->getJSON();
             foreach ($data as $key => $value) {
                 $item = [
                     'id_registrasi_dosen' => $value->id_registrasi_dosen,
@@ -478,6 +472,18 @@ class Sync extends BaseController
                         } else {
                             $record['gagal'][] = $item;
                         }
+                    }
+                } else if ($value->set_sync == 'delete') {
+                    $item = [
+                        'id_aktivitas_mengajar' => $value->id_aktivitas_mengajar
+                    ];
+                    $setData = (object) $item;
+                    $result = $this->api->deleteData('DeleteDosenPengajarKelasKuliah', $this->token, $setData);
+                    if ($result->error_code == "0") {
+                        $record['berhasil'][] = $value;
+                    } else {
+                        $item['error'] = $result;
+                        $record['gagal'][] = $value;
                     }
                 }
             }
