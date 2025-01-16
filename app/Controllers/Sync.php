@@ -283,6 +283,7 @@ class Sync extends BaseController
                         $object->query($query);
                         $record['berhasil'][] = $item;
                     } else {
+                        $result->key = $value->id_registrasi_mahasiswa;
                         $item['error'] = $result;
                         $record['gagal'][] = $item;
                     }
