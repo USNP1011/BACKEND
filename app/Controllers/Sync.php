@@ -427,7 +427,8 @@ class Sync extends BaseController
                             $object->query($query);
                             $record['berhasil'][] = $item;
                         } else {
-                            $record['gagal'][] = $item;
+                            $value->error = $result;
+                            $record['gagal'][] = $value;
                         }
                     } else {
                         $itemKelas = $object->query("SELECT
@@ -455,7 +456,8 @@ class Sync extends BaseController
                             $object->query($query);
                             $record['berhasil'][] = $item;
                         } else {
-                            $record['gagal'][] = $item;
+                            $value->error = $result;
+                            $record['gagal'][] = $value;
                         }
                     } else {
                         $itemKelas = $object->query("SELECT
@@ -482,7 +484,7 @@ class Sync extends BaseController
                     if ($result->error_code == "0") {
                         $record['berhasil'][] = $value;
                     } else {
-                        $item['error'] = $result;
+                        $value->error = $result;
                         $record['gagal'][] = $value;
                     }
                 }
