@@ -48,7 +48,7 @@ class Sync extends BaseController
 
             // History
             $object = new \App\Models\RiwayatPendidikanMahasiswaModel();
-            $data->riwayat_pendidikan = $object->select("riwayat_pendidikan_mahasiswa.id, (if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+            $data->riwayat_pendidikan = $object->select("riwayat_pendidikan_mahasiswa.*, (if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
             $array[] = [
                 'index' => 2,
                 'target' => 'riwayat_pendidikan',
@@ -227,7 +227,7 @@ class Sync extends BaseController
         $object = \Config\Database::connect();
         $record = ['berhasil' => [], 'gagal' => []];
         try {
-            $data = $object->query("SELECT riwayat_pendidikan_mahasiswa.*, (if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync FROM riwayat_pendidikan_mahasiswa WHERE if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL LIMIT 30")->getResult();
+            $data = $this->request->getJSON();
             foreach ($data as $key => $value) {
                 $mahasiswa = $object->query("SELECT mahasiswa.id, mahasiswa.id_mahasiswa FROM mahasiswa WHERE mahasiswa.id='" . $value->id_mahasiswa . "'")->getRowObject();
                 if ($value->set_sync == 'insert') {
