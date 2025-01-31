@@ -65,8 +65,8 @@ class Sync extends BaseController
 
             // Kelas Kuliah
             $object = new \App\Models\KelasKuliahModel();
-            $data->kelas_kuliah = $object->select("kelas_kuliah.id, kelas_kuliah.id_kelas_kuliah,kelas_kuliah.id_prodi,matakuliah_id,kelas_kuliah.id_semester,kelas_kuliah.nama_semester,kelas_kuliah.nama_program_studi,kelas_kuliah.kode_mata_kuliah,kelas_kuliah.nama_mata_kuliah, kelas_kuliah.kelas_id, kelas_kuliah.bahasan,kelas_kuliah.tanggal_mulai_efektif,kelas_kuliah.tanggal_akhir_efektif,kelas_kuliah.lingkup,kelas_kuliah.mode,kelas_kuliah.kapasitas, (if(kelas_kuliah.id_kelas_kuliah is null AND deleted_at is null, 'insert', if(kelas_kuliah.id_kelas_kuliah is not null AND deleted_at is null and sync_at<updated_at, 'update', if(kelas_kuliah.id_kelas_kuliah is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(kelas_kuliah.id_kelas_kuliah is null AND deleted_at is null, 'insert', if(kelas_kuliah.id_kelas_kuliah is not null AND deleted_at is null and sync_at<updated_at, 'update', if(kelas_kuliah.id_kelas_kuliah is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL AND kelas_kuliah.id_semester = '".$this->semester->id_semester."'")->findAll();
-                
+            $data->kelas_kuliah = $object->select("kelas_kuliah.id, kelas_kuliah.id_kelas_kuliah,kelas_kuliah.id_prodi,matakuliah_id,kelas_kuliah.id_semester,kelas_kuliah.nama_semester,kelas_kuliah.nama_program_studi,kelas_kuliah.kode_mata_kuliah,kelas_kuliah.nama_mata_kuliah, kelas_kuliah.kelas_id, kelas_kuliah.bahasan,kelas_kuliah.tanggal_mulai_efektif,kelas_kuliah.tanggal_akhir_efektif,kelas_kuliah.lingkup,kelas_kuliah.mode,kelas_kuliah.kapasitas, (if(kelas_kuliah.id_kelas_kuliah is null AND deleted_at is null, 'insert', if(kelas_kuliah.id_kelas_kuliah is not null AND deleted_at is null and sync_at<updated_at, 'update', if(kelas_kuliah.id_kelas_kuliah is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(kelas_kuliah.id_kelas_kuliah is null AND deleted_at is null, 'insert', if(kelas_kuliah.id_kelas_kuliah is not null AND deleted_at is null and sync_at<updated_at, 'update', if(kelas_kuliah.id_kelas_kuliah is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL AND kelas_kuliah.id_semester = '" . $this->semester->id_semester . "'")->findAll();
+
 
             $array[] = [
                 'index' => 3,
@@ -110,7 +110,7 @@ class Sync extends BaseController
             LEFT JOIN riwayat_pendidikan_mahasiswa on riwayat_pendidikan_mahasiswa.id=peserta_kelas.id_riwayat_pendidikan
             LEFT JOIN mahasiswa on mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa
             LEFT JOIN kelas_kuliah on kelas_kuliah.id=peserta_kelas.kelas_kuliah_id 
-            WHERE if(nilai_kelas.status_sync is null AND nilai_kelas.deleted_at is null, 'insert', if(nilai_kelas.status_sync is not null AND nilai_kelas.deleted_at is null and nilai_kelas.sync_at<nilai_kelas.updated_at, 'update', if(nilai_kelas.status_sync is not null and nilai_kelas.deleted_at is not null and nilai_kelas.sync_at<nilai_kelas.deleted_at,'delete', null))) IS NOT NULL AND kelas_kuliah.id_semester = '".$this->semester->id_semester."'")->getResultArray();
+            WHERE if(nilai_kelas.status_sync is null AND nilai_kelas.deleted_at is null, 'insert', if(nilai_kelas.status_sync is not null AND nilai_kelas.deleted_at is null and nilai_kelas.sync_at<nilai_kelas.updated_at, 'update', if(nilai_kelas.status_sync is not null and nilai_kelas.deleted_at is not null and nilai_kelas.sync_at<nilai_kelas.deleted_at,'delete', null))) IS NOT NULL AND kelas_kuliah.id_semester = '" . $this->semester->id_semester . "'")->getResultArray();
 
             $array[] = [
                 'index' => 6,
@@ -152,6 +152,12 @@ class Sync extends BaseController
                 ->where("if(perkuliahan_mahasiswa.sync_at is null AND perkuliahan_mahasiswa.deleted_at is null, 'insert', if(perkuliahan_mahasiswa.sync_at is not null AND perkuliahan_mahasiswa.deleted_at is null and perkuliahan_mahasiswa.sync_at<perkuliahan_mahasiswa.updated_at, 'update', if(perkuliahan_mahasiswa.sync_at is not null and perkuliahan_mahasiswa.deleted_at is not null and perkuliahan_mahasiswa.sync_at<perkuliahan_mahasiswa.updated_at,'delete', null))) IS NOT NULL")
                 ->where('id_jenis_keluar IS NULL')
                 ->findAll();
+            $array[] = [
+                'index' => 7,
+                'target' => 'perkuliahan_mahasiswa',
+                'displayName' => 'Aktivitas Kuliah Mahasiswa',
+                'data' => $data->perkuliahan_mahasiswa
+            ];
 
             return $this->respond($array);
         } catch (\Throwable $th) {

@@ -26,6 +26,7 @@ class PerkuliahanMahasiswaModel extends Model
 		'status_sync',
         'id_pembiayaan'
     ];
+	protected bool $allowEmptyInserts = false;
 	protected $useTimestamps = true;
     protected $dateFormat    = 'datetime';
     protected $createdField  = 'created_at';
