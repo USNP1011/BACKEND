@@ -152,12 +152,12 @@ class Sync extends BaseController
                 ->where("if(perkuliahan_mahasiswa.sync_at is null AND perkuliahan_mahasiswa.deleted_at is null, 'insert', if(perkuliahan_mahasiswa.sync_at is not null AND perkuliahan_mahasiswa.deleted_at is null and perkuliahan_mahasiswa.sync_at<perkuliahan_mahasiswa.updated_at, 'update', if(perkuliahan_mahasiswa.sync_at is not null and perkuliahan_mahasiswa.deleted_at is not null and perkuliahan_mahasiswa.sync_at<perkuliahan_mahasiswa.updated_at,'delete', null))) IS NOT NULL")
                 ->where('id_jenis_keluar IS NULL')
                 ->findAll();
-            $array[] = [
-                'index' => 7,
-                'target' => 'perkuliahan_mahasiswa',
-                'displayName' => 'Aktivitas Kuliah Mahasiswa',
-                'data' => $data->perkuliahan_mahasiswa
-            ];
+            // $array[] = [
+            //     'index' => 7,
+            //     'target' => 'perkuliahan_mahasiswa',
+            //     'displayName' => 'Aktivitas Kuliah Mahasiswa',
+            //     'data' => $data->perkuliahan_mahasiswa
+            // ];
 
             return $this->respond($array);
         } catch (\Throwable $th) {
