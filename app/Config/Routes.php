@@ -183,7 +183,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
         $routes->get('(:hash)', 'Mahasiswa::show/$1', ['filter' => 'general']);
         $routes->get('(:hash)/riwayat_pendidikan', 'Mahasiswa::riwayatPendidikan/$1', ['filter' => 'auth']);
         $routes->get('(:hash)/nilai_transfer', 'Mahasiswa::nilaiTransfer/$1', ['filter' => 'auth']);
-        $routes->get('(:hash)/krsm', 'Mahasiswa::krsm/$1', ['filter' => 'auth']);
+        $routes->get('(:hash)/krsm', 'Mahasiswa::krsm/$1', ['filter' => 'general']);
         $routes->get('(:hash)/aktivitas_kuliah', 'Mahasiswa::aktivitasKuliah/$1', ['filter' => 'auth']);
         $routes->get('(:hash)/transkrip', 'Mahasiswa::transkrip/$1', ['filter' => 'general']);
         $routes->get('(:hash)/update_transkrip', 'Mahasiswa::updateTranskrip/$1', ['filter' => 'general']);
@@ -403,7 +403,7 @@ $routes->group('sync', function($routes){
     $routes->get('delete_kelas_kuliah', 'Sync::syncDeleteKelasKuliah');
     $routes->post('pengajar_kelas', 'Sync::syncPengajarKelas');
     $routes->get('delete_pengajar_kelas', 'Sync::syncDeletePengajarKelas');
-    $routes->get('peserta_kelas', 'Sync::syncPesertaKelas');
+    $routes->post('peserta_kelas', 'Sync::syncPesertaKelas');
     $routes->get('delete_peserta_kelas', 'Sync::syncDeletePesertaKelas');
     $routes->post('perkuliahan_mahasiswa', 'Sync::syncPerkuliahanMahasiswa');
     $routes->post('nilai_peserta_kelas', 'Sync::syncNilaiPesertaKelas');
