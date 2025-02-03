@@ -165,13 +165,13 @@ class Sync extends BaseController
             `kelas_kuliah`.`id_kelas_kuliah`,
             `konversi_kampus_merdeka`.`id_konversi_aktivitas`,
             `nilai_transfer`.`id_transfer`,
-            `matakuliah`.`id_matkul`, `riwayat_pendidikan_mahasiswa`.`id_registrasi_mahasiswa`, (if(sync_at is null AND deleted_at is null, 'insert', if(sync_at is not null AND deleted_at is null and sync_at<updated_at, 'update', if(sync_at is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")
+            `matakuliah`.`id_matkul`, `riwayat_pendidikan_mahasiswa`.`id_registrasi_mahasiswa`, (if(transkrip.sync_at is null AND transkrip.deleted_at is null, 'insert', if(transkrip.sync_at is not null AND transkrip.deleted_at is null and transkrip.sync_at<transkrip.updated_at, 'update', if(transkrip.sync_at is not null and transkrip.deleted_at is not null and transkrip.sync_at<transkrip.updated_at,'delete', null)))) as set_sync")
             ->join('nilai_transfer', '`transkrip`.`nilai_transfer_id` = `nilai_transfer`.`id`', 'left')
             ->join('kelas_kuliah', '`transkrip`.`kelas_kuliah_id` = `kelas_kuliah`.`id`', 'left')
             ->join('konversi_kampus_merdeka', '`transkrip`.`konversi_kampus_merdeka_id` = `konversi_kampus_merdeka`.`id`', 'left')
             ->join('matakuliah', '`transkrip`.`matakuliah_id` = `matakuliah`.`id`', 'left')
             ->join('riwayat_pendidikan_mahasiswa', '`transkrip`.`id_riwayat_pendidikan` = `riwayat_pendidikan_mahasiswa`.`id`', 'left')
-            ->where("if(sync_at is null AND deleted_at is null, 'insert', if(sync_at is not null AND deleted_at is null and sync_at<updated_at, 'update', if(sync_at is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+            ->where("if(transkrip.sync_at is null AND transkrip.deleted_at is null, 'insert', if(transkrip.sync_at is not null AND transkrip.deleted_at is null and transkrip.sync_at<transkrip.updated_at, 'update', if(transkrip.sync_at is not null and transkrip.deleted_at is not null and transkrip.sync_at<transkrip.updated_at,'delete', null))) IS NOT NULL")->findAll();
             $array[] = [
                 'index' => 8,
                 'target' => 'trakskrip',
