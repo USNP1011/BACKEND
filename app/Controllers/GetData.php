@@ -248,6 +248,7 @@ class GetData extends BaseController
         }
         $itemUpdate = [];
         foreach ($data->data as $key => $value) {
+            $nilaiTransfer->where('id_transfer', $value->id_transfer)->delete();
             $value->id = Uuid::uuid4()->toString();
             $value->id_riwayat_pendidikan = $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first()->id;
             $itemUpdate[] = $value;
@@ -1155,6 +1156,10 @@ class GetData extends BaseController
             foreach ($data->data as $key => $value) {
                 $itemMatakuliah = $matakuliah->where('id_matkul', $value->id_matkul)->first();
                 $itemRiwayat = $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
+                $object
+                ->where('id_riwayat_pendidikan', $itemRiwayat->id)
+                ->where('matakuliah_id', $itemMatakuliah->id)
+                ->delete();
                 $itemUpdate = [
                     'id' => Uuid::uuid4()->toString(),
                     'id_riwayat_pendidikan' => $itemRiwayat->id,
@@ -1163,7 +1168,6 @@ class GetData extends BaseController
                     'nilai_indeks' => $value->nilai_indeks,
                     'nilai_huruf' => $value->nilai_huruf,
                     'status_sync' => 'sudah sync'
-
                 ];
                 if (!is_null($value->id_kelas_kuliah)) {
                     $item = $kelas->where('id_kelas_kuliah', $value->id_kelas_kuliah)->first();
