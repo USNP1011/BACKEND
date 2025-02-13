@@ -325,6 +325,10 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     $routes->post('reset_password', 'AuthController::resetPassword', ['filter'=>'general']);
     $routes->post('create_user', 'AuthController::createUser', ['filter'=>'general']);
     $routes->post('change_password', 'AuthController::changePassword', ['filter'=>'general']);
+
+    $routes->group('v2', function($routes){
+        $routes->get('detail_kurikulum_by_prodi/(:hash)', 'V2\Kurikulum::detail_kurikulum/$1');
+    });
 });
 
 $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($routes){
