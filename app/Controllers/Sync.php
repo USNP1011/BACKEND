@@ -864,23 +864,14 @@ class Sync extends BaseController
             foreach ($data as $key => $value) {
                 if ($value->set_sync == 'insert') {
                     $item = [
-                        'program_mbkm' => 0,
-                        'jenis_anggota' => $value->jenis_anggota,
-                        'id_jenis_aktivitas' => $value->id_jenis_aktivitas_mahasiswa,
-                        'id_prodi' => $value->id_prodi,
-                        'id_semester' => $value->id_semester,
-                        'judul' => $value->judul,
-                        'keterangan' => $value->keterangan,
-                        'lokasi' => $value->lokasi,
-                        'sk_tugas' => $value->sk_tugas,
-                        'tanggal_sk_tugas' => $value->tanggal_sk_tugas,
-                        'tanggal_mulai' => $value->tanggal_mulai,
-                        'tanggal_selesai' => $value->tanggal_selesai,
+                        'id_aktivitas' => $value->id_aktivitas,
+                        'id_registrasi_mahasiswa' => $value->id_registrasi_mahasiswa,
+                        'jenis_peran' => $value->jenis_peran
                     ];
                     $setData = (object) $item;
-                    $result = $this->api->insertData('InsertAktivitasMahasiswa', $this->token, $setData);
+                    $result = $this->api->insertData('InsertAnggotaAktivitasMahasiswa', $this->token, $setData);
                     if ($result->error_code == "0" || $result->error_code == "1260") {
-                        $query = "UPDATE aktivitas_mahasiswa SET id_aktivitas='" . $result->data->id_aktivitas . "',  sync_at = '" . date('Y-m-d H:i:s') . "', updated_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $query = "UPDATE anggota_aktivitas SET id_anggota='" . $result->data->id_anggota . "',  sync_at = '" . date('Y-m-d H:i:s') . "', updated_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
                         $object->query($query);
                         $record['berhasil'][] = $item;
                     } else {
@@ -889,27 +880,18 @@ class Sync extends BaseController
                     }
                 } else if ($value->set_sync == 'update') {
                     $item = [
-                        'program_mbkm' => 0,
-                        'jenis_anggota' => $value->jenis_anggota,
-                        'id_jenis_aktivitas' => $value->id_jenis_aktivitas_mahasiswa,
-                        'id_prodi' => $value->id_prodi,
-                        'id_semester' => $value->id_semester,
-                        'judul' => $value->judul,
-                        'keterangan' => $value->keterangan,
-                        'lokasi' => $value->lokasi,
-                        'sk_tugas' => $value->sk_tugas,
-                        'tanggal_sk_tugas' => $value->tanggal_sk_tugas,
-                        'tanggal_mulai' => $value->tanggal_mulai,
-                        'tanggal_selesai' => $value->tanggal_selesai,
+                        'id_aktivitas' => $value->id_aktivitas,
+                        'id_registrasi_mahasiswa' => $value->id_registrasi_mahasiswa,
+                        'jenis_peran' => $value->jenis_peran
                     ];
                     $setData = (object) $item;
                     $itemKey = [
-                        'id_aktivitas' => $value->id_aktivitas
+                        'id_anggota' => $value->id_anggota
                     ];
                     $setKey = (object) $itemKey;
-                    $result = $this->api->updateData('UpdateAktivitasMahasiswa', $this->token, $setData, $setKey);
+                    $result = $this->api->updateData('UpdateAnggotaAktivitasKampusMahasiswa', $this->token, $setData, $setKey);
                     if ($result->error_code == "0") {
-                        $query = "UPDATE aktivitas_mahasiswa SET sync_at = '" . date('Y-m-d H:i:s') . "', updated_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $query = "UPDATE anggota_aktivitas SET sync_at = '" . date('Y-m-d H:i:s') . "', updated_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
                         $object->query($query);
                         $record['berhasil'][] = $item;
                     } else {
@@ -918,10 +900,140 @@ class Sync extends BaseController
                     }
                 }else{
                     $item = [
-                        'id_aktivitas' => $value->id_aktivitas
+                        'id_anggota' => $value->id_anggota
                     ];
                     $setData = (object) $item;
-                    $result = $this->api->deleteData('DeleteAktivitasMahasiswa', $this->token, $setData);
+                    $result = $this->api->deleteData('DeleteAnggotaAktivitasMahasiswa', $this->token, $setData);
+                    if ($result->error_code == "0") {
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $value->error = $result;
+                        $record['gagal'][] = $value;
+                    }
+                }
+            }
+            return $this->respond($record);
+        } catch (\Throwable $th) {
+            return $this->fail($record);
+        }
+    }
+
+    function syncBimbingMahasiswa()
+    {
+        $object = \Config\Database::connect();
+        $record = ['berhasil' => [], 'gagal' => []];
+        try {
+            $data = $this->request->getJSON();
+            foreach ($data as $key => $value) {
+                if ($value->set_sync == 'insert') {
+                    $item = [
+                        'id_aktivitas' => $value->id_aktivitas,
+                        'id_kategori_kegiatan' => $value->id_kategori_kegiatan,
+                        'id_dosen' => $value->id_dosen,
+                        'pembimbing_ke' => $value->pembimbing_ke
+                    ];
+                    $setData = (object) $item;
+                    $result = $this->api->insertData('InsertBimbingMahasiswa', $this->token, $setData);
+                    if ($result->error_code == "0" || $result->error_code == "1260") {
+                        $query = "UPDATE bimbing_mahasiswa SET id_bimbing_mahasiswa='" . $result->data->id_bimbing_mahasiswa . "',  sync_at = '" . date('Y-m-d H:i:s') . "', updated_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $object->query($query);
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $value->error = $result;
+                        $record['gagal'][] = $value;
+                    }
+                } else if ($value->set_sync == 'update') {
+                    $item = [
+                        'id_aktivitas' => $value->id_aktivitas,
+                        'id_kategori_kegiatan' => $value->id_kategori_kegiatan,
+                        'id_dosen' => $value->id_dosen,
+                        'pembimbing_ke' => $value->pembimbing_ke
+                    ];
+                    $setData = (object) $item;
+                    $itemKey = [
+                        'id_bimbing_mahasiswa' => $value->id_bimbing_mahasiswa
+                    ];
+                    $setKey = (object) $itemKey;
+                    $result = $this->api->updateData('UpdateBimbingMahasiswa', $this->token, $setData, $setKey);
+                    if ($result->error_code == "0") {
+                        $query = "UPDATE bimbing_mahasiswa SET sync_at = '" . date('Y-m-d H:i:s') . "', updated_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $object->query($query);
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $value->error = $result;
+                        $record['gagal'][] = $value;
+                    }
+                }else{
+                    $item = [
+                        'id_bimbing_mahasiswa' => $value->id_bimbing_mahasiswa
+                    ];
+                    $setData = (object) $item;
+                    $result = $this->api->deleteData('DeleteBimbingMahasiswa', $this->token, $setData);
+                    if ($result->error_code == "0") {
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $value->error = $result;
+                        $record['gagal'][] = $value;
+                    }
+                }
+            }
+            return $this->respond($record);
+        } catch (\Throwable $th) {
+            return $this->fail($record);
+        }
+    }
+
+    function syncUjiMahasiswa()
+    {
+        $object = \Config\Database::connect();
+        $record = ['berhasil' => [], 'gagal' => []];
+        try {
+            $data = $this->request->getJSON();
+            foreach ($data as $key => $value) {
+                if ($value->set_sync == 'insert') {
+                    $item = [
+                        'id_aktivitas' => $value->id_aktivitas,
+                        'id_kategori_kegiatan' => $value->id_kategori_kegiatan,
+                        'id_dosen' => $value->id_dosen,
+                        'penguji_ke' => $value->penguji_ke
+                    ];
+                    $setData = (object) $item;
+                    $result = $this->api->insertData('InsertUjiMahasiswa', $this->token, $setData);
+                    if ($result->error_code == "0" || $result->error_code == "1260") {
+                        $query = "UPDATE uji_mahasiswa SET id_uji='" . $result->data->id_uji . "',  sync_at = '" . date('Y-m-d H:i:s') . "', updated_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $object->query($query);
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $value->error = $result;
+                        $record['gagal'][] = $value;
+                    }
+                } else if ($value->set_sync == 'update') {
+                    $item = [
+                        'id_aktivitas' => $value->id_aktivitas,
+                        'id_kategori_kegiatan' => $value->id_kategori_kegiatan,
+                        'id_dosen' => $value->id_dosen,
+                        'penguji_ke' => $value->penguji_ke
+                    ];
+                    $setData = (object) $item;
+                    $itemKey = [
+                        'id_uji' => $value->id_uji
+                    ];
+                    $setKey = (object) $itemKey;
+                    $result = $this->api->updateData('UpdateUjiMahasiswa', $this->token, $setData, $setKey);
+                    if ($result->error_code == "0") {
+                        $query = "UPDATE uji_mahasiswa SET sync_at = '" . date('Y-m-d H:i:s') . "', updated_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $object->query($query);
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $value->error = $result;
+                        $record['gagal'][] = $value;
+                    }
+                }else{
+                    $item = [
+                        'uji_mahasiswa' => $value->uji_mahasiswa
+                    ];
+                    $setData = (object) $item;
+                    $result = $this->api->deleteData('DeleteUjiMahasiswa', $this->token, $setData);
                     if ($result->error_code == "0") {
                         $record['berhasil'][] = $item;
                     } else {

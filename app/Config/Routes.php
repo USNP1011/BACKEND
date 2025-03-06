@@ -411,6 +411,10 @@ $routes->group('sync', function($routes){
     $routes->get('delete_peserta_kelas', 'Sync::syncDeletePesertaKelas');
     $routes->post('perkuliahan_mahasiswa', 'Sync::syncPerkuliahanMahasiswa');
     $routes->post('nilai_peserta_kelas', 'Sync::syncNilaiPesertaKelas');
+    $routes->post('aktivitas_mahasiswa', 'Sync::syncAktivitasMahasiswa');
+    $routes->post('anggota_aktivitas_mahasiswa', 'Sync::syncAnggotaAktivitasMahasiswa');
+    $routes->post('bimbing_mahasiswa', 'Sync::syncBimbingMahasiswa');
+    $routes->post('uji_mahasiswa', 'Sync::syncUjiMahasiswa');
 });
 
 $routes->group('repair', function($routes){
