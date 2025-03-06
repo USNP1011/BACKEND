@@ -486,6 +486,9 @@ class GetData extends BaseController
             }
             foreach ($data->data as $key => $value) {
                 $value->id = Uuid::uuid4()->toString();
+                $value->status_sync = "sudah sync";
+                $value->sync_at = date('Y-m-d H:i:s');
+                $value->updated_at = date('Y-m-d H:i:s');
                 $itemAktivitas = $aktivitas->where('id_aktivitas', $value->id_aktivitas)->first();
                 $value->aktivitas_mahasiswa_id = $itemAktivitas->id;
                 $itemRiwayat = $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
@@ -511,6 +514,9 @@ class GetData extends BaseController
         foreach ($data->data as $key => $value) {
             if($bimbingMahasiswa->where('id_bimbing_mahasiswa', $value->id_bimbing_mahasiswa)->countAllResults()==0){
                 $value->id = Uuid::uuid4()->toString();
+                $value->status_sync = "sudah sync";
+                $value->sync_at = date('Y-m-d H:i:s');
+                $value->updated_at = date('Y-m-d H:i:s');
                 $itemAktivitas = $aktivitas->where('id_aktivitas', $value->id_aktivitas)->first();
                 $value->aktivitas_mahasiswa_id = $itemAktivitas->id;
                 $bimbingMahasiswa->insert($value);
@@ -530,6 +536,9 @@ class GetData extends BaseController
         foreach ($data->data as $key => $value) {
             if($ujiMahasiswa->where('id_uji', $value->id_uji)->countAllResults()==0){
                 $value->id = Uuid::uuid4()->toString();
+                $value->status_sync = "sudah sync";
+                $value->sync_at = date('Y-m-d H:i:s');
+                $value->updated_at = date('Y-m-d H:i:s');
                 $itemAktivitas = $aktivitas->where('id_aktivitas', $value->id_aktivitas)->first();
                 $value->aktivitas_mahasiswa_id = $itemAktivitas->id;
                 $ujiMahasiswa->insert($value);
