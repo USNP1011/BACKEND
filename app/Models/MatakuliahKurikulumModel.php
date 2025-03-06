@@ -27,7 +27,8 @@ class MatakuliahKurikulumModel extends Model
 		'semester_mulai_berlaku',
 		'sks_tatap_muka',
 		'sync_at',
-		'status_sync'
+		'status_sync',
+		'status_matakuliah'
     ];
 	protected bool $allowEmptyInserts = false;
     protected $useTimestamps = true;

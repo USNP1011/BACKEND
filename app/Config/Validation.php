@@ -373,6 +373,13 @@ class Validation extends BaseConfig
             "errors" => [
                 "required" => "semester Tidak Boleh Kosong"
             ]
+            ],
+        "status_matakuliah" => [
+            "label" => "Status Matakuliah",
+            "rules" => "required",
+            "errors" => [
+                "required" => "Status Matakuliah Tidak Boleh Kosong"
+            ]
         ]
     ];
 
