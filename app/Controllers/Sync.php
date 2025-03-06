@@ -170,7 +170,7 @@ class Sync extends BaseController
             // Uji Mahasiswa
             $object = new \App\Models\UjiMahasiswaModel();
             $data->uji_mahasiswa = $object->select("uji_mahasiswa.*, aktivitas_mahasiswa.id_aktivitas, (if(id_uji is null AND uji_mahasiswa.deleted_at is null, 'insert', if(id_uji is not null AND uji_mahasiswa.deleted_at is null and uji_mahasiswa.sync_at<uji_mahasiswa.updated_at, 'update', if(id_uji is not null and uji_mahasiswa.deleted_at is not null and uji_mahasiswa.sync_at<uji_mahasiswa.updated_at,'delete', null)))) as set_sync")
-            ->join('aktivitas_mahasiswa', 'aktivitas_mahasiswa.id=bimbing_mahasiswa.aktivitas_mahasiswa_id', 'left')
+            ->join('aktivitas_mahasiswa', 'aktivitas_mahasiswa.id=uji_mahasiswa.aktivitas_mahasiswa_id', 'left')
             ->where("if(id_uji is null AND uji_mahasiswa.deleted_at is null, 'insert', if(id_uji is not null AND uji_mahasiswa.deleted_at is null and uji_mahasiswa.sync_at<uji_mahasiswa.updated_at, 'update', if(id_uji is not null and uji_mahasiswa.deleted_at is not null and uji_mahasiswa.sync_at<uji_mahasiswa.updated_at,'delete', null))) IS NOT NULL AND aktivitas_mahasiswa.id_semester = '" . $this->semester->id_semester . "'")->findAll();
             $array[] = [
                 'index' => 10,
