@@ -64,8 +64,12 @@ class Sync extends BaseController
 
 
             // Kelas Kuliah
-            $object = new \App\Models\KelasKuliahModel();
-            $data->kelas_kuliah = $object->select("kelas_kuliah.id, kelas_kuliah.id_kelas_kuliah,kelas_kuliah.id_prodi,matakuliah_id,kelas_kuliah.id_semester,kelas_kuliah.nama_semester,kelas_kuliah.nama_program_studi,kelas_kuliah.kode_mata_kuliah,kelas_kuliah.nama_mata_kuliah, kelas_kuliah.kelas_id, kelas_kuliah.bahasan,kelas_kuliah.tanggal_mulai_efektif,kelas_kuliah.tanggal_akhir_efektif,kelas_kuliah.lingkup,kelas_kuliah.mode,kelas_kuliah.kapasitas, (if(kelas_kuliah.id_kelas_kuliah is null AND deleted_at is null, 'insert', if(kelas_kuliah.id_kelas_kuliah is not null AND deleted_at is null and sync_at<updated_at, 'update', if(kelas_kuliah.id_kelas_kuliah is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(kelas_kuliah.id_kelas_kuliah is null AND deleted_at is null, 'insert', if(kelas_kuliah.id_kelas_kuliah is not null AND deleted_at is null and sync_at<updated_at, 'update', if(kelas_kuliah.id_kelas_kuliah is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL AND kelas_kuliah.id_semester = '" . $this->semester->id_semester . "'")->findAll();
+            $object = \Config\Database::connect();
+            $data->kelas_kuliah = $object->query("SELECT kelas_kuliah.id, kelas_kuliah.id_kelas_kuliah,kelas_kuliah.id_prodi,matakuliah_id,kelas_kuliah.id_semester,kelas_kuliah.nama_semester,kelas_kuliah.nama_program_studi,kelas_kuliah.kode_mata_kuliah,kelas_kuliah.nama_mata_kuliah,kelas_kuliah.bahasan,kelas_kuliah.tanggal_mulai_efektif,kelas_kuliah.tanggal_akhir_efektif,kelas_kuliah.lingkup,kelas_kuliah.mode,kelas_kuliah.kapasitas, kelas.nama_kelas_kuliah, matakuliah.id_matkul, matakuliah.sks_mata_kuliah, matakuliah.sks_tatap_muka, matakuliah.sks_praktek, matakuliah.sks_praktek_lapangan, matakuliah.sks_simulasi, (if(kelas_kuliah.id_kelas_kuliah is null AND kelas_kuliah.deleted_at is null, 'insert', if(kelas_kuliah.id_kelas_kuliah is not null AND kelas_kuliah.deleted_at is null and kelas_kuliah.sync_at<kelas_kuliah.updated_at, 'update', if(kelas_kuliah.id_kelas_kuliah is not null and kelas_kuliah.deleted_at is not null and kelas_kuliah.sync_at<kelas_kuliah.updated_at,'delete', null)))) as set_sync 
+            FROM kelas_kuliah 
+            LEFT JOIN kelas on kelas.id=kelas_kuliah.kelas_id
+            LEFT JOIN matakuliah on matakuliah.id=kelas_kuliah.matakuliah_id 
+            WHERE if(kelas_kuliah.id_kelas_kuliah is null AND kelas_kuliah.deleted_at is null, 'insert', if(kelas_kuliah.id_kelas_kuliah is not null AND kelas_kuliah.deleted_at is null and kelas_kuliah.sync_at<kelas_kuliah.updated_at, 'update', if(kelas_kuliah.id_kelas_kuliah is not null and kelas_kuliah.deleted_at is not null and kelas_kuliah.sync_at<kelas_kuliah.updated_at,'delete', null))) IS NOT NULL AND kelas_kuliah.id_semester = '" . $this->semester->id_semester . "'")->getResult();
 
 
             $array[] = [
@@ -128,7 +132,7 @@ class Sync extends BaseController
 
             // Aktivitas Mahasiswa
             $object = new \App\Models\AktivitasMahasiswaModel();
-            $data->aktivitas_mahasiswa = $object->select("aktivitas_mahasiswa.*, (if(id_aktivitas is null AND deleted_at is null, 'insert', if(id_aktivitas is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_aktivitas is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_aktivitas is null AND deleted_at is null, 'insert', if(id_aktivitas is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_aktivitas is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+            $data->aktivitas_mahasiswa = $object->select("aktivitas_mahasiswa.*, (if(id_aktivitas is null AND deleted_at is null, 'insert', if(id_aktivitas is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_aktivitas is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_aktivitas is null AND deleted_at is null, 'insert', if(id_aktivitas is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_aktivitas is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL AND id_semester = '" . $this->semester->id_semester . "'")->findAll();
             $array[] = [
                 'index' => 7,
                 'target' => 'aktivitas_mahasiswa',
@@ -138,7 +142,11 @@ class Sync extends BaseController
 
             // Anggota Aktivitas Mahasiswa
             $object = new \App\Models\AnggotaAktivitasModel();
-            $data->anggota_aktivitas_mahasiswa = $object->select("anggota_aktivitas.*, (if(id_anggota is null AND deleted_at is null, 'insert', if(id_anggota is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_anggota is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_anggota is null AND deleted_at is null, 'insert', if(id_anggota is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_anggota is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+            $data->anggota_aktivitas_mahasiswa = $object->select("anggota_aktivitas.*, aktivitas_mahasiswa.id_aktivitas, riwayat_pendidikan_mahasiswa.id_registrasi_mahasiswa, (if(id_anggota is null AND anggota_aktivitas.deleted_at is null, 'insert', if(id_anggota is not null AND anggota_aktivitas.deleted_at is null and anggota_aktivitas.sync_at<anggota_aktivitas.updated_at, 'update', if(id_anggota is not null and anggota_aktivitas.deleted_at is not null and anggota_aktivitas.sync_at<anggota_aktivitas.updated_at,'delete', null)))) as set_sync")
+            ->join('aktivitas_mahasiswa', 'aktivitas_mahasiswa.id=anggota_aktivitas.aktivitas_mahasiswa_id', 'left')
+            ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id=anggota_aktivitas.id_riwayat_pendidikan', 'left')
+            ->where("if(id_anggota is null AND anggota_aktivitas.deleted_at is null, 'insert', if(id_anggota is not null AND anggota_aktivitas.deleted_at is null and anggota_aktivitas.sync_at<anggota_aktivitas.updated_at, 'update', if(id_anggota is not null and anggota_aktivitas.deleted_at is not null and anggota_aktivitas.sync_at<anggota_aktivitas.updated_at,'delete', null))) IS NOT NULL AND aktivitas_mahasiswa.id_semester = '" . $this->semester->id_semester . "'")
+            ->findAll();
             $array[] = [
                 'index' => 8,
                 'target' => 'anggota_aktivitas_mahasiswa',
@@ -148,7 +156,10 @@ class Sync extends BaseController
 
             // Bimbing Mahasiswa
             $object = new \App\Models\BimbingMahasiswaModel();
-            $data->bimbing_mahasiswa = $object->select("bimbing_mahasiswa.*, (if(id_bimbing_mahasiswa is null AND deleted_at is null, 'insert', if(id_bimbing_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_bimbing_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_bimbing_mahasiswa is null AND deleted_at is null, 'insert', if(id_bimbing_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_bimbing_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+            $data->bimbing_mahasiswa = $object->select("bimbing_mahasiswa.*, aktivitas_mahasiswa.id_aktivitas, (if(id_bimbing_mahasiswa is null AND bimbing_mahasiswa.deleted_at is null, 'insert', if(id_bimbing_mahasiswa is not null AND bimbing_mahasiswa.deleted_at is null and bimbing_mahasiswa.sync_at<bimbing_mahasiswa.updated_at, 'update', if(id_bimbing_mahasiswa is not null and bimbing_mahasiswa.deleted_at is not null and bimbing_mahasiswa.sync_at<bimbing_mahasiswa.updated_at,'delete', null)))) as set_sync")
+            ->join('aktivitas_mahasiswa', 'aktivitas_mahasiswa.id=bimbing_mahasiswa.aktivitas_mahasiswa_id', 'left')
+            ->where("if(id_bimbing_mahasiswa is null AND bimbing_mahasiswa.deleted_at is null, 'insert', if(id_bimbing_mahasiswa is not null AND bimbing_mahasiswa.deleted_at is null and bimbing_mahasiswa.sync_at<bimbing_mahasiswa.updated_at, 'update', if(id_bimbing_mahasiswa is not null and bimbing_mahasiswa.deleted_at is not null and bimbing_mahasiswa.sync_at<bimbing_mahasiswa.updated_at,'delete', null))) IS NOT NULL AND aktivitas_mahasiswa.id_semester = '" . $this->semester->id_semester . "'")
+            ->findAll();
             $array[] = [
                 'index' => 9,
                 'target' => 'bimbing_mahasiswa',
@@ -158,7 +169,9 @@ class Sync extends BaseController
 
             // Uji Mahasiswa
             $object = new \App\Models\UjiMahasiswaModel();
-            $data->uji_mahasiswa = $object->select("uji_mahasiswa.id, (if(id_uji is null AND deleted_at is null, 'insert', if(id_uji is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_uji is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_uji is null AND deleted_at is null, 'insert', if(id_uji is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_uji is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+            $data->uji_mahasiswa = $object->select("uji_mahasiswa.*, aktivitas_mahasiswa.id_aktivitas, (if(id_uji is null AND uji_mahasiswa.deleted_at is null, 'insert', if(id_uji is not null AND uji_mahasiswa.deleted_at is null and uji_mahasiswa.sync_at<uji_mahasiswa.updated_at, 'update', if(id_uji is not null and uji_mahasiswa.deleted_at is not null and uji_mahasiswa.sync_at<uji_mahasiswa.updated_at,'delete', null)))) as set_sync")
+            ->join('aktivitas_mahasiswa', 'aktivitas_mahasiswa.id=bimbing_mahasiswa.aktivitas_mahasiswa_id', 'left')
+            ->where("if(id_uji is null AND uji_mahasiswa.deleted_at is null, 'insert', if(id_uji is not null AND uji_mahasiswa.deleted_at is null and uji_mahasiswa.sync_at<uji_mahasiswa.updated_at, 'update', if(id_uji is not null and uji_mahasiswa.deleted_at is not null and uji_mahasiswa.sync_at<uji_mahasiswa.updated_at,'delete', null))) IS NOT NULL AND aktivitas_mahasiswa.id_semester = '" . $this->semester->id_semester . "'")->findAll();
             $array[] = [
                 'index' => 10,
                 'target' => 'uji_mahasiswa',
@@ -361,11 +374,7 @@ class Sync extends BaseController
         $record = ['berhasil' => [], 'gagal' => []];
         $semester = getSemesterAktif();
         try {
-            $data = $object->query("SELECT kelas_kuliah.id, kelas_kuliah.id_kelas_kuliah,kelas_kuliah.id_prodi,matakuliah_id,kelas_kuliah.id_semester,kelas_kuliah.nama_semester,kelas_kuliah.nama_program_studi,kelas_kuliah.kode_mata_kuliah,kelas_kuliah.nama_mata_kuliah,kelas_kuliah.bahasan,kelas_kuliah.tanggal_mulai_efektif,kelas_kuliah.tanggal_akhir_efektif,kelas_kuliah.lingkup,kelas_kuliah.mode,kelas_kuliah.kapasitas, kelas.nama_kelas_kuliah, matakuliah.id_matkul, matakuliah.sks_mata_kuliah, matakuliah.sks_tatap_muka, matakuliah.sks_praktek, matakuliah.sks_praktek_lapangan, matakuliah.sks_simulasi, (if(kelas_kuliah.id_kelas_kuliah is null AND kelas_kuliah.deleted_at is null, 'insert', if(kelas_kuliah.id_kelas_kuliah is not null AND kelas_kuliah.deleted_at is null and kelas_kuliah.sync_at<kelas_kuliah.updated_at, 'update', if(kelas_kuliah.id_kelas_kuliah is not null and kelas_kuliah.deleted_at is not null and kelas_kuliah.sync_at<kelas_kuliah.updated_at,'delete', null)))) as set_sync 
-            FROM kelas_kuliah 
-            LEFT JOIN kelas on kelas.id=kelas_kuliah.kelas_id
-            LEFT JOIN matakuliah on matakuliah.id=kelas_kuliah.matakuliah_id 
-            WHERE if(kelas_kuliah.id_kelas_kuliah is null AND kelas_kuliah.deleted_at is null, 'insert', if(kelas_kuliah.id_kelas_kuliah is not null AND kelas_kuliah.deleted_at is null and kelas_kuliah.sync_at<kelas_kuliah.updated_at, 'update', if(kelas_kuliah.id_kelas_kuliah is not null and kelas_kuliah.deleted_at is not null and kelas_kuliah.sync_at<kelas_kuliah.updated_at,'delete', null))) IS NOT NULL LIMIT 37")->getResult();
+            $data = $this->request->getJSON();
             foreach ($data as $key => $value) {
                 $item = [
                     'id_semester' => $value->id_semester,
@@ -757,6 +766,168 @@ class Sync extends BaseController
                 } else {
                     $key->error = $result;
                     $record['gagal'][] = $key;
+                }
+            }
+            return $this->respond($record);
+        } catch (\Throwable $th) {
+            return $this->fail($record);
+        }
+    }
+
+    function syncAktivitasMahasiswa()
+    {
+        $object = \Config\Database::connect();
+        $record = ['berhasil' => [], 'gagal' => []];
+        try {
+            $data = $this->request->getJSON();
+            foreach ($data as $key => $value) {
+                if ($value->set_sync == 'insert') {
+                    $item = [
+                        'program_mbkm' => 0,
+                        'jenis_anggota' => $value->jenis_anggota,
+                        'id_jenis_aktivitas' => $value->id_jenis_aktivitas_mahasiswa,
+                        'id_prodi' => $value->id_prodi,
+                        'id_semester' => $value->id_semester,
+                        'judul' => $value->judul,
+                        'keterangan' => $value->keterangan,
+                        'lokasi' => $value->lokasi,
+                        'sk_tugas' => $value->sk_tugas,
+                        'tanggal_sk_tugas' => $value->tanggal_sk_tugas,
+                        'tanggal_mulai' => $value->tanggal_mulai,
+                        'tanggal_selesai' => $value->tanggal_selesai,
+                    ];
+                    $setData = (object) $item;
+                    $result = $this->api->insertData('InsertAktivitasMahasiswa', $this->token, $setData);
+                    if ($result->error_code == "0" || $result->error_code == "1260") {
+                        $query = "UPDATE aktivitas_mahasiswa SET id_aktivitas='" . $result->data->id_aktivitas . "',  sync_at = '" . date('Y-m-d H:i:s') . "', updated_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $object->query($query);
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $value->error = $result;
+                        $record['gagal'][] = $value;
+                    }
+                } else if ($value->set_sync == 'update') {
+                    $item = [
+                        'program_mbkm' => 0,
+                        'jenis_anggota' => $value->jenis_anggota,
+                        'id_jenis_aktivitas' => $value->id_jenis_aktivitas_mahasiswa,
+                        'id_prodi' => $value->id_prodi,
+                        'id_semester' => $value->id_semester,
+                        'judul' => $value->judul,
+                        'keterangan' => $value->keterangan,
+                        'lokasi' => $value->lokasi,
+                        'sk_tugas' => $value->sk_tugas,
+                        'tanggal_sk_tugas' => $value->tanggal_sk_tugas,
+                        'tanggal_mulai' => $value->tanggal_mulai,
+                        'tanggal_selesai' => $value->tanggal_selesai,
+                    ];
+                    $setData = (object) $item;
+                    $itemKey = [
+                        'id_aktivitas' => $value->id_aktivitas
+                    ];
+                    $setKey = (object) $itemKey;
+                    $result = $this->api->updateData('UpdateAktivitasMahasiswa', $this->token, $setData, $setKey);
+                    if ($result->error_code == "0") {
+                        $query = "UPDATE aktivitas_mahasiswa SET sync_at = '" . date('Y-m-d H:i:s') . "', updated_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $object->query($query);
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $value->error = $result;
+                        $record['gagal'][] = $value;
+                    }
+                }else{
+                    $item = [
+                        'id_aktivitas' => $value->id_aktivitas
+                    ];
+                    $setData = (object) $item;
+                    $result = $this->api->deleteData('DeleteAktivitasMahasiswa', $this->token, $setData);
+                    if ($result->error_code == "0") {
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $value->error = $result;
+                        $record['gagal'][] = $value;
+                    }
+                }
+            }
+            return $this->respond($record);
+        } catch (\Throwable $th) {
+            return $this->fail($record);
+        }
+    }
+
+    function syncAnggotaAktivitasMahasiswa()
+    {
+        $object = \Config\Database::connect();
+        $record = ['berhasil' => [], 'gagal' => []];
+        try {
+            $data = $this->request->getJSON();
+            foreach ($data as $key => $value) {
+                if ($value->set_sync == 'insert') {
+                    $item = [
+                        'program_mbkm' => 0,
+                        'jenis_anggota' => $value->jenis_anggota,
+                        'id_jenis_aktivitas' => $value->id_jenis_aktivitas_mahasiswa,
+                        'id_prodi' => $value->id_prodi,
+                        'id_semester' => $value->id_semester,
+                        'judul' => $value->judul,
+                        'keterangan' => $value->keterangan,
+                        'lokasi' => $value->lokasi,
+                        'sk_tugas' => $value->sk_tugas,
+                        'tanggal_sk_tugas' => $value->tanggal_sk_tugas,
+                        'tanggal_mulai' => $value->tanggal_mulai,
+                        'tanggal_selesai' => $value->tanggal_selesai,
+                    ];
+                    $setData = (object) $item;
+                    $result = $this->api->insertData('InsertAktivitasMahasiswa', $this->token, $setData);
+                    if ($result->error_code == "0" || $result->error_code == "1260") {
+                        $query = "UPDATE aktivitas_mahasiswa SET id_aktivitas='" . $result->data->id_aktivitas . "',  sync_at = '" . date('Y-m-d H:i:s') . "', updated_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $object->query($query);
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $value->error = $result;
+                        $record['gagal'][] = $value;
+                    }
+                } else if ($value->set_sync == 'update') {
+                    $item = [
+                        'program_mbkm' => 0,
+                        'jenis_anggota' => $value->jenis_anggota,
+                        'id_jenis_aktivitas' => $value->id_jenis_aktivitas_mahasiswa,
+                        'id_prodi' => $value->id_prodi,
+                        'id_semester' => $value->id_semester,
+                        'judul' => $value->judul,
+                        'keterangan' => $value->keterangan,
+                        'lokasi' => $value->lokasi,
+                        'sk_tugas' => $value->sk_tugas,
+                        'tanggal_sk_tugas' => $value->tanggal_sk_tugas,
+                        'tanggal_mulai' => $value->tanggal_mulai,
+                        'tanggal_selesai' => $value->tanggal_selesai,
+                    ];
+                    $setData = (object) $item;
+                    $itemKey = [
+                        'id_aktivitas' => $value->id_aktivitas
+                    ];
+                    $setKey = (object) $itemKey;
+                    $result = $this->api->updateData('UpdateAktivitasMahasiswa', $this->token, $setData, $setKey);
+                    if ($result->error_code == "0") {
+                        $query = "UPDATE aktivitas_mahasiswa SET sync_at = '" . date('Y-m-d H:i:s') . "', updated_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $object->query($query);
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $value->error = $result;
+                        $record['gagal'][] = $value;
+                    }
+                }else{
+                    $item = [
+                        'id_aktivitas' => $value->id_aktivitas
+                    ];
+                    $setData = (object) $item;
+                    $result = $this->api->deleteData('DeleteAktivitasMahasiswa', $this->token, $setData);
+                    if ($result->error_code == "0") {
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $value->error = $result;
+                        $record['gagal'][] = $value;
+                    }
                 }
             }
             return $this->respond($record);
