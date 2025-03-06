@@ -512,7 +512,7 @@ class GetData extends BaseController
             $data = $this->api->getData('GetListBimbingMahasiswa', $this->token);
         }
         foreach ($data->data as $key => $value) {
-            if($bimbingMahasiswa->where('id_bimbing_mahasiswa', $value->id_bimbing_mahasiswa)->countAllResults()==0){
+            if ($bimbingMahasiswa->where('id_bimbing_mahasiswa', $value->id_bimbing_mahasiswa)->countAllResults() == 0) {
                 $value->id = Uuid::uuid4()->toString();
                 $value->status_sync = "sudah sync";
                 $value->sync_at = date('Y-m-d H:i:s');
@@ -534,7 +534,7 @@ class GetData extends BaseController
             $data = $this->api->getData('GetListUjiMahasiswa', $this->token);
         }
         foreach ($data->data as $key => $value) {
-            if($ujiMahasiswa->where('id_uji', $value->id_uji)->countAllResults()==0){
+            if ($ujiMahasiswa->where('id_uji', $value->id_uji)->countAllResults() == 0) {
                 $value->id = Uuid::uuid4()->toString();
                 $value->status_sync = "sudah sync";
                 $value->sync_at = date('Y-m-d H:i:s');
@@ -656,18 +656,20 @@ class GetData extends BaseController
     {
         $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
         $mahasiswa = new \App\Models\MahasiswaModel();
-        $data = $this->api->getData('GetListRiwayatPendidikanMahasiswa', $this->token);
-        if ($data->error_code == 100) {
-            $this->token = $this->api->getToken()->data->token;
-            $data = $this->api->getData('GetListRiwayatPendidikanMahasiswa', $this->token);
-        }
+        $data = $this->api->getData('GetListRiwayatPendidikanMahasiswa', $this->token, "nim='202411152'");
         foreach ($data->data as $key => $value) {
+            $item = $riwayat->where('nim', '202411152')->first();
             $model = new \App\Entities\RiwayatPendidikanMahasiswa();
             $value->id = Uuid::uuid4()->toString();
             $value->angkatan = $value->nim;
+            $value->status_sync = "sudah sync";
+            $value->sync_at = date('Y-m-d H:i:s');
+            $value->updated_at = date('Y-m-d H:i:s');
             $value->id_mahasiswa = $mahasiswa->where('id_mahasiswa', $value->id_mahasiswa)->first()->id;
             $model->fill((array)$value);
-            $riwayat->insert($model);
+            $riwayat->update($item->id,$model);
+            // if ($riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->countAllResults() == 0) {
+            // }
         }
     }
 
@@ -1072,7 +1074,7 @@ class GetData extends BaseController
         $mhs = new \App\Models\MahasiswaLulusDOModel();
         $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
         $dataRiwayat = $riwayat->findAll();
-        $data = $this->api->getData('GetDetailMahasiswaLulusDO', $this->token,"");
+        $data = $this->api->getData('GetDetailMahasiswaLulusDO', $this->token, "");
         $tempArray = [];
         foreach ($data->data as $obj) {
             $tempArray[$obj->{'id_registrasi_mahasiswa'}] = $obj;
@@ -1169,9 +1171,9 @@ class GetData extends BaseController
                 $itemMatakuliah = $matakuliah->where('id_matkul', $value->id_matkul)->first();
                 $itemRiwayat = $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
                 $object
-                ->where('id_riwayat_pendidikan', $itemRiwayat->id)
-                ->where('matakuliah_id', $itemMatakuliah->id)
-                ->delete();
+                    ->where('id_riwayat_pendidikan', $itemRiwayat->id)
+                    ->where('matakuliah_id', $itemMatakuliah->id)
+                    ->delete();
                 $itemUpdate = [
                     'id' => Uuid::uuid4()->toString(),
                     'id_riwayat_pendidikan' => $itemRiwayat->id,

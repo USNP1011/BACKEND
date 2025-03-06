@@ -401,9 +401,9 @@ $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($
 $routes->group('sync', function($routes){
     $routes->get('', 'Sync::index');
     $routes->get('read', 'Sync::getSync');
-    $routes->get('mahasiswa', 'Sync::syncMahasiswa');
+    $routes->post('mahasiswa', 'Sync::syncMahasiswa');
     $routes->post('riwayat_pendidikan', 'Sync::syncHistoryPendidikan');
-    $routes->get('kelas_kuliah', 'Sync::syncKelasKuliah');
+    $routes->post('kelas_kuliah', 'Sync::syncKelasKuliah');
     $routes->get('delete_kelas_kuliah', 'Sync::syncDeleteKelasKuliah');
     $routes->post('pengajar_kelas', 'Sync::syncPengajarKelas');
     $routes->get('delete_pengajar_kelas', 'Sync::syncDeletePengajarKelas');
