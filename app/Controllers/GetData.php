@@ -911,7 +911,7 @@ class GetData extends BaseController
         $pengajar = new \App\Models\DosenPengajarKelasModel();
         $kelasKuliah = new \App\Models\KelasKuliahModel();
 
-        $data = $this->api->getData('GetDosenPengajarKelasKuliah', $this->token, "id_kelas_kuliah='00733a83-2d8d-46e4-b2a5-15416f5ea2ed'");
+        $data = $this->api->getData('GetDosenPengajarKelasKuliah', $this->token, "id_semester='20241'");
         if ($data->error_code == 100) {
             $this->token = $this->api->getToken()->data->token;
             $data = $this->api->getData('GetDosenPengajarKelasKuliah', $this->token);
@@ -919,6 +919,7 @@ class GetData extends BaseController
         $item = [];
         try {
             foreach ($data->data as $key => $value) {
+                // if($pengajar->where('id_aktivitas_mangajar IS NULL')->where('id_kelas_kuliah', $value->id_kelas_kuliah))
                 $value->id = Uuid::uuid4()->toString();
                 $value->status_sync = 'sudah sync';
                 $value->sync_at = date('Y-m-d H:i:s');
