@@ -61,6 +61,6 @@ class BimbingMahasiswaModel extends Model
                 LEFT JOIN `kategori_kegiatan` ON `kategori_kegiatan`.`id_kategori_kegiatan` =
                 `bimbing_mahasiswa`.`id_kategori_kegiatan`
                 LEFT JOIN `dosen` ON `dosen`.`id_dosen` = `bimbing_mahasiswa`.`id_dosen`
-                WHERE aktivitas_mahasiswa_id='" . $id . "' AND bimbing_mahasiswa.deleted_at")->getResult();
+                WHERE aktivitas_mahasiswa_id='" . $id . "' AND bimbing_mahasiswa.deleted_at IS NULL")->getResult();
     }
 }
