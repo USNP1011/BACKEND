@@ -462,6 +462,9 @@ class GetData extends BaseController
         foreach ($data->data as $key => $value) {
             if ($aktivitasMahasiswa->where('id_aktivitas', $value->id_aktivitas)->countAllResults() == 0) {
                 $value->id = Uuid::uuid4()->toString();
+                $value->status_sync = "sudah sync";
+                $value->sync_at = date('Y-m-d H:i:s');
+                $value->updated_at = date('Y-m-d H:i:s');
                 $value->id_jenis_aktivitas_mahasiswa = $value->id_jenis_aktivitas;
                 $tanggal = explode('-', $value->tanggal_sk_tugas);
                 $value->tanggal_sk_tugas = $value->tanggal_sk_tugas != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
