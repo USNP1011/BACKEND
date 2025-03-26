@@ -79,8 +79,11 @@ class Mahasiswa extends ResourceController
         $object = new PesertaKelasModel();
         return $this->respond([
             'status' => true,
-            'data' => $object->select("kelas_kuliah.*, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, prodi.nama_program_studi")
+            'data' => $object->select("kelas_kuliah.*, kelas.nama_kelas_kuliah, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, prodi.nama_program_studi, 
+            (if(dosen_pengajar_kelas.id_registrasi_dosen IS NOT NULL , (SELECT penugasan_dosen.nidn FROM penugasan_dosen WHERE penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen LIMIT 1), (SELECT dosen.nidn FROM dosen WHERE dosen.id_dosen = dosen_pengajar_kelas.id_dosen))) as nidn, 
+            (if(dosen_pengajar_kelas.id_registrasi_dosen IS NOT NULL , (SELECT penugasan_dosen.nama_dosen FROM penugasan_dosen WHERE penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen LIMIT 1), (SELECT dosen.nama_dosen FROM dosen WHERE dosen.id_dosen = dosen_pengajar_kelas.id_dosen))) as nama_dosen,")
                 ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
+                ->join('kelas', 'kelas.id = kelas_kuliah.kelas_id', 'left')
                 ->join('matakuliah', 'matakuliah.id = kelas_kuliah.matakuliah_id', 'left')
                 ->join('prodi', 'prodi.id_prodi = kelas_kuliah.id_prodi', 'left')
                 ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = peserta_kelas.id_riwayat_pendidikan', 'left')
