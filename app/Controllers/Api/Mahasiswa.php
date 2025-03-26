@@ -75,23 +75,36 @@ class Mahasiswa extends ResourceController
 
     public function krsm($id = null, $id_semester = null)
     {
+        $profile = getProfileByMahasiswa($id);
         $semester = $id_semester ?? getSemesterAktif()->id_semester;
+        $data = [
+            'id_riwayat_pendidikan' => $profile->id_riwayat_pendidikan,
+            'id_semester' => $semester->id_semester,
+            'nama_semester' => $semester->nama_semester,
+            'nama_mahasiswa' => $profile->nama_mahasiswa,
+            'nim' => $profile->nim,
+            'nama_program_studi' => $profile->nama_program_studi,
+            'nama_kaprodi' => getKaprodi($profile->id_prodi)->nama_dosen,
+            'dosen_wali' => $profile->dosen_wali,
+        ];
         $object = new PesertaKelasModel();
+        $data['detail']= $object->select("kelas_kuliah.id, kelas.nama_kelas_kuliah, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, prodi.nama_program_studi, matakuliah_kurikulum.semester,
+        (if(dosen_pengajar_kelas.id_registrasi_dosen IS NOT NULL , (SELECT penugasan_dosen.nidn FROM penugasan_dosen WHERE penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen LIMIT 1), (SELECT dosen.nidn FROM dosen WHERE dosen.id_dosen = dosen_pengajar_kelas.id_dosen))) as nidn, 
+        (if(dosen_pengajar_kelas.id_registrasi_dosen IS NOT NULL , (SELECT penugasan_dosen.nama_dosen FROM penugasan_dosen WHERE penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen LIMIT 1), (SELECT dosen.nama_dosen FROM dosen WHERE dosen.id_dosen = dosen_pengajar_kelas.id_dosen))) as nama_dosen,")
+            ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
+            ->join('kelas', 'kelas.id = kelas_kuliah.kelas_id', 'left')
+            ->join('matakuliah', 'matakuliah.id = kelas_kuliah.matakuliah_id', 'left')
+            ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id = kelas_kuliah.id', 'left')
+            ->join('prodi', 'prodi.id_prodi = kelas_kuliah.id_prodi', 'left')
+            ->join('matakuliah_kurikulum', 'matakuliah_kurikulum.matakuliah_id = kelas_kuliah.matakuliah_id', 'left')
+            ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = peserta_kelas.id_riwayat_pendidikan', 'left')
+            ->where('riwayat_pendidikan_mahasiswa.id_mahasiswa', $id)
+            ->where('kelas_kuliah.id_semester', $semester)
+            ->where('dosen_pengajar_kelas.mengajar', '1')
+            ->findAll();
         return $this->respond([
             'status' => true,
-            'data' => $object->select("kelas_kuliah.*, kelas.nama_kelas_kuliah, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, prodi.nama_program_studi, matakuliah_kurikulum.semester,
-            (if(dosen_pengajar_kelas.id_registrasi_dosen IS NOT NULL , (SELECT penugasan_dosen.nidn FROM penugasan_dosen WHERE penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen LIMIT 1), (SELECT dosen.nidn FROM dosen WHERE dosen.id_dosen = dosen_pengajar_kelas.id_dosen))) as nidn, 
-            (if(dosen_pengajar_kelas.id_registrasi_dosen IS NOT NULL , (SELECT penugasan_dosen.nama_dosen FROM penugasan_dosen WHERE penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen LIMIT 1), (SELECT dosen.nama_dosen FROM dosen WHERE dosen.id_dosen = dosen_pengajar_kelas.id_dosen))) as nama_dosen,")
-                ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
-                ->join('kelas', 'kelas.id = kelas_kuliah.kelas_id', 'left')
-                ->join('matakuliah', 'matakuliah.id = kelas_kuliah.matakuliah_id', 'left')
-                ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id = kelas_kuliah.id', 'left')
-                ->join('prodi', 'prodi.id_prodi = kelas_kuliah.id_prodi', 'left')
-                ->join('matakuliah_kurikulum', 'matakuliah_kurikulum.matakuliah_id = kelas_kuliah.matakuliah_id', 'left')
-                ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = peserta_kelas.id_riwayat_pendidikan', 'left')
-                ->where('riwayat_pendidikan_mahasiswa.id_mahasiswa', $id)
-                ->where('kelas_kuliah.id_semester', $semester)
-                ->findAll()
+            'data' => $data
         ]);
     }
 
