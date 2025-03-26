@@ -76,7 +76,7 @@ class Mahasiswa extends ResourceController
     public function krsm($id = null, $id_semester = null)
     {
         $profile = getProfileByMahasiswa($id);
-        $semester = $id_semester ?? getSemesterAktif()->id_semester;
+        $semester = getSemesterById($id_semester) ?? getSemesterAktif();
         $data = [
             'id_riwayat_pendidikan' => $profile->id_riwayat_pendidikan,
             'id_semester' => $semester->id_semester,
@@ -99,7 +99,7 @@ class Mahasiswa extends ResourceController
             ->join('matakuliah_kurikulum', 'matakuliah_kurikulum.matakuliah_id = kelas_kuliah.matakuliah_id', 'left')
             ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = peserta_kelas.id_riwayat_pendidikan', 'left')
             ->where('riwayat_pendidikan_mahasiswa.id_mahasiswa', $id)
-            ->where('kelas_kuliah.id_semester', $semester)
+            ->where('kelas_kuliah.id_semester', $semester->id_semester)
             ->where('dosen_pengajar_kelas.mengajar', '1')
             ->findAll();
         return $this->respond([
