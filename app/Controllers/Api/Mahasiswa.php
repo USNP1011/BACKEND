@@ -73,9 +73,9 @@ class Mahasiswa extends ResourceController
         ]);
     }
 
-    public function krsm($id = null)
+    public function krsm($id = null, $id_semester = null)
     {
-        $semester = getSemesterAktif();
+        $semester = $id_semester ?? getSemesterAktif()->id_semester;
         $object = new PesertaKelasModel();
         return $this->respond([
             'status' => true,
@@ -85,7 +85,26 @@ class Mahasiswa extends ResourceController
                 ->join('prodi', 'prodi.id_prodi = kelas_kuliah.id_prodi', 'left')
                 ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = peserta_kelas.id_riwayat_pendidikan', 'left')
                 ->where('riwayat_pendidikan_mahasiswa.id_mahasiswa', $id)
-                ->where('kelas_kuliah.id_semester', $semester->id_semester)
+                ->where('kelas_kuliah.id_semester', $semester)
+                ->findAll()
+        ]);
+    }
+
+    public function khsm($id = null, $id_semester = null)
+    {
+        $semester = $id_semester ?? getSemesterAktif()->id_semester;
+        $object = new PesertaKelasModel();
+        return $this->respond([
+            'status' => true,
+            'data' => $object->select("kelas_kuliah.*, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, prodi.nama_program_studi, nilai_kelas.nilai_angka, nilai_kelas.nilai_huruf, nilai_kelas.nilai_indeks, (matakuliah.sks_mata_kuliah*nilai_kelas.nilai_indeks) as nxsks, if(nilai_kelas.nilai_indeks>=2,'L', 'TL') as ket")
+                ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
+                ->join('nilai_kelas', 'nilai_kelas.id_nilai_kelas=peserta_kelas.id', 'left')
+                ->join('matakuliah', 'matakuliah.id = kelas_kuliah.matakuliah_id', 'left')
+                ->join('matakuliah_kurikulum', 'matakuliah_kurikulum.matakuliah_id=kelas_kuliah.matakuliah_id', 'left')
+                ->join('prodi', 'prodi.id_prodi = kelas_kuliah.id_prodi', 'left')
+                ->join('riwayat_pendidikan_mahasiswa', 'riwayat_pendidikan_mahasiswa.id = peserta_kelas.id_riwayat_pendidikan', 'left')
+                ->where('riwayat_pendidikan_mahasiswa.id_mahasiswa', $id)
+                ->where('kelas_kuliah.id_semester', $semester)
                 ->findAll()
         ]);
     }
