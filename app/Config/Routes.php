@@ -352,6 +352,7 @@ $routes->group('rest', ['namespace'=> 'App\Controllers\Rest'], static function($
     });
 
     $routes->group('krsm', ['filter' => 'general'], function($routes){
+        $routes->get('', 'Mahasiswa\Krsm::show');
         $routes->get('(:hash)', 'Mahasiswa\Krsm::show/$1');
         $routes->post('', 'Mahasiswa\Krsm::create');
         $routes->post('(:hash)', 'Mahasiswa\Krsm::create/$1');
