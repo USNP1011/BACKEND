@@ -13,12 +13,14 @@ class KategoriKegiatan extends ResourceController
         if($req == 'pembimbing'){
             return $this->respond([
                 'status' => true,
-                'data' => $object->where("SUBSTRING(id_kategori_kegiatan,1,4)='1104'")->findAll()
+                // 'data' => $object->where("SUBSTRING(id_kategori_kegiatan,1,4)='1104'")->findAll()
+                'data' => $object->findAll()
             ]);
         }else if($req=='penguji'){
             return $this->respond([
                 'status' => true,
-                'data' => $object->where("SUBSTRING(id_kategori_kegiatan,1,4)='1105'")->findAll()
+                // 'data' => $object->where("SUBSTRING(id_kategori_kegiatan,1,4)='1105'")->findAll()
+                'data' => $object->findAll()
             ]);
         }else{
             return $this->failNotFound("URL tujuan tidak terdaftar");
