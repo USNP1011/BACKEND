@@ -29,7 +29,7 @@ class UjiMahasiswaModel extends Model
     function getById($id = null)
     {
         return $this->db->query("SELECT
-                `bimbing_mahasiswa`.*,
+                `uji_mahasiswa`.*,
                 `kategori_kegiatan`.`nama_kategori_kegiatan`,
                 `dosen`.`nama_dosen`,
                 `dosen`.`nidn`,
@@ -37,11 +37,11 @@ class UjiMahasiswaModel extends Model
                 FROM
                 `uji_mahasiswa`
                 LEFT JOIN `aktivitas_mahasiswa`
-                ON `bimbing_mahasiswa`.`aktivitas_mahasiswa_id` = `aktivitas_mahasiswa`.`id`
+                ON `uji_mahasiswa`.`aktivitas_mahasiswa_id` = `aktivitas_mahasiswa`.`id`
                 LEFT JOIN `kategori_kegiatan` ON `kategori_kegiatan`.`id_kategori_kegiatan` =
-                `bimbing_mahasiswa`.`id_kategori_kegiatan`
-                LEFT JOIN `dosen` ON `dosen`.`id_dosen` = `bimbing_mahasiswa`.`id_dosen`
-                WHERE bimbing_mahasiswa.id='" . $id . "' AND uji_mahasiswa.deleted_at IS NULL")->getRowObject();
+                `uji_mahasiswa`.`id_kategori_kegiatan`
+                LEFT JOIN `dosen` ON `dosen`.`id_dosen` = `uji_mahasiswa`.`id_dosen`
+                WHERE uji_mahasiswa.id='" . $id . "' AND uji_mahasiswa.deleted_at IS NULL")->getRowObject();
     }
 
     function getByAktivitas($id = null)
