@@ -38,7 +38,7 @@ class AktivitasMahasiswaModel extends Model
 
 	function getById($id = null)
 	{
-		$this->db->query("SELECT
+		return $this->db->query("SELECT
 			`aktivitas_mahasiswa`.*,
 			`jenis_aktivitas`.`nama_jenis_aktivitas_mahasiswa`,
 			`prodi`.`nama_program_studi`,
@@ -51,6 +51,6 @@ class AktivitasMahasiswaModel extends Model
 			LEFT JOIN `prodi` ON `prodi`.`id_prodi` = `aktivitas_mahasiswa`.`id_prodi`
 			LEFT JOIN `semester` ON `semester`.`id_semester` =
 			`aktivitas_mahasiswa`.`id_semester` 
-			WHERE bimbing_mahasiswa.id='" . $id . "' AND aktivitas_mahasiswa.deleted_at IS NULL")->getRowObject();
+			WHERE aktivitas_mahasiswa.id='" . $id . "' AND aktivitas_mahasiswa.deleted_at IS NULL")->getRowObject();
 	}
 }
