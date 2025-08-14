@@ -86,4 +86,27 @@ class Repair extends BaseController
             return false;
         }
     }
+
+    function clearTemp()
+    {
+        $temp = new \App\Models\TempKrsmModel();
+        $detail = new \App\Models\TempPesertaKelasModel();
+        $perkuliahan = new \App\Models\PerkuliahanMahasiswaModel();
+        $dataTempt = $temp->findAll();
+        $conn = \Config\Database::connect();
+        $semester = getSemesterAktif();
+        foreach ($dataTempt as $key => $value) {
+            try {
+                $conn->transBegin();
+                $temp->delete($value->id);
+                $detail->where('temp_krsm_id', $value->id)->delete();
+                $perkuliahan->where('id_riwayat_pendidikan', $value->id_pendidikan_mahasiswa)->where('id_semester', $semester->id_semester)->update(null, ['id_status_mahasiswa' => 'N']);
+                $conn->transCommit();
+            } catch (\Throwable $th) {
+                $conn->transRollback();
+            }
+            
+        }
+        
+    }
 }

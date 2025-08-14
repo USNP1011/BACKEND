@@ -75,7 +75,7 @@ class GetData extends BaseController
         // $this->status_mahasiswa();
         // $this->aktivitas_kuliah();
         // $this->nilai_transfer();
-        // $this->aktivitas_mahasiswa();
+        $this->aktivitas_mahasiswa();
         // $this->anggota_aktivitas_mahasiswa();
         // $this->bimbing_mahasiswa();
         // $this->ujiMahasiswa();
@@ -460,15 +460,22 @@ class GetData extends BaseController
             $data = $this->api->getData('GetListAktivitasMahasiswa', $this->token);
         }
         foreach ($data->data as $key => $value) {
-            if ($aktivitasMahasiswa->where('id_aktivitas', $value->id_aktivitas)->countAllResults() == 0) {
+            $cek = $aktivitasMahasiswa->where('id_aktivitas', $value->id_aktivitas)->first();
+            if (count($cek) == 0) {
+                $now = date('Y-m-d H:i:s');
                 $value->id = Uuid::uuid4()->toString();
                 $value->status_sync = "sudah sync";
-                $value->sync_at = date('Y-m-d H:i:s');
-                $value->updated_at = date('Y-m-d H:i:s');
+                $value->sync_at   = $now;
+                $value->updated_at = $now;
                 $value->id_jenis_aktivitas_mahasiswa = $value->id_jenis_aktivitas;
                 $tanggal = explode('-', $value->tanggal_sk_tugas);
                 $value->tanggal_sk_tugas = $value->tanggal_sk_tugas != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
                 $aktivitasMahasiswa->insert($value);
+            } else {
+                $now = date('Y-m-d H:i:s');
+                $value->sync_at   = $now;
+                $value->updated_at = $now;
+                $aktivitasMahasiswa->update($cek->id, $value);
             }
         }
     }
@@ -667,7 +674,7 @@ class GetData extends BaseController
             $value->updated_at = date('Y-m-d H:i:s');
             $value->id_mahasiswa = $mahasiswa->where('id_mahasiswa', $value->id_mahasiswa)->first()->id;
             $model->fill((array)$value);
-            $riwayat->update($item->id,$model);
+            $riwayat->update($item->id, $model);
             // if ($riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->countAllResults() == 0) {
             // }
         }
@@ -869,9 +876,11 @@ class GetData extends BaseController
             $data = $this->api->getData('DetailBiodataDosen', $this->token);
         }
         foreach ($data->data as $key => $value) {
-            $tanggal = explode('-', $value->tanggal_lahir);
-            $value->tanggal_lahir = $value->tanggal_lahir != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
-            $dosen->save($value);
+            if ($value->nama_dosen == 'WAYDEWIN C. B. RUMBOIRUSI') {
+                $tanggal = explode('-', $value->tanggal_lahir);
+                $value->tanggal_lahir = $value->tanggal_lahir != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
+                $dosen->save($value);
+            }
         }
     }
 
