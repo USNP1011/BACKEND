@@ -65,11 +65,11 @@ class GetData extends BaseController
         // $this->riwayat_pendidikan();
         // $this->prestasiMahasiswa();
         // $this->kurikulum();
-        // $this->matakuliah();
-        // $this->kurikulum_detail();
+        $this->matakuliah();
+        $this->kurikulum_detail();
         // $this->kelas_kuliah();
-        // $this->dosen();
-        // $this->penugasan_dosen();
+        $this->dosen();
+        $this->penugasan_dosen();
         // $this->pengajar_kelas();
         // $this->peserta_kelas();
         // $this->status_mahasiswa();
@@ -79,7 +79,7 @@ class GetData extends BaseController
         // $this->anggota_aktivitas_mahasiswa();
         // $this->bimbing_mahasiswa();
         // $this->ujiMahasiswa();
-        // $this->konversiKampusMerdeka();
+        $this->konversiKampusMerdeka();
         $this->transkrip();
     }
 
@@ -455,13 +455,13 @@ class GetData extends BaseController
         $aktivitasMahasiswa = new \App\Models\AktivitasMahasiswaModel();
 
         $data = $this->api->getData('GetListAktivitasMahasiswa', $this->token);
-        if ($data->error_code == 100) {
-            $this->token = $this->api->getToken()->data->token;
-            $data = $this->api->getData('GetListAktivitasMahasiswa', $this->token);
-        }
+        // if ($data->error_code == 100) {
+        //     $this->token = $this->api->getToken()->data->token;
+        //     $data = $this->api->getData('GetListAktivitasMahasiswa', $this->token);
+        // }
         foreach ($data->data as $key => $value) {
             $cek = $aktivitasMahasiswa->where('id_aktivitas', $value->id_aktivitas)->first();
-            if (count($cek) == 0) {
+            if (is_null($cek)) {
                 $now = date('Y-m-d H:i:s');
                 $value->id = Uuid::uuid4()->toString();
                 $value->status_sync = "sudah sync";
@@ -487,22 +487,23 @@ class GetData extends BaseController
             $riwayat = new \App\Models\RiwayatPendidikanMahasiswaModel();
             $aktivitas = new \App\Models\AktivitasMahasiswaModel();
             $data = $this->api->getData('GetListAnggotaAktivitasMahasiswa', $this->token);
-            if ($data->error_code == 100) {
-                $this->token = $this->api->getToken()->data->token;
-                $data = $this->api->getData('GetListAnggotaAktivitasMahasiswa', $this->token);
-            }
             foreach ($data->data as $key => $value) {
+                $now = date('Y-m-d H:i:s');
                 $value->id = Uuid::uuid4()->toString();
                 $value->status_sync = "sudah sync";
-                $value->sync_at = date('Y-m-d H:i:s');
-                $value->updated_at = date('Y-m-d H:i:s');
-                $itemAktivitas = $aktivitas->where('id_aktivitas', $value->id_aktivitas)->first();
-                $value->aktivitas_mahasiswa_id = $itemAktivitas->id;
-                $itemRiwayat = $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
-                $value->id_riwayat_pendidikan = $itemRiwayat->id;
-                if ($anggotaAktivitasMahasiswa->where('aktivitas_mahasiswa_id', $itemAktivitas->id)->where("id_riwayat_pendidikan", $itemRiwayat->id)->where('jenis_peran', $value->jenis_peran)->countAllResults() == 0) {
+                $value->sync_at = $now;
+                $value->updated_at = $now;
+                $cek = $anggotaAktivitasMahasiswa->where('id_anggota', $value->id_anggota)->first();
+                if (is_null($cek)) {
+                    $itemAktivitas = $aktivitas->where('id_aktivitas', $value->id_aktivitas)->first();
+                    $value->aktivitas_mahasiswa_id = $itemAktivitas->id;
+                    $itemRiwayat = $riwayat->where('id_registrasi_mahasiswa', $value->id_registrasi_mahasiswa)->first();
+                    $value->id_riwayat_pendidikan = $itemRiwayat->id;
                     $anggotaAktivitasMahasiswa->insert($value);
                 }
+                // else{
+                //     $anggotaAktivitasMahasiswa->update($cek->id, $value);
+                // }
             }
         } catch (\Throwable $th) {
             echo $th->getMessage();
@@ -533,23 +534,23 @@ class GetData extends BaseController
 
     public function ujiMahasiswa()
     {
-        $ujiMahasiswa = new \App\Models\UjiMahasiswaModel();
-        $aktivitas = new \App\Models\AktivitasMahasiswaModel();
-        $data = $this->api->getData('GetListUjiMahasiswa', $this->token);
-        if ($data->error_code == 100) {
-            $this->token = $this->api->getToken()->data->token;
+        try {
+            $ujiMahasiswa = new \App\Models\UjiMahasiswaModel();
+            $aktivitas = new \App\Models\AktivitasMahasiswaModel();
             $data = $this->api->getData('GetListUjiMahasiswa', $this->token);
-        }
-        foreach ($data->data as $key => $value) {
-            if ($ujiMahasiswa->where('id_uji', $value->id_uji)->countAllResults() == 0) {
-                $value->id = Uuid::uuid4()->toString();
-                $value->status_sync = "sudah sync";
-                $value->sync_at = date('Y-m-d H:i:s');
-                $value->updated_at = date('Y-m-d H:i:s');
-                $itemAktivitas = $aktivitas->where('id_aktivitas', $value->id_aktivitas)->first();
-                $value->aktivitas_mahasiswa_id = $itemAktivitas->id;
-                $ujiMahasiswa->insert($value);
+            foreach ($data->data as $key => $value) {
+                if ($ujiMahasiswa->where('id_uji', $value->id_uji)->countAllResults() == 0) {
+                    $value->id = Uuid::uuid4()->toString();
+                    $value->status_sync = "sudah sync";
+                    $value->sync_at = date('Y-m-d H:i:s');
+                    $value->updated_at = date('Y-m-d H:i:s');
+                    $itemAktivitas = $aktivitas->where('id_aktivitas', $value->id_aktivitas)->first();
+                    $value->aktivitas_mahasiswa_id = $itemAktivitas->id;
+                    $ujiMahasiswa->insert($value);
+                }
             }
+        } catch (\Throwable $th) {
+            echo $th->getMessage();
         }
     }
 
@@ -751,13 +752,16 @@ class GetData extends BaseController
         $conn = \Config\Database::connect();
         try {
             $conn->transException(true)->transStart();
-            $data = $this->api->getData('GetDetailMataKuliah', $this->token, "");
-            if ($data->error_code == 100) {
-                $this->token = $this->api->getToken()->data->token;
-                $data = $this->api->getData('GetDetailMataKuliah', $this->token);
-            }
+            $data = $this->api->getData('GetDetailMataKuliah', $this->token, "id_prodi='1ca14d1e-a981-4caa-9b9a-367c6c0012c0'");
+            // if ($data->error_code == 100) {
+            //     $this->token = $this->api->getToken()->data->token;
+            //     $data = $this->api->getData('GetDetailMataKuliah', $this->token);
+            // }
             $result = ['update' => [], 'insert' => []];
             foreach ($data->data as $key => $value) {
+                $now = date('Y-m-d H:i:s');
+                $value->sync_at   = $now;
+                $value->updated_at = $now;
                 $itemKuliah = $matakuliah->where('id_matkul', $value->id_matkul)->first();
                 if (is_null($itemKuliah)) {
                     $value->id = Uuid::uuid4()->toString();
@@ -791,11 +795,7 @@ class GetData extends BaseController
         $conn = \Config\Database::connect();
         try {
             $conn->transException(true)->transStart();
-            $data = $this->api->getData('GetMatkulKurikulum', $this->token, "nama_kurikulum not in('TI-2011')");
-            if ($data->error_code == 100) {
-                $this->token = $this->api->getToken()->data->token;
-                $data = $this->api->getData('GetMatkulKurikulum', $this->token, "nama_kurikulum not in('TI-2011')");
-            }
+            $data = $this->api->getData('GetMatkulKurikulum', $this->token, "id_prodi='1ca14d1e-a981-4caa-9b9a-367c6c0012c0'");
             foreach ($data->data as $key => $value) {
                 $itemKurikulum = $kurikulum->where('id_kurikulum', $value->id_kurikulum)->first();
                 $value->kurikulum_id = $itemKurikulum->id;
@@ -811,7 +811,12 @@ class GetData extends BaseController
                         'kurikulum_id' => $value->kurikulum_id,
                         'matakuliah_id' => $value->matakuliah_id,
                         'apakah_wajib' => $value->apakah_wajib,
-                        'semester' => $value->semester
+                        'semester' => $value->semester,
+                        'sks_mata_kuliah' => $value->sks_mata_kuliah,
+                        'sks_praktek' => $value->sks_praktek,
+                        'sks_praktek_lapangan' => $value->sks_praktek_lapangan,
+                        'nama_mata_kuliah' => $value->nama_mata_kuliah,
+                        'kode_mata_kuliah' => $value->kode_mata_kuliah,
                     ];
                     $value->status_sync = "sudah sync";
                     $detail->update($itemDetail->id, $value);
@@ -876,11 +881,11 @@ class GetData extends BaseController
             $data = $this->api->getData('DetailBiodataDosen', $this->token);
         }
         foreach ($data->data as $key => $value) {
-            if ($value->nama_dosen == 'WAYDEWIN C. B. RUMBOIRUSI') {
-                $tanggal = explode('-', $value->tanggal_lahir);
-                $value->tanggal_lahir = $value->tanggal_lahir != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
-                $dosen->save($value);
-            }
+            $tanggal = explode('-', $value->tanggal_lahir);
+            $value->tanggal_lahir = $value->tanggal_lahir != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
+            $dosen->save($value);
+            // if ($value->nama_dosen == 'WAYDEWIN C. B. RUMBOIRUSI') {
+            // }
         }
     }
 
@@ -888,10 +893,6 @@ class GetData extends BaseController
     {
         $penugasan = new \App\Models\PenugasanDosenModel();
         $data = $this->api->getData('GetListPenugasanDosen', $this->token, "");
-        if ($data->error_code == 100) {
-            $this->token = $this->api->getToken()->data->token;
-            $data = $this->api->getData('GetListPenugasanDosen', $this->token);
-        }
         foreach ($data->data as $key => $value) {
             $tanggal = explode('-', $value->tanggal_surat_tugas);
             $value->tanggal_surat_tugas = $value->tanggal_surat_tugas != null ? date('Y-m-d', strtotime($tanggal[1] . '/' . $tanggal[0] . '/' . $tanggal[2])) : null;
@@ -1089,10 +1090,10 @@ class GetData extends BaseController
         foreach ($data->data as $obj) {
             $tempArray[$obj->{'id_registrasi_mahasiswa'}] = $obj;
         }
-        if ($data->error_code == 100) {
-            $this->token = $this->api->getToken()->data->token;
-            $data = $this->api->getData('GetDetailMahasiswaLulusDO', $this->token);
-        }
+        // if ($data->error_code == 100) {
+        //     $this->token = $this->api->getToken()->data->token;
+        //     $data = $this->api->getData('GetDetailMahasiswaLulusDO', $this->token);
+        // }
         foreach (array_values($tempArray) as $key => $valueLulus) {
             foreach ($dataRiwayat as $key => $value) {
                 if ($valueLulus->id_registrasi_mahasiswa == $value->id_registrasi_mahasiswa) {
@@ -1139,23 +1140,25 @@ class GetData extends BaseController
             $anggotaAktivitas = new \App\Models\AnggotaAktivitasModel();
             $matakuliah = new \App\Models\MatakuliahModel();
             foreach ($data->data as $key => $value) {
-                $itemAktivitas = $anggotaAktivitas->select("anggota_aktivitas.id as anggota_aktivitas_id, aktivitas_mahasiswa.id as aktivitas_mahasiswa_id")->join('aktivitas_mahasiswa', 'aktivitas_mahasiswa.id=anggota_aktivitas.aktivitas_mahasiswa_id', 'left')
-                    ->where('anggota_aktivitas.id_anggota', $value->id_anggota)->first();
-                $itemMatakuliah = $matakuliah->where('id_matkul', $value->id_matkul)->first();
-                $itemUpdate = [
-                    'id' => Uuid::uuid4()->toString(),
-                    'id_konversi_aktivitas' => $value->id_konversi_aktivitas,
-                    'id_semester' => $value->id_semester,
-                    'matakuliah_id' => $itemMatakuliah->id,
-                    'anggota_aktivitas_id' => $itemAktivitas->anggota_aktivitas_id,
-                    'aktivitas_mahasiswa_id' => $itemAktivitas->aktivitas_mahasiswa_id,
-                    'nilai_angka' => $value->nilai_angka,
-                    'nilai_huruf' => $value->nilai_huruf,
-                    'nilai_indeks' => $value->nilai_indeks,
-                ];
-                $model = new \App\Entities\KonversiKampusMerdekaEntity();
-                $model->fill($itemUpdate);
-                $dataUpdate[] = $model;
+                if($object->where('id_konversi_aktivitas', $value->id_konversi_aktivitas)->countAllResults()==0){
+                    $itemAktivitas = $anggotaAktivitas->select("anggota_aktivitas.id as anggota_aktivitas_id, aktivitas_mahasiswa.id as aktivitas_mahasiswa_id")->join('aktivitas_mahasiswa', 'aktivitas_mahasiswa.id=anggota_aktivitas.aktivitas_mahasiswa_id', 'left')
+                        ->where('anggota_aktivitas.id_anggota', $value->id_anggota)->first();
+                    $itemMatakuliah = $matakuliah->where('id_matkul', $value->id_matkul)->first();
+                    $itemUpdate = [
+                        'id' => Uuid::uuid4()->toString(),
+                        'id_konversi_aktivitas' => $value->id_konversi_aktivitas,
+                        'id_semester' => $value->id_semester,
+                        'matakuliah_id' => $itemMatakuliah->id,
+                        'anggota_aktivitas_id' => $itemAktivitas->anggota_aktivitas_id,
+                        'aktivitas_mahasiswa_id' => $itemAktivitas->aktivitas_mahasiswa_id,
+                        'nilai_angka' => $value->nilai_angka,
+                        'nilai_huruf' => $value->nilai_huruf,
+                        'nilai_indeks' => $value->nilai_indeks,
+                    ];
+                    $model = new \App\Entities\KonversiKampusMerdekaEntity();
+                    $model->fill($itemUpdate);
+                    $dataUpdate[] = $model;
+                }
             }
             $object->insertBatch($dataUpdate);
             $conn->transComplete();

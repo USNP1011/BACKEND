@@ -18,6 +18,7 @@ class DosenModel extends Model
 		'id_agama',
 		'id_status_aktif',
 		'nidn',
+		'nuptk',
 		'nama_ibu',
 		'nik',
 		'nip',

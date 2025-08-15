@@ -66,11 +66,16 @@ class DosenWali extends ResourceController
 
     public function update($id = null)
     {
+        $data = $this->request->getJSON();
         try {
             $object = new \App\Models\DosenWaliModel();
-            $model = new \App\Entities\DosenWaliEntity();
-            $model->fill((array)$this->request->getJSON());
-            $object->save($model);
+            $dataUpdate = [];
+            foreach ($data as $key => $value) {
+                $model = new \App\Entities\DosenWaliEntity();
+                $model->fill((array)$value);
+                $dataUpdate[] = $model;
+            }
+            $object->updateBatch($dataUpdate, "id");
             return $this->respond([
                 'status' => true,
                 'data' => $model
@@ -82,7 +87,6 @@ class DosenWali extends ResourceController
             ]);
         }
     }
-
 
     public function delete($id = null)
     {

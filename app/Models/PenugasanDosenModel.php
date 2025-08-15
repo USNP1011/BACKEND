@@ -15,6 +15,7 @@ class PenugasanDosenModel extends Model
 		'id_dosen',
 		'nama_dosen',
 		'nidn',
+		'nuptk',
 		'id_perguruan_tinggi',
 		'nama_perguruan_tinggi',
 		'id_prodi',
