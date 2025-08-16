@@ -43,7 +43,7 @@ class Repair extends BaseController
                 }
                 // $model = new \App\Entities\AktivitasKuliahEntity();
                 // $model->fill((array)$value);
-                $perkuliahan->update($value->id, ['ips'=>$value->ips, 'ipk'=>$value->ipk]);
+                $perkuliahan->update($value->id, ['ips' => $value->ips, 'ipk' => $value->ipk]);
             }
             return $this->respond($dataPerkuliahan);
         } catch (\Throwable $th) {
@@ -71,7 +71,7 @@ class Repair extends BaseController
                         'konversi_kampus_merdeka_id' => NULL,
                         'nilai_transfer_id' => NULL,
                     ];
-                    if($value->nilai_indeks > 1){
+                    if ($value->nilai_indeks > 1) {
                         $data[] = $item;
                     }
                     // $model = new \App\Entities\TranskripEntity();
@@ -105,8 +105,123 @@ class Repair extends BaseController
             } catch (\Throwable $th) {
                 $conn->transRollback();
             }
-            
         }
-        
+    }
+
+    public function transkrip()
+    {
+        $db = db_connect();
+
+        try {
+            // Ambil semua data peserta kelas + nilai + mk
+            $peserta = $db->table('peserta_kelas')
+                ->select("peserta_kelas.id_riwayat_pendidikan, 
+                  peserta_kelas.kelas_kuliah_id, 
+                  nilai_kelas.nilai_angka, nilai_kelas.nilai_huruf, nilai_kelas.nilai_indeks, 
+                  kelas_kuliah.matakuliah_id, 
+                  matakuliah.sks_mata_kuliah")
+                ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
+                ->join('nilai_kelas', 'nilai_kelas.id_nilai_kelas = peserta_kelas.id', 'left')
+                ->join('matakuliah', 'matakuliah.id = kelas_kuliah.matakuliah_id', 'left')
+                ->get()->getResult();
+
+            // Ambil nilai transfer
+            $transfer = $db->table('nilai_transfer')
+                ->select("nilai_transfer.id_riwayat_pendidikan, 
+                  matakuliah.id as matakuliah_id, 
+                  nilai_transfer.nilai_angka_diakui as nilai_indeks, 
+                  nilai_transfer.nilai_huruf_diakui as nilai_huruf, 
+                  NULL as nilai_angka,
+                  matakuliah.sks_mata_kuliah, 
+                  nilai_transfer.id as nilai_transfer_id")
+                ->join('matakuliah', 'matakuliah.id_matkul = nilai_transfer.id_matkul', 'left')
+                ->get()->getResult();
+
+            // Ambil konversi kampus merdeka (via anggota_aktivitas)
+            $konversi = $db->table('konversi_kampus_merdeka')
+                ->select("anggota_aktivitas.id_riwayat_pendidikan, 
+                  konversi_kampus_merdeka.id as konversi_kampus_merdeka_id, 
+                  konversi_kampus_merdeka.matakuliah_id, 
+                  konversi_kampus_merdeka.nilai_angka, 
+                  konversi_kampus_merdeka.nilai_huruf, 
+                  konversi_kampus_merdeka.nilai_indeks,
+                  matakuliah.sks_mata_kuliah")
+                ->join('anggota_aktivitas', 'anggota_aktivitas.id = konversi_kampus_merdeka.anggota_aktivitas_id', 'left')
+                ->join('matakuliah', 'matakuliah.id = konversi_kampus_merdeka.matakuliah_id', 'left')
+                ->get()->getResult();
+
+            // Gabungkan semua ke dalam 1 array transkrip kandidat
+            $kandidat = [];
+
+            foreach ($peserta as $p) {
+                $kandidat[$p->id_riwayat_pendidikan][$p->matakuliah_id][] = [
+                    'id_riwayat_pendidikan' => $p->id_riwayat_pendidikan,
+                    'matakuliah_id' => $p->matakuliah_id,
+                    'kelas_kuliah_id' => $p->kelas_kuliah_id,
+                    'konversi_kampus_merdeka_id' => null,
+                    'nilai_transfer_id' => null,
+                    'nilai_angka' => $p->nilai_angka,
+                    'nilai_huruf' => $p->nilai_huruf,
+                    'nilai_indeks' => $p->nilai_indeks,
+                ];
+            }
+
+            foreach ($transfer as $t) {
+                $kandidat[$t->id_riwayat_pendidikan][$t->matakuliah_id][] = [
+                    'id_riwayat_pendidikan' => $t->id_riwayat_pendidikan,
+                    'matakuliah_id' => $t->matakuliah_id,
+                    'kelas_kuliah_id' => null,
+                    'konversi_kampus_merdeka_id' => null,
+                    'nilai_transfer_id' => $t->nilai_transfer_id,
+                    'nilai_angka' => $t->nilai_angka,
+                    'nilai_huruf' => $t->nilai_huruf,
+                    'nilai_indeks' => $t->nilai_indeks,
+                ];
+            }
+
+            foreach ($konversi as $k) {
+                $kandidat[$k->id_riwayat_pendidikan][$k->matakuliah_id][] = [
+                    'id_riwayat_pendidikan' => $k->id_riwayat_pendidikan,
+                    'matakuliah_id' => $k->matakuliah_id,
+                    'kelas_kuliah_id' => null,
+                    'konversi_kampus_merdeka_id' => $k->konversi_kampus_merdeka_id,
+                    'nilai_transfer_id' => null,
+                    'nilai_angka' => $k->nilai_angka,
+                    'nilai_huruf' => $k->nilai_huruf,
+                    'nilai_indeks' => $k->nilai_indeks,
+                ];
+            }
+
+            // Pilih nilai tertinggi untuk setiap matakuliah
+            $final = [];
+            foreach ($kandidat as $idPendidikan => $matkulList) {
+                foreach ($matkulList as $matkulId => $nilaiSet) {
+                    // sort by nilai_indeks tertinggi
+                    usort($nilaiSet, fn($a, $b) => $b['nilai_indeks'] <=> $a['nilai_indeks']);
+
+                    // ambil yang tertinggi
+                    $item = $nilaiSet[0];
+
+                    // tambahkan id UUID
+                    $item['id'] = Uuid::uuid4()->toString();
+
+                    $final[] = $item;
+                }
+            }
+
+            // Bersihkan transkrip lama & insert baru
+            $transkripModel = new \App\Models\TranskripModel();
+            // foreach ($final as $row) {
+            // }
+            $db->table('transkrip')->truncate();
+            $transkripModel->insertBatch($final);
+
+            return $this->respond([
+                'status' => 'ok',
+                'inserted' => count($final),
+            ]);
+        } catch (\Throwable $th) {
+            return $this->fail($th->getMessage());
+        }
     }
 }

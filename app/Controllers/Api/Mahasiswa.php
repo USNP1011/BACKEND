@@ -87,11 +87,11 @@ class Mahasiswa extends ResourceController
             'nim' => $profile->nim,
             'nama_program_studi' => $profile->nama_program_studi,
             'nama_kaprodi' => getKaprodi($profile->id_prodi)->nama_dosen,
-            'sks_semester' =>$dataPerkuliahan->sks_semester,
+            'sks_semester' => $dataPerkuliahan->sks_semester,
             'dosen_wali' => $profile->dosen_wali,
         ];
         $object = new PesertaKelasModel();
-        $data['detail']= $object->select("kelas_kuliah.id, kelas_kuliah.hari, kelas_kuliah.jam_mulai, kelas_kuliah.jam_selesai, kelas.nama_kelas_kuliah, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, prodi.nama_program_studi, matakuliah_kurikulum.semester,
+        $data['detail'] = $object->select("kelas_kuliah.id, kelas_kuliah.hari, kelas_kuliah.jam_mulai, kelas_kuliah.jam_selesai, kelas.nama_kelas_kuliah, matakuliah.kode_mata_kuliah, matakuliah.nama_mata_kuliah, matakuliah.sks_mata_kuliah, prodi.nama_program_studi, matakuliah_kurikulum.semester,
         (if(dosen_pengajar_kelas.id_registrasi_dosen IS NOT NULL , (SELECT penugasan_dosen.nidn FROM penugasan_dosen WHERE penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen LIMIT 1), (SELECT dosen.nidn FROM dosen WHERE dosen.id_dosen = dosen_pengajar_kelas.id_dosen))) as nidn, 
         (if(dosen_pengajar_kelas.id_registrasi_dosen IS NOT NULL , (SELECT penugasan_dosen.nama_dosen FROM penugasan_dosen WHERE penugasan_dosen.id_registrasi_dosen=dosen_pengajar_kelas.id_registrasi_dosen LIMIT 1), (SELECT dosen.nama_dosen FROM dosen WHERE dosen.id_dosen = dosen_pengajar_kelas.id_dosen))) as nama_dosen,")
             ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
@@ -441,7 +441,66 @@ class Mahasiswa extends ResourceController
         $object = model(MahasiswaModel::class);
         $item = [
             'status' => true,
-            'data' => $object->select("mahasiswa.id, mahasiswa.nama_mahasiswa, mahasiswa.id_user, mahasiswa.jenis_kelamin, mahasiswa.status_sync, mahasiswa.sync_at, mahasiswa.tanggal_lahir, agama.nama_agama, agama.id_agama, riwayat_pendidikan_mahasiswa.nim, riwayat_pendidikan_mahasiswa.angkatan, prodi.nama_program_studi, prodi.id_prodi, (SELECT perkuliahan_mahasiswa.sks_total from perkuliahan_mahasiswa where id_riwayat_pendidikan = riwayat_pendidikan_mahasiswa.id AND sks_total != '0' order by id_semester desc limit 1) as sks_total, (SELECT jenis_keluar.jenis_keluar FROM mahasiswa_lulus_do LEFT JOIN jenis_keluar on jenis_keluar.id_jenis_keluar = mahasiswa_lulus_do.id_jenis_keluar WHERE mahasiswa_lulus_do.id_riwayat_pendidikan = riwayat_pendidikan_mahasiswa.id  limit 1) as nama_jenis_keluar, (SELECT status_mahasiswa.nama_status_mahasiswa FROM perkuliahan_mahasiswa LEFT JOIN status_mahasiswa ON status_mahasiswa.id_status_mahasiswa=perkuliahan_mahasiswa.id_status_mahasiswa WHERE perkuliahan_mahasiswa.id_riwayat_pendidikan = riwayat_pendidikan_mahasiswa.id order by perkuliahan_mahasiswa.created_at desc limit 1) as nama_status_mahasiswa")
+            'data' => $object->select("mahasiswa.id, 
+    mahasiswa.nama_mahasiswa, 
+    mahasiswa.id_user, 
+    mahasiswa.jenis_kelamin, 
+    mahasiswa.status_sync, 
+    mahasiswa.sync_at, 
+    mahasiswa.tanggal_lahir, 
+    agama.nama_agama, 
+    agama.id_agama, 
+    riwayat_pendidikan_mahasiswa.nim, 
+    riwayat_pendidikan_mahasiswa.angkatan, 
+    prodi.nama_program_studi, 
+    prodi.id_prodi, 
+
+    (SELECT perkuliahan_mahasiswa.sks_total 
+        FROM perkuliahan_mahasiswa 
+        WHERE id_riwayat_pendidikan = riwayat_pendidikan_mahasiswa.id 
+        AND sks_total != '0' 
+        ORDER BY id_semester DESC 
+        LIMIT 1
+    ) as sks_total,
+
+    (SELECT jenis_keluar.jenis_keluar 
+        FROM mahasiswa_lulus_do 
+        LEFT JOIN jenis_keluar 
+            ON jenis_keluar.id_jenis_keluar = mahasiswa_lulus_do.id_jenis_keluar 
+        WHERE mahasiswa_lulus_do.id_riwayat_pendidikan = riwayat_pendidikan_mahasiswa.id  
+        LIMIT 1
+    ) as nama_jenis_keluar,
+
+    CASE 
+        WHEN (
+            (SELECT jenis_keluar.jenis_keluar 
+             FROM mahasiswa_lulus_do 
+             LEFT JOIN jenis_keluar 
+                ON jenis_keluar.id_jenis_keluar = mahasiswa_lulus_do.id_jenis_keluar 
+             WHERE mahasiswa_lulus_do.id_riwayat_pendidikan = riwayat_pendidikan_mahasiswa.id  
+             LIMIT 1
+            ) IS NOT NULL
+        )
+        THEN (
+            (SELECT jenis_keluar.jenis_keluar 
+             FROM mahasiswa_lulus_do 
+             LEFT JOIN jenis_keluar 
+                ON jenis_keluar.id_jenis_keluar = mahasiswa_lulus_do.id_jenis_keluar 
+             WHERE mahasiswa_lulus_do.id_riwayat_pendidikan = riwayat_pendidikan_mahasiswa.id  
+             LIMIT 1
+            )
+        )
+        ELSE (
+            (SELECT status_mahasiswa.nama_status_mahasiswa 
+             FROM perkuliahan_mahasiswa 
+             LEFT JOIN status_mahasiswa 
+                ON status_mahasiswa.id_status_mahasiswa = perkuliahan_mahasiswa.id_status_mahasiswa 
+             WHERE perkuliahan_mahasiswa.id_riwayat_pendidikan = riwayat_pendidikan_mahasiswa.id 
+             ORDER BY perkuliahan_mahasiswa.created_at DESC 
+             LIMIT 1
+            )
+        )
+    END as nama_status_mahasiswa")
                 ->join("agama", "agama.id_agama=mahasiswa.id_agama", "LEFT")
                 ->join("riwayat_pendidikan_mahasiswa", "riwayat_pendidikan_mahasiswa.id_mahasiswa=mahasiswa.id", "LEFT")
                 ->join("prodi", "riwayat_pendidikan_mahasiswa.id_prodi=prodi.id_prodi", "LEFT")

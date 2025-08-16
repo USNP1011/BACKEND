@@ -422,4 +422,5 @@ $routes->group('sync', function($routes){
 $routes->group('repair', function($routes){
     $routes->get('', 'Repair::repair');
     $routes->get('temp', 'Repair::clearTemp');
+    $routes->get('transkrip', 'Repair::transkrip');
 });
