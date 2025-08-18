@@ -78,10 +78,9 @@ class Mahasiswa extends ResourceController
         else $profile = getProfileByMahasiswa($id);
         $object = new MatakuliahKurikulumModel();
         $itemKurikulum = $object->select('matakuliah_kurikulum.id, matakuliah_kurikulum.kurikulum_id, matakuliah_kurikulum.matakuliah_id, matakuliah_kurikulum.semester, matakuliah.nama_mata_kuliah, matakuliah.kode_mata_kuliah, matakuliah.sks_mata_kuliah')
-            ->join('kurikulum', 'kurikulum.id=matakuliah_kurikulum.kurikulum_id', 'left')
             ->join('matakuliah', 'matakuliah.id=matakuliah_kurikulum.matakuliah_id', 'left')
             ->orderBy('semester', 'asc')
-            ->where('kurikulum.id_prodi', $profile->id_prodi)->findAll();
+            ->where('matakuliah_kurikulum.kurikulum_id', $profile->kurikulum_id)->findAll();
         $object = new \App\Models\TranskripModel();
         $itemTranskrip = $object->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->findAll();
         foreach ($itemKurikulum as $key => $kuri) {

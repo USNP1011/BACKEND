@@ -3,6 +3,15 @@
 namespace App\Controllers;
 
 use Ramsey\Uuid\Uuid;
+use App\Libraries\Rest;
+use App\Models\MahasiswaModel;
+use App\Entities\Mahasiswa  as EntitiesMahasiswa;
+use App\Models\RiwayatPendidikanMahasiswaModel;
+use App\Models\UserRoleModel;
+use CodeIgniter\HTTP\ResponseInterface;
+use CodeIgniter\RESTful\ResourceController;
+use CodeIgniter\Shield\Entities\User;
+use CodeIgniter\Database\Exceptions\DatabaseException;
 
 class Repair extends BaseController
 {
@@ -116,10 +125,10 @@ class Repair extends BaseController
             // Ambil semua data peserta kelas + nilai + mk
             $peserta = $db->table('peserta_kelas')
                 ->select("peserta_kelas.id_riwayat_pendidikan, 
-                  peserta_kelas.kelas_kuliah_id, 
-                  nilai_kelas.nilai_angka, nilai_kelas.nilai_huruf, nilai_kelas.nilai_indeks, 
-                  kelas_kuliah.matakuliah_id, 
-                  matakuliah.sks_mata_kuliah")
+                      peserta_kelas.kelas_kuliah_id, 
+                      nilai_kelas.nilai_angka, nilai_kelas.nilai_huruf, nilai_kelas.nilai_indeks, 
+                      kelas_kuliah.matakuliah_id, 
+                      matakuliah.sks_mata_kuliah")
                 ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
                 ->join('nilai_kelas', 'nilai_kelas.id_nilai_kelas = peserta_kelas.id', 'left')
                 ->join('matakuliah', 'matakuliah.id = kelas_kuliah.matakuliah_id', 'left')
@@ -128,24 +137,24 @@ class Repair extends BaseController
             // Ambil nilai transfer
             $transfer = $db->table('nilai_transfer')
                 ->select("nilai_transfer.id_riwayat_pendidikan, 
-                  matakuliah.id as matakuliah_id, 
-                  nilai_transfer.nilai_angka_diakui as nilai_indeks, 
-                  nilai_transfer.nilai_huruf_diakui as nilai_huruf, 
-                  NULL as nilai_angka,
-                  matakuliah.sks_mata_kuliah, 
-                  nilai_transfer.id as nilai_transfer_id")
+                      matakuliah.id as matakuliah_id, 
+                      nilai_transfer.nilai_angka_diakui as nilai_indeks, 
+                      nilai_transfer.nilai_huruf_diakui as nilai_huruf, 
+                      NULL as nilai_angka,
+                      matakuliah.sks_mata_kuliah, 
+                      nilai_transfer.id as nilai_transfer_id")
                 ->join('matakuliah', 'matakuliah.id_matkul = nilai_transfer.id_matkul', 'left')
                 ->get()->getResult();
 
             // Ambil konversi kampus merdeka (via anggota_aktivitas)
             $konversi = $db->table('konversi_kampus_merdeka')
                 ->select("anggota_aktivitas.id_riwayat_pendidikan, 
-                  konversi_kampus_merdeka.id as konversi_kampus_merdeka_id, 
-                  konversi_kampus_merdeka.matakuliah_id, 
-                  konversi_kampus_merdeka.nilai_angka, 
-                  konversi_kampus_merdeka.nilai_huruf, 
-                  konversi_kampus_merdeka.nilai_indeks,
-                  matakuliah.sks_mata_kuliah")
+                      konversi_kampus_merdeka.id as konversi_kampus_merdeka_id, 
+                      konversi_kampus_merdeka.matakuliah_id, 
+                      konversi_kampus_merdeka.nilai_angka, 
+                      konversi_kampus_merdeka.nilai_huruf, 
+                      konversi_kampus_merdeka.nilai_indeks,
+                      matakuliah.sks_mata_kuliah")
                 ->join('anggota_aktivitas', 'anggota_aktivitas.id = konversi_kampus_merdeka.anggota_aktivitas_id', 'left')
                 ->join('matakuliah', 'matakuliah.id = konversi_kampus_merdeka.matakuliah_id', 'left')
                 ->get()->getResult();
@@ -163,6 +172,7 @@ class Repair extends BaseController
                     'nilai_angka' => $p->nilai_angka,
                     'nilai_huruf' => $p->nilai_huruf,
                     'nilai_indeks' => $p->nilai_indeks,
+                    'sks_mata_kuliah' => $p->sks_mata_kuliah,
                 ];
             }
 
@@ -176,6 +186,7 @@ class Repair extends BaseController
                     'nilai_angka' => $t->nilai_angka,
                     'nilai_huruf' => $t->nilai_huruf,
                     'nilai_indeks' => $t->nilai_indeks,
+                    'sks_mata_kuliah' => $t->sks_mata_kuliah,
                 ];
             }
 
@@ -189,6 +200,7 @@ class Repair extends BaseController
                     'nilai_angka' => $k->nilai_angka,
                     'nilai_huruf' => $k->nilai_huruf,
                     'nilai_indeks' => $k->nilai_indeks,
+                    'sks_mata_kuliah' => $k->sks_mata_kuliah,
                 ];
             }
 
@@ -211,10 +223,49 @@ class Repair extends BaseController
 
             // Bersihkan transkrip lama & insert baru
             $transkripModel = new \App\Models\TranskripModel();
-            // foreach ($final as $row) {
-            // }
             $db->table('transkrip')->truncate();
             $transkripModel->insertBatch($final);
+
+            // ===============================
+            // Proses perkuliahan mahasiswa
+            // ===============================
+            $perkuliahanModel = new \App\Models\PerkuliahanMahasiswaModel();
+            $semesterAktif = '20241';
+            $perkuliahanData = $perkuliahanModel->where('id_semester', $semesterAktif)->findAll();
+
+            foreach ($perkuliahanData as $pk) {
+                if ($pk->id_status_mahasiswa == 'A') {
+                    // IPS semester ini
+                    $transkripMahasiswa = array_filter($final, fn($t) => $t['id_riwayat_pendidikan'] == $pk->id_riwayat_pendidikan);
+                    $nxsks = $sks = 0;
+                    foreach ($transkripMahasiswa as $t) {
+                        if ($t['nilai_indeks'] !== null) {
+                            $sks += (int)$t['sks_mata_kuliah'];
+                            $nxsks += ((float)$t['nilai_indeks'] * (int)$t['sks_mata_kuliah']);
+                        }
+                    }
+                    $pk->ips = $sks > 0 ? round($nxsks / $sks, 2) : 0;
+
+                    // IPK keseluruhan
+                    $ipkData = $db->table('transkrip')
+                        ->select('SUM(sks_mata_kuliah * nilai_indeks) / SUM(sks_mata_kuliah) as ipk')
+                        ->where('id_riwayat_pendidikan', $pk->id_riwayat_pendidikan)
+                        ->get()->getRow();
+                    $pk->ipk = $ipkData ? round($ipkData->ipk, 2) : 0;
+                } else {
+                    // Mahasiswa tidak aktif, ambil IPK semester terakhir
+                    $lastPerkuliahan = $perkuliahanModel
+                        ->where('id_riwayat_pendidikan', $pk->id_riwayat_pendidikan)
+                        ->orderBy('id_semester', 'desc')
+                        ->limit(1, 1)
+                        ->first();
+                    $pk->ips = 0;
+                    $pk->ipk = $lastPerkuliahan ? $lastPerkuliahan->ipk : 0;
+                }
+
+                // Update perkuliahan
+                $perkuliahanModel->update($pk->id, ['ips' => $pk->ips, 'ipk' => $pk->ipk]);
+            }
 
             return $this->respond([
                 'status' => 'ok',
@@ -223,5 +274,253 @@ class Repair extends BaseController
         } catch (\Throwable $th) {
             return $this->fail($th->getMessage());
         }
+    }
+
+
+    public function createMahasiswa()
+    {
+        $data = $this->request->getJSON();
+        $conn = \Config\Database::connect();
+        try {
+            $conn->transException(true)->transStart();
+            // if (!$this->validate('mahasiswa')) {
+            //     $result = [
+            //         "status" => false,
+            //         "message" => $this->validator->getErrors(),
+            //     ];
+            //     return $this->failValidationErrors($result);
+            // }
+            $dataSimpan = [];
+            $object = new MahasiswaModel();
+
+            foreach ($data as $key => $item) {
+                $item->id = Uuid::uuid4()->toString();
+                $model = new EntitiesMahasiswa();
+                $model->fill((array) $item);
+                $dataSimpan[] = $model;
+            }
+            $object->insertBatch($dataSimpan);
+
+            $conn->transComplete();
+            return $this->respond([
+                'status' => true,
+                'data' => $item
+            ]);
+        } catch (DatabaseException $th) {
+            return $this->failValidationErrors([
+                'status' => false,
+                'message' => $th->getCode() == 1062 ? "Mahasiswa dengan nama, tempat, tanggal lahir dan ibu kandung yang sama sudah ada" : "Maaf, Terjadi kesalahan, silahkan hubungi bagian pengembang!",
+            ]);
+        }
+    }
+
+    public function createRegistrasi()
+    {
+        $conn = \Config\Database::connect();
+        try {
+            $conn->transException(true)->transStart();
+            $data = $this->request->getJSON();
+
+            // --- 1. Ambil semua NIK sekaligus (cache data mahasiswa) ---
+            $nikList = array_map(fn($i) => $i->nik, $data);
+            $mhsModel = new \App\Models\MahasiswaModel();
+            $allMhs = $mhsModel->whereIn('nik', $nikList)->findAll();
+            $mapMhs = [];
+            foreach ($allMhs as $row) {
+                $mapMhs[$row->nik] = $row;
+            }
+
+            // --- 2. Ambil semester aktif & biaya per prodi/angkatan ---
+            $semester = getSemesterAktif();
+            $biayaModel = new \App\Models\SettingBiayaModel();
+            $prodiAngkatan = [];
+            foreach ($data as $item) {
+                $angkatan = substr($item->nim, 0, 4);
+                $prodiAngkatan[] = ['id_prodi' => $item->id_prodi, 'angkatan' => $angkatan];
+            }
+
+            // unikkan kombinasi
+            $prodiAngkatan = array_unique(array_map('serialize', $prodiAngkatan));
+            $prodiAngkatan = array_map('unserialize', $prodiAngkatan);
+
+            // query sekali biaya
+            $biayaList = [];
+            foreach ($prodiAngkatan as $pa) {
+                $row = $biayaModel
+                    ->where('id_prodi', $pa['id_prodi'])
+                    ->where('angkatan', $pa['angkatan'])
+                    ->first();
+                if ($row) {
+                    $biayaList[$pa['id_prodi']][$pa['angkatan']] = $row->biaya;
+                }
+            }
+
+            // --- 3. Loop utama ---
+            foreach ($data as $item) {
+                // === User ===
+                $itemUser = [
+                    'username' => $item->nim,
+                    'email'    => $item->nim . '@usn-papua.ac.id',
+                    'password' => $item->nim,
+                ];
+
+                $userObject = auth()->getProvider();
+                $userEntityObject = new User();
+                $userEntityObject->fill($itemUser);
+                $userObject->save($userEntityObject);
+                $itemData = $userObject->findById($userObject->getInsertID());
+                $item->id_user = $userObject->getInsertID();
+                $userObject->addToDefaultGroup($itemData);
+                $itemData->forcePasswordReset();
+                $itemData->activate();
+
+                // === Mahasiswa ===
+                if (isset($mapMhs[$item->nik])) {
+                    $item->id_mahasiswa = $mapMhs[$item->nik]->id;
+                    $mhsModel->update($item->id_mahasiswa, ['id_user' => $item->id_user]);
+                }
+
+                // === Role ===
+                (new UserRoleModel())->insert([
+                    'users_id' => $item->id_user,
+                    'role_id'  => '4'
+                ]);
+
+                // === Riwayat Pendidikan ===
+                $item->id = Uuid::uuid4()->toString();
+                $item->angkatan = substr($item->nim, 0, 4);
+                $riwayatModel = new \App\Models\RiwayatPendidikanMahasiswaModel();
+                $riwayatEntity = new \App\Entities\RiwayatPendidikanMahasiswa();
+                $riwayatEntity->fill((array)$item);
+                $riwayatModel->insert($riwayatEntity);
+
+                // === Perkuliahan ===
+                $biayaKuliah = $biayaList[$item->id_prodi][$item->angkatan] ?? 0;
+
+                $perkuliahanModel = new \App\Models\PerkuliahanMahasiswaModel();
+                $perkuliahanEntity = new \App\Entities\AktivitasKuliahEntity();
+                $perkuliahanEntity->fill([
+                    'id'                   => Uuid::uuid4()->toString(),
+                    'id_riwayat_pendidikan' => $item->id,
+                    'id_mahasiswa'         => $item->id_mahasiswa,
+                    'id_semester'          => $semester->id_semester,
+                    'nama_semester'        => $semester->nama_semester,
+                    'nim'                  => $item->nim,
+                    'id_prodi'             => $item->id_prodi,
+                    'id_status_mahasiswa'  => "N",
+                    'ips'                  => '0',
+                    'ipk'                  => '0',
+                    'sks_semester'         => '0',
+                    'sks_total'            => '0',
+                    'id_pembiayaan'        => '1',
+                    'biaya_kuliah_smt'     => $biayaKuliah
+                ]);
+                $perkuliahanModel->insert($perkuliahanEntity);
+            }
+
+            $conn->transComplete();
+            return $this->respond([
+                'status' => true,
+                'message' => 'Registrasi berhasil'
+            ]);
+        } catch (\Throwable $th) {
+            return $this->fail([
+                'status' => false,
+                'message' => $th->getMessage()
+            ]);
+        }
+    }
+
+    public function prosesPerkuliahanMandiri(string $semester)
+    {
+        $db = db_connect();
+        $perkuliahanModel = new \App\Models\PerkuliahanMahasiswaModel();
+
+        // Ambil data perkuliahan semester aktif
+        $perkuliahanData = $perkuliahanModel
+            ->where('id_semester', $semester)
+            ->findAll();
+
+        // Ambil semua nilai semester ini (untuk IPS)
+        $nilaiIPS = $db->table('nilai_kelas nk')
+            ->select('pk.id_riwayat_pendidikan, mat.sks_mata_kuliah, nk.nilai_indeks')
+            ->join('peserta_kelas pk', 'pk.id = nk.id_nilai_kelas', 'left')
+            ->join('kelas_kuliah kk', 'kk.id = pk.kelas_kuliah_id', 'left')
+            ->join('matakuliah mat', 'mat.id = kk.matakuliah_id', 'left')
+            ->where('kk.id_semester', $semester) // ✅ filter hanya semester ini
+            ->get()->getResult();
+
+        // Kelompokkan nilai IPS per mahasiswa
+        $nilaiPerMahasiswa = [];
+        foreach ($nilaiIPS as $n) {
+            $nilaiPerMahasiswa[$n->id_riwayat_pendidikan][] = $n;
+        }
+
+        // Ambil semua nilai historis (untuk IPK, tanpa filter semester)
+        $nilaiIPK = $db->table('nilai_kelas nk')
+            ->select('pk.id_riwayat_pendidikan, mat.sks_mata_kuliah, nk.nilai_indeks')
+            ->join('peserta_kelas pk', 'pk.id = nk.id_nilai_kelas', 'left')
+            ->join('kelas_kuliah kk', 'kk.id = pk.kelas_kuliah_id', 'left')
+            ->join('matakuliah mat', 'mat.id = kk.matakuliah_id', 'left')
+            ->whereIn('pk.id_riwayat_pendidikan', array_map(fn($p) => $p->id_riwayat_pendidikan, $perkuliahanData))
+            ->get()->getResult();
+
+        // Kelompokkan nilai IPK per mahasiswa
+        $nilaiKumulatif = [];
+        foreach ($nilaiIPK as $n) {
+            $nilaiKumulatif[$n->id_riwayat_pendidikan][] = $n;
+        }
+
+        // Siapkan data untuk updateBatch
+        $updateData = [];
+        foreach ($perkuliahanData as $p) {
+            if ($p->id_status_mahasiswa == 'A') {
+                // Hitung IPS
+                $sksIPS = $nxIPS = 0;
+                if (isset($nilaiPerMahasiswa[$p->id_riwayat_pendidikan])) {
+                    foreach ($nilaiPerMahasiswa[$p->id_riwayat_pendidikan] as $nilai) {
+                        $sksIPS += (int)$nilai->sks_mata_kuliah;
+                        $nxIPS  += ((float)$nilai->nilai_indeks * (int)$nilai->sks_mata_kuliah);
+                    }
+                }
+                $ips = $sksIPS > 0 ? round($nxIPS / $sksIPS, 2) : 0;
+
+                // Hitung IPK
+                $sksIPK = $nxIPK = 0;
+                if (isset($nilaiKumulatif[$p->id_riwayat_pendidikan])) {
+                    foreach ($nilaiKumulatif[$p->id_riwayat_pendidikan] as $nilai) {
+                        $sksIPK += (int)$nilai->sks_mata_kuliah;
+                        $nxIPK  += ((float)$nilai->nilai_indeks * (int)$nilai->sks_mata_kuliah);
+                    }
+                }
+                $ipk = $sksIPK > 0 ? round($nxIPK / $sksIPK, 2) : 0;
+            } else {
+                // Mahasiswa tidak aktif
+                $lastPerkuliahan = $perkuliahanModel
+                    ->where('id_riwayat_pendidikan', $p->id_riwayat_pendidikan)
+                    ->orderBy('id_semester', 'desc')
+                    ->limit(1)
+                    ->first();
+                $ips = 0;
+                $ipk = $lastPerkuliahan ? $lastPerkuliahan->ipk : 0;
+            }
+
+            $updateData[] = [
+                'id'  => $p->id,
+                'ips' => $ips,
+                'ipk' => $ipk,
+            ];
+        }
+
+        // Update batch
+        $chunks = array_chunk($updateData, 500);
+        foreach ($chunks as $chunk) {
+            $perkuliahanModel->updateBatch($chunk, 'id');
+        }
+
+        return [
+            'status'  => 'ok',
+            'updated' => count($updateData)
+        ];
     }
 }
