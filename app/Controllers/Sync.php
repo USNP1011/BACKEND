@@ -208,7 +208,7 @@ class Sync extends BaseController
                 ->join('konversi_kampus_merdeka', '`transkrip`.`konversi_kampus_merdeka_id` = `konversi_kampus_merdeka`.`id`', 'left')
                 ->join('matakuliah', '`transkrip`.`matakuliah_id` = `matakuliah`.`id`', 'left')
                 ->join('riwayat_pendidikan_mahasiswa', '`transkrip`.`id_riwayat_pendidikan` = `riwayat_pendidikan_mahasiswa`.`id`', 'left')
-                ->where("if(transkrip.sync_at is null AND transkrip.deleted_at is null, 'insert', if(transkrip.sync_at is not null AND transkrip.deleted_at is null and transkrip.sync_at<transkrip.updated_at, 'update', if(transkrip.sync_at is not null and transkrip.deleted_at is not null and transkrip.sync_at<transkrip.updated_at,'delete', null))) IS NOT NULL")->limit(10, 0)->findAll();
+                ->where("if(transkrip.sync_at is null AND transkrip.deleted_at is null, 'insert', if(transkrip.sync_at is not null AND transkrip.deleted_at is null and transkrip.sync_at<transkrip.updated_at, 'update', if(transkrip.sync_at is not null and transkrip.deleted_at is not null and transkrip.sync_at<transkrip.updated_at,'delete', null))) IS NOT NULL")->limit(1, 0)->findAll();
             $array[] = [
                 'index' => 12,
                 'target' => 'trakskrip',
