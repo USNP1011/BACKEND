@@ -77,8 +77,12 @@ class Mahasiswa extends ResourceController
     {
         $perkuliahan = new PerkuliahanMahasiswaModel();
         $profile = getProfileByMahasiswa($id);
-        $dataPerkuliahan = $perkuliahan->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->where('id_semester', $id_semester)->first();
         $semester = getSemesterById($id_semester) ?? getSemesterAktif();
+        // $itemPerkuliahan = $dataPerkuliahan = $perkuliahan->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1)->first();
+        // if($itemPerkuliahan->id_semester != $semester->id_semester){
+        //     $itemPerkuliahan = $dataPerkuliahan = $perkuliahan->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1, 1)->first();
+        // }
+        // $dataPerkuliahan = $perkuliahan->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)->orderBy('id_semester', 'desc')->limit(1)->first();
         $data = [
             'id_riwayat_pendidikan' => $profile->id_riwayat_pendidikan,
             'id_semester' => $semester->id_semester,
@@ -87,7 +91,7 @@ class Mahasiswa extends ResourceController
             'nim' => $profile->nim,
             'nama_program_studi' => $profile->nama_program_studi,
             'nama_kaprodi' => getKaprodi($profile->id_prodi)->nama_dosen,
-            'sks_semester' => $dataPerkuliahan->sks_semester,
+            'sks_semester' => 0,
             'dosen_wali' => $profile->dosen_wali,
         ];
         $object = new PesertaKelasModel();
