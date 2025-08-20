@@ -1062,72 +1062,33 @@ class Sync extends BaseController
         }
     }
 
-    function transkrip()
+    function syncTranskrip()
     {
         $object = \Config\Database::connect();
         $record = ['berhasil' => [], 'gagal' => []];
         try {
             $data = $this->request->getJSON();
             foreach ($data as $key => $value) {
-                $key = ['id_registrasi_mahasiswa' => $value->id_registrasi_mahasiswa, 'id_matkul' => $value->id_matkul];
+                $key = [
+                    'id_registrasi_mahasiswa' => $value->id_registrasi_mahasiswa,
+                    'id_matkul' => $value->id_matkul
+                ];
                 $setData = (object) $key;
-                $result = $this->api->deleteData('DeleteDosenPengajarKelasKuliah', $this->token, $setData);
-                if ($result->error_code == "0" || $result->error_code == "1260") {
-                    
-                }
-                if ($value->set_sync == 'insert') {
-                    $item = [
-                        'id_aktivitas' => $value->id_aktivitas,
-                        'id_kategori_kegiatan' => $value->id_kategori_kegiatan,
-                        'id_dosen' => $value->id_dosen,
-                        'penguji_ke' => $value->penguji_ke
+                $result = $this->api->developerModeDelete('DeleteTranskripMahasiswa', $this->token, $setData);
+                if ($result->error_code == "0" || $result->error_code == "112") {
+                    $itemTranskrip = [
+                        "id_registrasi_mahasiswa"=>$value->id_registrasi_mahasiswa,
+                        "id_matkul"=>$value->id_matkul,
+                        "id_kelas_kuliah"=>$value->id_kelas_kuliah,
+                        "id_nilai_transfer"=>$value->id_nilai_transfer,
+                        "id_konversi_aktivitas"=>$value->id_konversi_aktivitas,
+                        "smt_diambil" => $value->smt_diambil,
                     ];
-                    $setData = (object) $item;
-                    $result = $this->api->insertData('InsertUjiMahasiswa', $this->token, $setData);
-                    if ($result->error_code == "0" || $result->error_code == "1260") {
-                        $query = "UPDATE uji_mahasiswa SET id_uji='" . $result->data->id_uji . "',  sync_at = '" . date('Y-m-d H:i:s') . "', updated_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
-                        $object->query($query);
-                        $record['berhasil'][] = $item;
-                    } else {
-                        $value->error = $result;
-                        $record['gagal'][] = $value;
-                    }
-                } else if ($value->set_sync == 'update') {
-                    $item = [
-                        'id_aktivitas' => $value->id_aktivitas,
-                        'id_kategori_kegiatan' => $value->id_kategori_kegiatan,
-                        'id_dosen' => $value->id_dosen,
-                        'penguji_ke' => $value->penguji_ke
-                    ];
-                    $setData = (object) $item;
-                    $itemKey = [
-                        'id_uji' => $value->id_uji
-                    ];
-                    $setKey = (object) $itemKey;
-                    $result = $this->api->updateData('UpdateUjiMahasiswa', $this->token, $setData, $setKey);
-                    if ($result->error_code == "0") {
-                        $query = "UPDATE uji_mahasiswa SET sync_at = '" . date('Y-m-d H:i:s') . "', updated_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
-                        $object->query($query);
-                        $record['berhasil'][] = $item;
-                    } else {
-                        $value->error = $result;
-                        $record['gagal'][] = $value;
-                    }
-                } else {
-                    $item = [
-                        'uji_mahasiswa' => $value->uji_mahasiswa
-                    ];
-                    $setData = (object) $item;
-                    $result = $this->api->deleteData('DeleteUjiMahasiswa', $this->token, $setData);
-                    if ($result->error_code == "0") {
-                        $record['berhasil'][] = $item;
-                    } else {
-                        $value->error = $result;
-                        $record['gagal'][] = $value;
-                    }
+                    $dataTranskrip = (object) $itemTranskrip;
+                    $result = $this->api->developerModeInsert('InsertTranskripMahasiswa', $this->token, $dataTranskrip);
                 }
             }
-            return $this->respond($record);
+            return $this->respond($result);
         } catch (\Throwable $th) {
             return $this->fail($record);
         }

@@ -185,6 +185,7 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
         $routes->get('(:hash)/nilai_transfer', 'Mahasiswa::nilaiTransfer/$1', ['filter' => 'auth']);
         $routes->get('(:hash)/(:hash)/krsm', 'Mahasiswa::krsm/$1/$2', ['filter' => 'general']);
         $routes->get('(:hash)/(:hash)/khsm', 'Mahasiswa::khsm/$1/$2', ['filter' => 'general']);
+        $routes->get('(:hash)/khsm', 'Mahasiswa::khsm/$1', ['filter' => 'general']);
         $routes->get('(:hash)/aktivitas_kuliah', 'Mahasiswa::aktivitasKuliah/$1', ['filter' => 'auth']);
         $routes->get('(:hash)/transkrip', 'Mahasiswa::transkrip/$1', ['filter' => 'general']);
         $routes->get('(:hash)/update_transkrip', 'Mahasiswa::updateTranskrip/$1', ['filter' => 'general']);
@@ -417,6 +418,7 @@ $routes->group('sync', function($routes){
     $routes->post('anggota_aktivitas_mahasiswa', 'Sync::syncAnggotaAktivitasMahasiswa');
     $routes->post('bimbing_mahasiswa', 'Sync::syncBimbingMahasiswa');
     $routes->post('uji_mahasiswa', 'Sync::syncUjiMahasiswa');
+    $routes->post('transkrip', 'Sync::syncTranskrip');
 });
 
 $routes->group('repair', function($routes){

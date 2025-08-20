@@ -4,7 +4,7 @@ namespace App\Libraries;
 
 class Rest
 {
-    function getData($act, $token, $filter="", $order="", $limit="", $offset="")
+    function getData($act, $token, $filter = "", $order = "", $limit = "", $offset = "")
     {
         $curl = curl_init();
         curl_setopt_array($curl, array(
@@ -20,11 +20,11 @@ class Rest
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => '{
                 "act": "' . $act . '",
-                "token": "'.$token.'",
-                "filter": "'.$filter.'",
-                "order": "'.$order.'",
-                "limit": "'.$limit.'",
-                "offset": "'.$offset.'"
+                "token": "' . $token . '",
+                "filter": "' . $filter . '",
+                "order": "' . $order . '",
+                "limit": "' . $limit . '",
+                "offset": "' . $offset . '"
             }',
             CURLOPT_HTTPHEADER => array(
                 'Content-Type: application/json'
@@ -39,10 +39,10 @@ class Rest
 
     function getToken()
     {
-        
+
         $curl = curl_init();
         curl_setopt_array($curl, [
-            CURLOPT_URL => 'https://feeder.usn-papua.ac.id/ws/live2.php',
+            CURLOPT_URL => 'https://feeder.usn-papua.ac.id/ws/sandbox2.php',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_SSL_VERIFYPEER => 0,
             CURLOPT_SSL_VERIFYHOST => 0,
@@ -69,7 +69,7 @@ class Rest
         }
     }
 
-    function developerMode($act, $token, $filter="", $order="", $limit="", $offset="")
+    function developerMode($act, $token, $filter = "", $order = "", $limit = "", $offset = "")
     {
         $curl = curl_init();
         curl_setopt_array($curl, array(
@@ -85,11 +85,11 @@ class Rest
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => '{
                 "act": "' . $act . '",
-                "token": "'.$token.'",
-                "filter": "'.$filter.'",
-                "order": "'.$order.'",
-                "limit": "'.$limit.'",
-                "offset": "'.$offset.'"
+                "token": "' . $token . '",
+                "filter": "' . $filter . '",
+                "order": "' . $order . '",
+                "limit": "' . $limit . '",
+                "offset": "' . $offset . '"
             }',
             CURLOPT_HTTPHEADER => array(
                 'Content-Type: application/json'
@@ -104,6 +104,7 @@ class Rest
 
     function developerModeInsert($act, $token, $record)
     {
+        $itemData = json_encode($record);
         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_URL => 'https://feeder.usn-papua.ac.id/ws/sandbox2.php',
@@ -118,8 +119,38 @@ class Rest
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => '{
                 "act": "' . $act . '",
-                "token": "'.$token.'",
-                "record": '.json_encode($record).'
+                "token": "' . $token . '",
+                "record": ' . $itemData . '
+            }',
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        return json_decode($response);
+    }
+
+    function developerModeDelete($act, $token, $key)
+    {
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://feeder.usn-papua.ac.id/ws/sandbox2.php',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => 0,
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => '{
+                "act": "' . $act . '",
+                "token": "' . $token . '",
+                "key": ' . json_encode($key) . '
             }',
             CURLOPT_HTTPHEADER => array(
                 'Content-Type: application/json'
@@ -148,8 +179,8 @@ class Rest
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => '{
                 "act": "' . $act . '",
-                "token": "'.$token.'",
-                "record": '.json_encode($record).'
+                "token": "' . $token . '",
+                "record": ' . json_encode($record) . '
             }',
             CURLOPT_HTTPHEADER => array(
                 'Content-Type: application/json'
@@ -161,7 +192,7 @@ class Rest
         curl_close($curl);
         return json_decode($response);
     }
-    
+
     function updateData($act, $token, $record, $key)
     {
         $curl = curl_init();
@@ -178,9 +209,9 @@ class Rest
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => '{
                 "act": "' . $act . '",
-                "token": "'.$token.'",
-                "key": '.json_encode($key).',
-                "record": '.json_encode($record).'
+                "token": "' . $token . '",
+                "key": ' . json_encode($key) . ',
+                "record": ' . json_encode($record) . '
             }',
             CURLOPT_HTTPHEADER => array(
                 'Content-Type: application/json'
@@ -209,8 +240,8 @@ class Rest
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => '{
                 "act": "' . $act . '",
-                "token": "'.$token.'",
-                "key": '.json_encode($key).'
+                "token": "' . $token . '",
+                "key": ' . json_encode($key) . '
             }',
             CURLOPT_HTTPHEADER => array(
                 'Content-Type: application/json'
