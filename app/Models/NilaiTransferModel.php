@@ -29,6 +29,7 @@ class NilaiTransferModel extends Model
 		'id_periode_masuk',
 		'kode_matkul_diakui',
 		'nama_mata_kuliah_diakui',
+		'id_perguruan_tinggi',
 		'status_sync',
 		'sync_at'
     ];

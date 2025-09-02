@@ -420,6 +420,7 @@ $routes->group('sync', function($routes){
     $routes->post('bimbing_mahasiswa', 'Sync::syncBimbingMahasiswa');
     $routes->post('uji_mahasiswa', 'Sync::syncUjiMahasiswa');
     $routes->post('transkrip', 'Sync::syncTranskrip');
+    $routes->post('nilai_transfer', 'Sync::syncNilaiTransfer');
 });
 
 $routes->group('repair', function($routes){

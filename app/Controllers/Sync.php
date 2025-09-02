@@ -1089,11 +1089,11 @@ class Sync extends BaseController
                 $result = $this->api->developerModeDelete('DeleteTranskripMahasiswa', $this->token, $setData);
                 if ($result->error_code == "0" || $result->error_code == "112") {
                     $itemTranskrip = [
-                        "id_registrasi_mahasiswa"=>$value->id_registrasi_mahasiswa,
-                        "id_matkul"=>$value->id_matkul,
-                        "id_kelas_kuliah"=>$value->id_kelas_kuliah,
-                        "id_nilai_transfer"=>$value->id_nilai_transfer,
-                        "id_konversi_aktivitas"=>$value->id_konversi_aktivitas,
+                        "id_registrasi_mahasiswa" => $value->id_registrasi_mahasiswa,
+                        "id_matkul" => $value->id_matkul,
+                        "id_kelas_kuliah" => $value->id_kelas_kuliah,
+                        "id_nilai_transfer" => $value->id_nilai_transfer,
+                        "id_konversi_aktivitas" => $value->id_konversi_aktivitas,
                         "smt_diambil" => $value->smt_diambil,
                     ];
                     $dataTranskrip = (object) $itemTranskrip;
@@ -1101,6 +1101,87 @@ class Sync extends BaseController
                 }
             }
             return $this->respond($result);
+        } catch (\Throwable $th) {
+            return $this->fail($record);
+        }
+    }
+
+    function syncNilaiTransfer()
+    {
+        $object = \Config\Database::connect();
+        $record = ['berhasil' => [], 'gagal' => []];
+        try {
+            $data = $this->request->getJSON();
+            foreach ($data as $key => $value) {
+                if ($value->set_sync == 'insert') {
+                    $item = [
+                        'id_registrasi_mahasiswa' => $value->id_registrasi_mahasiswa,
+                        'kode_mata_kuliah_asal' => $value->kode_mata_kuliah_asal,
+                        'nama_mata_kuliah_asal' => $value->nama_mata_kuliah_asal,
+                        'sks_mata_kuliah_asal' => $value->sks_mata_kuliah_asal,
+                        'nilai_huruf_asal' => $value->nilai_huruf_asal,
+                        'id_matkul' => $value->id_matkul,
+                        'sks_mata_kuliah_diakui' => $value->sks_mata_kuliah_diakui,
+                        'nilai_huruf_diakui' => $value->nilai_huruf_diakui,
+                        'nilai_angka_diakui' => $value->nilai_angka_diakui,
+                        'id_perguruan_tinggi' => $value->id_perguruan_tinggi,
+                        'id_semester' => $value->id_periode_masuk,
+                        'id_aktivitas'=> null
+                    ];
+                    $setData = (object) $item;
+                    $result = $this->api->insertData('InsertNilaiTransferPendidikanMahasiswa', $this->token, $setData);
+                    if ($result->error_code == "0" || $result->error_code == "1260") {
+                        $query = "UPDATE nilai_transfer SET id_transfer='" . $result->data->id_transfer . "',  sync_at = '" . date('Y-m-d H:i:s') . "', updated_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $object->query($query);
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $value->error = $result;
+                        $record['gagal'][] = $value;
+                    }
+                } else if ($value->set_sync == 'update') {
+                    $item = [
+                        'id_registrasi_mahasiswa' => $value->id_registrasi_mahasiswa,
+                        'kode_mata_kuliah_asal' => $value->kode_mata_kuliah_asal,
+                        'nama_mata_kuliah_asal' => $value->nama_mata_kuliah_asal,
+                        'sks_mata_kuliah_asal' => $value->sks_mata_kuliah_asal,
+                        'nilai_huruf_asal' => $value->nilai_huruf_asal,
+                        'id_matkul' => $value->id_matkul,
+                        'sks_mata_kuliah_diakui' => $value->sks_mata_kuliah_diakui,
+                        'nilai_huruf_diakui' => $value->nilai_huruf_diakui,
+                        'nilai_angka_diakui' => $value->nilai_angka_diakui,
+                        'id_perguruan_tinggi' => $value->id_perguruan_tinggi,
+                        'id_semester' => $value->id_periode_masuk,
+                        'id_aktivitas'=> null
+                    ];
+                    $setData = (object) $item;
+                    $itemKey = [
+                        'id_transfer' => $value->id_transfer
+                    ];
+                    $setKey = (object) $itemKey;
+                    $result = $this->api->updateData('UpdateNilaiTransferPendidikanMahasiswa', $this->token, $setData, $setKey);
+                    if ($result->error_code == "0") {
+                        $query = "UPDATE nilai_transfer SET sync_at = '" . date('Y-m-d H:i:s') . "', updated_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $object->query($query);
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $value->error = $result;
+                        $record['gagal'][] = $value;
+                    }
+                } else {
+                    $item = [
+                        'id_transfer' => $value->id_transfer
+                    ];
+                    $setData = (object) $item;
+                    $result = $this->api->deleteData('DeleteNilaiTransferPendidikanMahasiswa', $this->token, $setData);
+                    if ($result->error_code == "0") {
+                        $record['berhasil'][] = $item;
+                    } else {
+                        $value->error = $result;
+                        $record['gagal'][] = $value;
+                    }
+                }
+            }
+            return $this->respond($record);
         } catch (\Throwable $th) {
             return $this->fail($record);
         }
