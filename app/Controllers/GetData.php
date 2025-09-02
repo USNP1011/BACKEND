@@ -32,6 +32,7 @@ class GetData extends BaseController
     public function index()
     {
         // $this->profile_pt();
+        // $this->pt();
         // $this->agama();
         // $this->prodi();
         // $this->ta();
@@ -81,6 +82,16 @@ class GetData extends BaseController
         // $this->ujiMahasiswa();
         $this->konversiKampusMerdeka();
         $this->transkrip();
+    }
+
+    public function pt()
+    {
+        $pt = new \App\Models\PTModel();
+
+        $data = $this->api->getData('GetAllPT', $this->token);
+        if($pt->insertBatch($data->data)){
+            return $this->respond($data->data);
+        }
     }
 
 

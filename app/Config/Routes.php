@@ -20,6 +20,7 @@ $routes->group('auth', static function($routes){
 
 $routes->group('get_data', static function($routes){
     $routes->get('/', 'GetData::index');
+    $routes->get('pt', 'GetData::pt');
     $routes->get('profile_pt', 'GetData::profile_pt');
     $routes->get('agama', 'GetData::agama');
     $routes->get('mahasiswa', 'GetData::mahasiswa');
@@ -77,6 +78,7 @@ $routes->group('get_data', static function($routes){
 $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($routes){
     $routes->post('register', 'AuthController::register');
     $routes->post('login', 'AuthController::login');
+    $routes->post('allpt', 'Referensi\AllPT::store', ['filter' => 'general']);
     $routes->get('perguruanTinggi', 'Referensi\PerguruanTinggi::store', ['filter' => 'general']);
     $routes->get('agama', 'Referensi\Agama::store', ['filter' => 'general']);
     $routes->get('penghasilan', 'Referensi\Penghasilan::store', ['filter' => 'general']);
