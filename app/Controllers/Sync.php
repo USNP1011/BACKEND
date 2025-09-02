@@ -196,6 +196,18 @@ class Sync extends BaseController
                 'data' => $data->perkuliahan_mahasiswa
             ];
 
+            // Nilai Transfer
+            $object = \Config\Database::connect();
+            $data->nilai_transfer = $object->query("SELECT nilai_transfer.*, (if(nilai_transfer.sync_at is null AND nilai_transfer.deleted_at is null, 'insert', if(nilai_transfer.sync_at is not null AND nilai_transfer.deleted_at is null and nilai_transfer.sync_at<nilai_transfer.updated_at, 'update', if(nilai_transfer.sync_at is not null and nilai_transfer.deleted_at is not null and nilai_transfer.sync_at<nilai_transfer.updated_at,'delete', null)))) as set_sync
+            FROM nilai_transfer 
+            WHERE if(nilai_transfer.status_sync is null AND nilai_transfer.deleted_at is null, 'insert', if(nilai_transfer.status_sync is not null AND nilai_transfer.deleted_at is null and nilai_transfer.sync_at<nilai_transfer.updated_at, 'update', if(nilai_transfer.status_sync is not null and nilai_transfer.deleted_at is not null and nilai_transfer.sync_at<nilai_transfer.updated_at,'delete', null))) IS NOT NULL AND id_periode_masuk = '" . $this->semester->id_semester . "'")->getResult();
+            $array[] = [
+                'index' => 12,
+                'target' => 'nilai_transfer',
+                'displayName' => 'Nilai Transfer',
+                'data' => $data->nilai_transfer
+            ];
+
             // Transkrip
             $object = new \App\Models\TranskripModel();
             $data->transkrip = $object->select("`transkrip`.*,
@@ -210,7 +222,7 @@ class Sync extends BaseController
                 ->join('riwayat_pendidikan_mahasiswa', '`transkrip`.`id_riwayat_pendidikan` = `riwayat_pendidikan_mahasiswa`.`id`', 'left')
                 ->where("if(transkrip.sync_at is null AND transkrip.deleted_at is null, 'insert', if(transkrip.sync_at is not null AND transkrip.deleted_at is null and transkrip.sync_at<transkrip.updated_at, 'update', if(transkrip.sync_at is not null and transkrip.deleted_at is not null and transkrip.sync_at<transkrip.updated_at,'delete', null))) IS NOT NULL")->limit(1, 0)->findAll();
             $array[] = [
-                'index' => 12,
+                'index' => 13,
                 'target' => 'trakskrip',
                 'displayName' => 'Transkrip Mahasiswa',
                 'data' => $data->transkrip
