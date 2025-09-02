@@ -3,6 +3,7 @@
 namespace App\Controllers\Api;
 
 use App\Models\NilaiTransferModel;
+use App\Models\RiwayatPendidikanMahasiswaModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use Ramsey\Uuid\Uuid;
@@ -12,21 +13,26 @@ class NilaiTransfer extends ResourceController
 
     public function show($id = null)
     {
+        $object = new RiwayatPendidikanMahasiswaModel();
+        $mahasiswa = $object->select("riwayat_pendidikan_mahasiswa.id as id_riwayat_pendidikan, id_registrasi_mahasiswa, prodi.id_prodi, prodi.nama_program_studi, nim, nama_mahasiswa, riwayat_pendidikan_mahasiswa.id_jenis_daftar, jenis_pendaftaran.nama_jenis_daftar")
+            ->join('mahasiswa', 'mahasiswa.id=riwayat_pendidikan_mahasiswa.id_mahasiswa', 'left')
+            ->join('prodi', 'prodi.id_prodi=riwayat_pendidikan_mahasiswa.id_prodi', 'left')
+            ->join('jenis_pendaftaran', 'jenis_pendaftaran.id_jenis_daftar=riwayat_pendidikan_mahasiswa.id_jenis_daftar', 'left')
+            ->where('riwayat_pendidikan_mahasiswa.id_mahasiswa', $id)->first();
         $object = new NilaiTransferModel();
+        $mahasiswa->matakuliah = $object->where('id_riwayat_pendidikan', $mahasiswa->id_riwayat_pendidikan)->findAll();
         return $this->respond([
             'status' => true,
-            'data' => $id == null ? $object->findAll() : $object->where('id', $id)->first()
+            'data' => $mahasiswa
         ]);
+        // $object = new NilaiTransferModel();
+        // return $this->respond([
+        //     'status' => true,
+        //     'data' => $id == null ? $object->findAll() : $object->where('id', $id)->first()
+        // ]);
     }
 
-    public function showByMhs($id = null)
-    {
-        $object = new NilaiTransferModel();
-        return $this->respond([
-            'status' => true,
-            'data' => $object->where('id_riwayat_pendidikan', $id)->findAll()
-        ]);
-    }
+    public function showByMhs($id = null) {}
 
     /**
      * Return a new resource object, with default properties.
@@ -55,7 +61,7 @@ class NilaiTransfer extends ResourceController
             return $this->respond([
                 'status' => true,
                 'data' => $model
-            ]); 
+            ]);
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,
@@ -93,7 +99,7 @@ class NilaiTransfer extends ResourceController
             return $this->respond([
                 'status' => true,
                 'data' => $model
-            ]); 
+            ]);
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,
@@ -117,8 +123,8 @@ class NilaiTransfer extends ResourceController
             return $this->respondDeleted([
                 'status' => true,
                 'message' => 'successful deleted',
-                'data'=>[]
-            ]); 
+                'data' => []
+            ]);
         } catch (\Throwable $th) {
             return $this->fail([
                 'status' => false,

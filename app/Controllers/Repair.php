@@ -6,6 +6,9 @@ use Ramsey\Uuid\Uuid;
 use App\Libraries\Rest;
 use App\Models\MahasiswaModel;
 use App\Entities\Mahasiswa  as EntitiesMahasiswa;
+use App\Models\NilaiTransferModel;
+use App\Models\PerkuliahanMahasiswaModel;
+use App\Models\PesertaKelasModel;
 use App\Models\RiwayatPendidikanMahasiswaModel;
 use App\Models\UserRoleModel;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -522,5 +525,145 @@ class Repair extends BaseController
             'status'  => 'ok',
             'updated' => count($updateData)
         ];
+    }
+
+    public function hitungAKM(string $semester): ResponseInterface
+    {
+        $object         = new PerkuliahanMahasiswaModel();
+        $peserta_kelas  = new PesertaKelasModel();
+        $nilai_transfer = new NilaiTransferModel();
+
+        // 1. Ambil semua riwayat pendidikan di semester
+        $dataPerkuliahan = $object->where('id_semester', $semester)->findAll();
+        if (empty($dataPerkuliahan)) {
+            return $this->respond(['status' => true, 'data' => []]);
+        }
+
+        // Ambil id_riwayat_pendidikan
+        $riwayatIds = array_map(fn($row) => $row->id_riwayat_pendidikan, $dataPerkuliahan);
+
+        // 2. Ambil semua peserta kelas sekaligus
+        $allPeserta = $peserta_kelas->select("
+            peserta_kelas.id,
+            peserta_kelas.id_riwayat_pendidikan,
+            kelas_kuliah.id_semester,
+            matakuliah.sks_mata_kuliah,
+            nilai_kelas.nilai_indeks
+        ")
+            ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
+            ->join('matakuliah', 'kelas_kuliah.matakuliah_id = matakuliah.id', 'left')
+            ->join('nilai_kelas', 'nilai_kelas.id_nilai_kelas = peserta_kelas.id', 'left')
+            ->whereIn('peserta_kelas.id_riwayat_pendidikan', $riwayatIds)
+            ->where('kelas_kuliah.id_semester <=', $semester)
+            ->findAll();
+
+        // 3. Kelompokkan peserta berdasarkan riwayat pendidikan
+        $pesertaByRiwayat = [];
+        foreach ($allPeserta as $p) {
+            $pesertaByRiwayat[$p->id_riwayat_pendidikan][] = $p;
+        }
+
+        // 4. Ambil semua nilai transfer sekaligus
+        $allTransfer = $nilai_transfer
+            ->whereIn('id_riwayat_pendidikan', $riwayatIds)
+            ->findAll();
+
+        $transferByRiwayat = [];
+        foreach ($allTransfer as $t) {
+            $transferByRiwayat[$t->id_riwayat_pendidikan][] = $t;
+        }
+
+        // 4b. Ambil IPK semester sebelumnya untuk semua mahasiswa sekaligus
+        $db = \Config\Database::connect();
+        $prevData = $db->table('perkuliahan_mahasiswa pm1')
+            ->select('pm1.id_riwayat_pendidikan, pm1.ipk, pm1.sks_total')
+            ->join('(
+            SELECT id_riwayat_pendidikan, MAX(id_semester) as max_semester
+            FROM perkuliahan_mahasiswa
+            WHERE id_semester < ' . $db->escape($semester) . '
+            GROUP BY id_riwayat_pendidikan
+        ) pm2', 'pm1.id_riwayat_pendidikan = pm2.id_riwayat_pendidikan AND pm1.id_semester = pm2.max_semester', 'inner')
+            ->whereIn('pm1.id_riwayat_pendidikan', $riwayatIds)
+            ->get()
+            ->getResult();
+
+        // Mapping prev IPK
+        $prevByRiwayat = [];
+        foreach ($prevData as $row) {
+            $prevByRiwayat[$row->id_riwayat_pendidikan] = $row;
+        }
+
+        // 5. Proses per mahasiswa
+        foreach ($dataPerkuliahan as &$value) {
+            $items     = $pesertaByRiwayat[$value->id_riwayat_pendidikan] ?? [];
+            $transfers = $transferByRiwayat[$value->id_riwayat_pendidikan] ?? [];
+
+            [$sks_total, $sks_semester, $ips, $ipk] = $this->hitungIPSIPK($items, $transfers, $semester);
+
+            // jika tidak ada mk di semester tsb → ambil dari prev
+            if ($sks_semester == 0 && isset($prevByRiwayat[$value->id_riwayat_pendidikan])) {
+                $ipk       = $prevByRiwayat[$value->id_riwayat_pendidikan]->ipk;
+                $sks_total = $prevByRiwayat[$value->id_riwayat_pendidikan]->sks_total;
+            }
+
+            $value->sks_total    = $sks_total;
+            $value->sks_semester = $sks_semester;
+            $value->ips          = $ips;
+            $value->ipk          = $ipk;
+        }
+
+        // 6. Update ke database sekaligus
+        $object->updateBatch($dataPerkuliahan, 'id');
+
+        return $this->respond([
+            'status' => true,
+            'data'   => $dataPerkuliahan
+        ]);
+    }
+
+
+    /**
+     * Hitung IPS & IPK satu mahasiswa
+     *
+     * @param array $items     Daftar peserta kelas
+     * @param array $transfers Daftar nilai transfer
+     * @param string $semester Semester aktif
+     * @return array [sks_total, sks_semester, ips, ipk]
+     */
+    private function hitungIPSIPK(array $items, array $transfers, string $semester): array
+    {
+        $sks_total    = 0;
+        $nx_total     = 0;
+        $sks_ipk      = 0;
+        $sks_semester = 0;
+        $nx_semester  = 0;
+
+        // Hitung dari peserta kelas
+        foreach ($items as $peserta) {
+            if ($peserta->id_semester == $semester) {
+                $sks_semester += $peserta->sks_mata_kuliah;
+                $nx_semester  += ($peserta->sks_mata_kuliah * $peserta->nilai_indeks);
+            }
+            if ($peserta->nilai_indeks >= 2) {
+                $nx_total += ($peserta->nilai_indeks * $peserta->sks_mata_kuliah);
+                $sks_ipk  += $peserta->sks_mata_kuliah;
+            }
+            $sks_total += $peserta->sks_mata_kuliah;
+        }
+
+        // Hitung dari nilai transfer
+        foreach ($transfers as $t) {
+            if ($t->nilai_angkat_diakui >= 2) {
+                $nx_total += ($t->nilai_angkat_diakui * $t->sks_mata_kuliah_diakui);
+                $sks_ipk  += $t->sks_mata_kuliah_diakui;
+            }
+            $sks_total += $t->sks_mata_kuliah_diakui;
+        }
+
+        // IPS & IPK
+        $ips = $sks_semester > 0 ? round($nx_semester / $sks_semester, 2) : 0;
+        $ipk = $sks_total > 0 ? round($nx_total / $sks_total, 2) : 0;
+
+        return [$sks_total, $sks_semester, $ips, $ipk];
     }
 }

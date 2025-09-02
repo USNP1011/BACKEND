@@ -16,8 +16,8 @@ class App extends BaseConfig
      *
      * E.g., http://example.com/
      */
-    // public string $baseURL = 'https://rest.usn-papua.ac.id/';
-    public string $baseURL = 'http://localhost:8080/transkrip/';
+    public string $baseURL = 'https://rest.usn-papua.ac.id/';
+    // public string $baseURL = 'http://localhost:8080/transkrip/';
 
     /**
      * Allowed Hostnames in the Site URL other than the hostname in the baseURL.

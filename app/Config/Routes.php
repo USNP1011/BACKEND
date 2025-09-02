@@ -216,7 +216,6 @@ $routes->group('api', ['namespace'=> 'App\Controllers\Api'], static function($ro
     });
 
     $routes->group('nilai_transfer', ['filter' => 'auth'], function($routes){
-        $routes->get('', 'NilaiTransfer::show');
         $routes->get('(:hash)', 'NilaiTransfer::show/$1');
         $routes->post('', 'NilaiTransfer::create');
         $routes->put('', 'NilaiTransfer::update');
@@ -428,4 +427,5 @@ $routes->group('repair', function($routes){
     $routes->get('akm/(:any)', 'Repair::prosesPerkuliahanMandiri/$1');
     $routes->post('mahasiswa', 'Repair::createMahasiswa');
     $routes->post('register', 'Repair::createRegistrasi');
+    $routes->get('hitung_akm/(:hash)', 'Repair::hitungAKM/$1');
 });
