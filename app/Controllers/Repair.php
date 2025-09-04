@@ -120,7 +120,7 @@ class Repair extends BaseController
         }
     }
 
-    public function transkrip()
+    public function transkrip($id_semester)
     {
         $db = db_connect();
 
@@ -233,7 +233,7 @@ class Repair extends BaseController
             // Proses perkuliahan mahasiswa
             // ===============================
             $perkuliahanModel = new \App\Models\PerkuliahanMahasiswaModel();
-            $semesterAktif = '20241';
+            $semesterAktif = $id_semester;
             $perkuliahanData = $perkuliahanModel->where('id_semester', $semesterAktif)->findAll();
 
             foreach ($perkuliahanData as $pk) {

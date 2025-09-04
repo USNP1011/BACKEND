@@ -426,7 +426,7 @@ $routes->group('sync', function($routes){
 $routes->group('repair', function($routes){
     $routes->get('', 'Repair::repair');
     $routes->get('temp', 'Repair::clearTemp');
-    $routes->get('transkrip', 'Repair::transkrip');
+    $routes->get('transkrip/(:hash)', 'Repair::transkrip/$1');
     $routes->get('akm/(:any)', 'Repair::prosesPerkuliahanMandiri/$1');
     $routes->post('mahasiswa', 'Repair::createMahasiswa');
     $routes->post('register', 'Repair::createRegistrasi');
