@@ -229,47 +229,6 @@ class Repair extends BaseController
             $db->table('transkrip')->truncate();
             $transkripModel->insertBatch($final);
 
-            // ===============================
-            // Proses perkuliahan mahasiswa
-            // ===============================
-            $perkuliahanModel = new \App\Models\PerkuliahanMahasiswaModel();
-            $semesterAktif = $id_semester;
-            $perkuliahanData = $perkuliahanModel->where('id_semester', $semesterAktif)->findAll();
-
-            foreach ($perkuliahanData as $pk) {
-                if ($pk->id_status_mahasiswa == 'A') {
-                    // IPS semester ini
-                    $transkripMahasiswa = array_filter($final, fn($t) => $t['id_riwayat_pendidikan'] == $pk->id_riwayat_pendidikan);
-                    $nxsks = $sks = 0;
-                    foreach ($transkripMahasiswa as $t) {
-                        if ($t['nilai_indeks'] !== null) {
-                            $sks += (int)$t['sks_mata_kuliah'];
-                            $nxsks += ((float)$t['nilai_indeks'] * (int)$t['sks_mata_kuliah']);
-                        }
-                    }
-                    $pk->ips = $sks > 0 ? round($nxsks / $sks, 2) : 0;
-
-                    // IPK keseluruhan
-                    $ipkData = $db->table('transkrip')
-                        ->select('SUM(sks_mata_kuliah * nilai_indeks) / SUM(sks_mata_kuliah) as ipk')
-                        ->where('id_riwayat_pendidikan', $pk->id_riwayat_pendidikan)
-                        ->get()->getRow();
-                    $pk->ipk = $ipkData ? round($ipkData->ipk, 2) : 0;
-                } else {
-                    // Mahasiswa tidak aktif, ambil IPK semester terakhir
-                    $lastPerkuliahan = $perkuliahanModel
-                        ->where('id_riwayat_pendidikan', $pk->id_riwayat_pendidikan)
-                        ->orderBy('id_semester', 'desc')
-                        ->limit(1, 1)
-                        ->first();
-                    $pk->ips = 0;
-                    $pk->ipk = $lastPerkuliahan ? $lastPerkuliahan->ipk : 0;
-                }
-
-                // Update perkuliahan
-                $perkuliahanModel->update($pk->id, ['ips' => $pk->ips, 'ipk' => $pk->ipk]);
-            }
-
             return $this->respond([
                 'status' => 'ok',
                 'inserted' => count($final),
