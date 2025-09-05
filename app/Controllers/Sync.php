@@ -50,7 +50,7 @@ class Sync extends BaseController
 
             // History
             $object = \Config\Database::connect();
-            $data->riwayat_pendidikan = $object->query("SELECT riwayat_pendidikan_mahasiswa.*, (if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync WHERE if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL LIMIT 5")->getResult();
+            $data->riwayat_pendidikan = $object->query("SELECT riwayat_pendidikan_mahasiswa.*, (if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync FROM riwayat_pendidikan_mahasiswa WHERE if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL LIMIT 5")->getResult();
             $array[] = [
                 'index' => 2,
                 'target' => 'riwayat_pendidikan',
@@ -337,7 +337,7 @@ class Sync extends BaseController
                     $setData = (object) $item;
                     $result = $this->api->insertData('InsertRiwayatPendidikanMahasiswa', $this->token, $setData);
                     if ($result->error_code == "0") {
-                        $query = "UPDATE riwayat_pendidikan_mahasiswa SET id_registrasi_mahasiswa='" . $result->data->id_registrasi_mahasiswa . "', sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $query = "UPDATE riwayat_pendidikan_mahasiswa SET id_registrasi_mahasiswa='" . $result->data->id_registrasi_mahasiswa . "', sync_at = '" . date('Y-m-d H:i:s') . "', updated_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
                         $object->query($query);
                         $record['berhasil'][] = $item;
                     } else {
