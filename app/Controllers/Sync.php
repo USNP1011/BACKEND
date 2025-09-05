@@ -39,7 +39,7 @@ class Sync extends BaseController
 
             // Mahasiswa
             $object = new \App\Models\MahasiswaModel();
-            $data->mahasiswa = $object->select("mahasiswa.id, (if(id_mahasiswa is null AND deleted_at is null, 'insert', if(id_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_mahasiswa is null AND deleted_at is null, 'insert', if(id_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+            $data->mahasiswa = $object->select("mahasiswa.id, (if(id_mahasiswa is null AND deleted_at is null, 'insert', if(id_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_mahasiswa is null AND deleted_at is null, 'insert', if(id_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL LIMIT 5")->findAll();
             $array[] = [
                 'index' => 1,
                 'target' => 'mahasiswa',
@@ -286,7 +286,9 @@ class Sync extends BaseController
                     'id_agama' => $value->id_agama,
                     'id_alat_transportasi' => $value->id_alat_transportasi,
                     'nama_wilayah' => $value->nama_wilayah,
-                    'kewarganegaraan' => $value->kewarganegaraan
+                    'kewarganegaraan' => $value->kewarganegaraan,
+                    'sync_at'=>date('Y-m-d H:i:s'),
+                    'updated_at'=>date('Y-m-d H:i:s')
                 ];
                 if ($value->set_sync == 'insert') {
                     $setData = (object) $item;
@@ -299,6 +301,9 @@ class Sync extends BaseController
                         $item['error'] = $result;
                         $record['gagal'][] = $item;
                     }
+                }else{
+                    $query = "UPDATE mahasiswa SET sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                    
                 }
             }
             return $this->respond($record);

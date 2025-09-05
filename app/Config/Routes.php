@@ -430,5 +430,6 @@ $routes->group('repair', function($routes){
     $routes->get('akm/(:any)', 'Repair::prosesPerkuliahanMandiri/$1');
     $routes->post('mahasiswa', 'Repair::createMahasiswa');
     $routes->post('register', 'Repair::createRegistrasi');
+    $routes->post('update_mahasiswa', 'Repair::UpdateMahasiswa');
     $routes->get('hitung_akm/(:hash)', 'Repair::hitungAKM/$1');
 });

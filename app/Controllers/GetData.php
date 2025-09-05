@@ -62,7 +62,7 @@ class GetData extends BaseController
         // $this->wilayah();
         // $this->skala_nilai();
         // $this->jenis_aktivitas();
-        // $this->mahasiswa();
+        $this->mahasiswa();
         // $this->riwayat_pendidikan();
         // $this->prestasiMahasiswa();
         // $this->kurikulum();

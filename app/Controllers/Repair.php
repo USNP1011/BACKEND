@@ -625,4 +625,35 @@ class Repair extends BaseController
 
         return [$sks_total, $sks_semester, $ips, $ipk];
     }
+
+        public function UpdateMahasiswa()
+    {
+        $data = $this->request->getJSON();
+        $conn = \Config\Database::connect();
+        try {
+            $conn->transException(true)->transStart();
+            // if (!$this->validate('mahasiswa')) {
+            //     $result = [
+            //         "status" => false,
+            //         "message" => $this->validator->getErrors(),
+            //     ];
+            //     return $this->failValidationErrors($result);
+            // }
+            $dataSimpan = [];
+            $object = new MahasiswaModel();
+
+            $object->updateBatch($data, 'nik');
+
+            $conn->transComplete();
+            return $this->respond([
+                'status' => true,
+                'data' => $data
+            ]);
+        } catch (DatabaseException $th) {
+            return $this->failValidationErrors([
+                'status' => false,
+                'message' => $th->getCode() == 1062 ? "Mahasiswa dengan nama, tempat, tanggal lahir dan ibu kandung yang sama sudah ada" : "Maaf, Terjadi kesalahan, silahkan hubungi bagian pengembang!",
+            ]);
+        }
+    }
 }
