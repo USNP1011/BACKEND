@@ -239,7 +239,7 @@ class Sync extends BaseController
         $object = \Config\Database::connect();
         $record = ['berhasil' => [], 'gagal' => []];
         try {
-            $data = $object->query("SELECT mahasiswa.*, (if(id_mahasiswa is null AND deleted_at is null, 'insert', if(id_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync FROM mahasiswa WHERE if(id_mahasiswa is null AND deleted_at is null, 'insert', if(id_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->getResult();
+            $data = $this->request->getJSON();
             foreach ($data as $key => $value) {
                 $item = [
                     'nama_mahasiswa' => $value->nama_mahasiswa,
@@ -294,7 +294,7 @@ class Sync extends BaseController
                     $setData = (object) $item;
                     $result = $this->api->insertData('InsertBiodataMahasiswa', $this->token, $setData);
                     if ($result->error_code == "0") {
-                        $query = "UPDATE mahasiswa SET id_mahasiswa='" . $result->data->id_mahasiswa . "', sync_at = '" . date('Y-m-d H:i:s') . "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
+                        $query = "UPDATE mahasiswa SET id_mahasiswa='" . $result->data->id_mahasiswa . "', sync_at = '" . date('Y-m-d H:i:s') . "', updated_at = '" . date('Y-m-d H:i:s') .  "', status_sync='sudah sync' WHERE id = '" . $value->id . "'";
                         $object->query($query);
                         $record['berhasil'][] = $item;
                     } else {
