@@ -49,8 +49,8 @@ class Sync extends BaseController
 
 
             // History
-            $object = new \App\Models\RiwayatPendidikanMahasiswaModel();
-            $data->riwayat_pendidikan = $object->select("riwayat_pendidikan_mahasiswa.*, (if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync")->where("if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL")->findAll();
+            $object = \Config\Database::connect();
+            $data->riwayat_pendidikan = $object->query("SELECT riwayat_pendidikan_mahasiswa.*, (if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null)))) as set_sync WHERE if(id_registrasi_mahasiswa is null AND deleted_at is null, 'insert', if(id_registrasi_mahasiswa is not null AND deleted_at is null and sync_at<updated_at, 'update', if(id_registrasi_mahasiswa is not null and deleted_at is not null and sync_at<updated_at,'delete', null))) IS NOT NULL LIMIT 5")->getResult();
             $array[] = [
                 'index' => 2,
                 'target' => 'riwayat_pendidikan',
