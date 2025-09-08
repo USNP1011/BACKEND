@@ -626,7 +626,7 @@ class Repair extends BaseController
         return [$sks_total, $sks_semester, $ips, $ipk];
     }
 
-        public function UpdateMahasiswa()
+    public function UpdateMahasiswa()
     {
         $data = $this->request->getJSON();
         $conn = \Config\Database::connect();
@@ -655,5 +655,21 @@ class Repair extends BaseController
                 'message' => $th->getCode() == 1062 ? "Mahasiswa dengan nama, tempat, tanggal lahir dan ibu kandung yang sama sudah ada" : "Maaf, Terjadi kesalahan, silahkan hubungi bagian pengembang!",
             ]);
         }
+    }
+
+    public function mhskip($id_semester)
+    {
+        $object = new PerkuliahanMahasiswaModel();
+        $param = $this->request->getJSON();
+        $nims = array_map(fn($p) => $p->nim, $param);
+        $result = $object->select("rpm.angkatan, rpm.nim, mahasiswa.nama_mahasiswa, sm.nama_status_mahasiswa as status")
+            ->join('riwayat_pendidikan_mahasiswa rpm', 'rpm.id = perkuliahan_mahasiswa.id_riwayat_pendidikan', 'left')
+            ->join('mahasiswa', 'mahasiswa.id = rpm.id_mahasiswa', 'left')
+            ->join('status_mahasiswa sm', 'sm.id_status_mahasiswa = perkuliahan_mahasiswa.id_status_mahasiswa', 'left')
+            ->whereIn('rpm.nim', $nims)
+            ->where('perkuliahan_mahasiswa.id_semester', $id_semester)
+            ->findAll();
+       
+        return $this->respond($result);
     }
 }
