@@ -10,6 +10,7 @@ use App\Models\NilaiTransferModel;
 use App\Models\PerkuliahanMahasiswaModel;
 use App\Models\PesertaKelasModel;
 use App\Models\RiwayatPendidikanMahasiswaModel;
+use App\Models\TranskripModel;
 use App\Models\UserRoleModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
@@ -135,6 +136,7 @@ class Repair extends BaseController
                 ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
                 ->join('nilai_kelas', 'nilai_kelas.id_nilai_kelas = peserta_kelas.id', 'left')
                 ->join('matakuliah', 'matakuliah.id = kelas_kuliah.matakuliah_id', 'left')
+                ->whereNotIn('kelas_kuliah.id_semester', [$id_semester])
                 ->get()->getResult();
 
             // Ambil nilai transfer
@@ -486,92 +488,80 @@ class Repair extends BaseController
         ];
     }
 
-    public function hitungAKM(string $semester): ResponseInterface
+    public function hitungAKM($semester): ResponseInterface
     {
-        $object         = new PerkuliahanMahasiswaModel();
-        $peserta_kelas  = new PesertaKelasModel();
-        $nilai_transfer = new NilaiTransferModel();
+        $object        = new PerkuliahanMahasiswaModel();
+        $peserta_kelas = new PesertaKelasModel();
+        $trs           = new TranskripModel();
 
-        // 1. Ambil semua riwayat pendidikan di semester
-        $dataPerkuliahan = $object->where('id_semester', $semester)->findAll();
+        // 1. Ambil semua riwayat pendidikan mahasiswa di semester tsb
+        $dataPerkuliahan = $object
+            ->where('id_semester', $semester)
+            ->where('sync_at IS NULL')
+            // ->where('id', '998cd31b-899f-4e7b-89a6-9dce68b5d26d')
+            ->findAll();
+
         if (empty($dataPerkuliahan)) {
-            return $this->respond(['status' => true, 'data' => []]);
+            return $this->respond([
+                'status' => true,
+                'data'   => []
+            ]);
         }
 
-        // Ambil id_riwayat_pendidikan
-        $riwayatIds = array_map(fn($row) => $row->id_riwayat_pendidikan, $dataPerkuliahan);
+        $riwayatIds = array_column($dataPerkuliahan, 'id_riwayat_pendidikan');
 
-        // 2. Ambil semua peserta kelas sekaligus
-        $allPeserta = $peserta_kelas->select("
-            peserta_kelas.id,
+        // 2. Hitung SKS semester sekali (group by mahasiswa)
+        $sksSemester = $peserta_kelas->select("
             peserta_kelas.id_riwayat_pendidikan,
-            kelas_kuliah.id_semester,
-            matakuliah.sks_mata_kuliah,
-            nilai_kelas.nilai_indeks
+            SUM(matakuliah.sks_mata_kuliah) as sks_semester
         ")
             ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
             ->join('matakuliah', 'kelas_kuliah.matakuliah_id = matakuliah.id', 'left')
-            ->join('nilai_kelas', 'nilai_kelas.id_nilai_kelas = peserta_kelas.id', 'left')
             ->whereIn('peserta_kelas.id_riwayat_pendidikan', $riwayatIds)
-            ->where('kelas_kuliah.id_semester <=', $semester)
+            ->where('kelas_kuliah.id_semester', $semester)
+            ->groupBy('peserta_kelas.id_riwayat_pendidikan')
             ->findAll();
 
-        // 3. Kelompokkan peserta berdasarkan riwayat pendidikan
-        $pesertaByRiwayat = [];
-        foreach ($allPeserta as $p) {
-            $pesertaByRiwayat[$p->id_riwayat_pendidikan][] = $p;
+        $sksSemesterBy = [];
+        foreach ($sksSemester as $row) {
+            $sksSemesterBy[$row->id_riwayat_pendidikan] = (int) $row->sks_semester;
         }
 
-        // 4. Ambil semua nilai transfer sekaligus
-        $allTransfer = $nilai_transfer
-            ->whereIn('id_riwayat_pendidikan', $riwayatIds)
+        // 3. Hitung transkrip sekali (group by mahasiswa)
+        $transkrip = $trs->select("
+            transkrip.id_riwayat_pendidikan,
+            SUM(transkrip.nilai_indeks * matakuliah.sks_mata_kuliah) as nxsks,
+            SUM(matakuliah.sks_mata_kuliah) as sks
+        ")
+            ->join('matakuliah', 'matakuliah.id = transkrip.matakuliah_id', 'left')
+            ->whereIn('transkrip.id_riwayat_pendidikan', $riwayatIds)
+            ->groupBy('transkrip.id_riwayat_pendidikan')
             ->findAll();
 
-        $transferByRiwayat = [];
-        foreach ($allTransfer as $t) {
-            $transferByRiwayat[$t->id_riwayat_pendidikan][] = $t;
+        $transkripBy = [];
+        foreach ($transkrip as $row) {
+            $transkripBy[$row->id_riwayat_pendidikan] = [
+                'nxsks' => (float) $row->nxsks,
+                'sks'   => (int) $row->sks,
+            ];
         }
 
-        // 4b. Ambil IPK semester sebelumnya untuk semua mahasiswa sekaligus
-        $db = \Config\Database::connect();
-        $prevData = $db->table('perkuliahan_mahasiswa pm1')
-            ->select('pm1.id_riwayat_pendidikan, pm1.ipk, pm1.sks_total')
-            ->join('(
-            SELECT id_riwayat_pendidikan, MAX(id_semester) as max_semester
-            FROM perkuliahan_mahasiswa
-            WHERE id_semester < ' . $db->escape($semester) . '
-            GROUP BY id_riwayat_pendidikan
-        ) pm2', 'pm1.id_riwayat_pendidikan = pm2.id_riwayat_pendidikan AND pm1.id_semester = pm2.max_semester', 'inner')
-            ->whereIn('pm1.id_riwayat_pendidikan', $riwayatIds)
-            ->get()
-            ->getResult();
+        // 4. Gabungkan hasil
+        foreach ($dataPerkuliahan as &$mhs) {
+            $idRp = $mhs->id_riwayat_pendidikan;
 
-        // Mapping prev IPK
-        $prevByRiwayat = [];
-        foreach ($prevData as $row) {
-            $prevByRiwayat[$row->id_riwayat_pendidikan] = $row;
+            $sks_semester = $sksSemesterBy[$idRp] ?? 0;
+            $trx          = $transkripBy[$idRp] ?? ['nxsks' => 0, 'sks' => 0];
+
+            $sks_total = $sks_semester + $trx['sks'];
+            $ipk       = $trx['sks'] > 0 ? round($trx['nxsks'] / $trx['sks'], 2) : 0;
+
+            $mhs->sks_semester = $sks_semester;
+            $mhs->sks_total    = $sks_total;
+            $mhs->ipk          = $ipk;
         }
 
-        // 5. Proses per mahasiswa
-        foreach ($dataPerkuliahan as &$value) {
-            $items     = $pesertaByRiwayat[$value->id_riwayat_pendidikan] ?? [];
-            $transfers = $transferByRiwayat[$value->id_riwayat_pendidikan] ?? [];
-
-            [$sks_total, $sks_semester, $ips, $ipk] = $this->hitungIPSIPK($items, $transfers, $semester);
-
-            // jika tidak ada mk di semester tsb → ambil dari prev
-            if ($sks_semester == 0 && isset($prevByRiwayat[$value->id_riwayat_pendidikan])) {
-                $ipk       = $prevByRiwayat[$value->id_riwayat_pendidikan]->ipk;
-                $sks_total = $prevByRiwayat[$value->id_riwayat_pendidikan]->sks_total;
-            }
-
-            $value->sks_total    = $sks_total;
-            $value->sks_semester = $sks_semester;
-            $value->ips          = $ips;
-            $value->ipk          = $ipk;
-        }
-
-        // 6. Update ke database sekaligus
+        // 5. Update batch
         $object->updateBatch($dataPerkuliahan, 'id');
 
         return $this->respond([
@@ -579,6 +569,7 @@ class Repair extends BaseController
             'data'   => $dataPerkuliahan
         ]);
     }
+
 
 
     /**
@@ -626,7 +617,7 @@ class Repair extends BaseController
         return [$sks_total, $sks_semester, $ips, $ipk];
     }
 
-        public function UpdateMahasiswa()
+    public function UpdateMahasiswa()
     {
         $data = $this->request->getJSON();
         $conn = \Config\Database::connect();
@@ -655,5 +646,31 @@ class Repair extends BaseController
                 'message' => $th->getCode() == 1062 ? "Mahasiswa dengan nama, tempat, tanggal lahir dan ibu kandung yang sama sudah ada" : "Maaf, Terjadi kesalahan, silahkan hubungi bagian pengembang!",
             ]);
         }
+    }
+
+    public function mhskip($id_semester)
+    {
+        $param = $this->request->getJSON();
+        $nims = array_map(fn($p) => $p->nim, $param); // ambil semua NIM
+
+        $object = new PerkuliahanMahasiswaModel();
+
+        $data = $object->select("
+            rpm.nim,
+            mahasiswa.nama_mahasiswa,
+            mahasiswa.handphone,
+            sm.nama_status_mahasiswa,
+            tahapan.tahapan
+        ")
+            ->join("riwayat_pendidikan_mahasiswa rpm", "rpm.id = perkuliahan_mahasiswa.id_riwayat_pendidikan", 'left')
+            ->join("mahasiswa", "mahasiswa.id = rpm.id_mahasiswa", 'left')
+            ->join("status_mahasiswa sm", "sm.id_status_mahasiswa = perkuliahan_mahasiswa.id_status_mahasiswa", 'left')
+            ->join("temp_krsm", "temp_krsm.id_riwayat_pendidikan = rpm.id", 'left')
+            ->join("tahapan", "tahapan.id = temp_krsm.id_tahapan", 'left')
+            ->whereIn('rpm.nim', $nims)
+            ->where('perkuliahan_mahasiswa.id_semester', $id_semester)
+            ->findAll();
+
+        return $this->respond($data);
     }
 }
