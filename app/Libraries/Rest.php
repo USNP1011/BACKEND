@@ -51,7 +51,7 @@ class Rest
             CURLOPT_TIMEOUT => 30,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => "{\n    \"act\":\"GetToken\",\n    \"username\":\"sherifadjie@gmail.com\",\n    \"password\":\"Sister_Usn@1011\"\n}",
+            CURLOPT_POSTFIELDS => "{\n    \"act\":\"GetToken\",\n    \"username\":\"usn.center.papua@gmail.com\",\n    \"password\":\"Usn@1011\"\n}",
             CURLOPT_HTTPHEADER => [
                 "Content-Type: application/json"
             ],

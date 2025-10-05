@@ -28,10 +28,10 @@ class Database extends Config
     
     public array $default = [
         'DSN'          => '',
-        'hostname'     => 'localhost',
-        'username'     => 'root',
-        'password'     => 'Sonyalpha@77', 
-        'database'     => 'simak_usn',
+        'hostname'     => 'usn-papua.ac.id',
+        'username'     => 'u3011751_siakad',
+        'password'     => 'Usn@1011', 
+        'database'     => 'u3011751_sistem_akademik',
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',
         'pConnect'     => true,

@@ -433,4 +433,5 @@ $routes->group('repair', function($routes){
     $routes->post('update_mahasiswa', 'Repair::UpdateMahasiswa');
     $routes->get('hitung_akm/(:hash)', 'Repair::hitungAKM/$1');
     $routes->post('mhskip/(:hash)', 'Repair::mhskip/$1');
+    $routes->get('uuid', 'Testing::uuid');
 });
