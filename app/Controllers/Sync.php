@@ -448,7 +448,7 @@ class Sync extends BaseController
                     }
                 } else {
                     $item = [
-                        'id_aktivitas_mengajar' => $value->id_aktivitas_mengajar
+                        'id_kelas_kuliah' => $value->id_kelas_kuliah
                     ];
                     $setData = (object) $item;
                     $result = $this->api->deleteData('DeleteKelasKuliah', $this->token, $setData);
