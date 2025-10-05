@@ -42,7 +42,7 @@ class Rest
 
         $curl = curl_init();
         curl_setopt_array($curl, [
-            CURLOPT_URL => 'https://feeder.usn-papua.ac.id/ws/sandbox2.php',
+            CURLOPT_URL => 'https://feeder.usn-papua.ac.id/ws/live2.php',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_SSL_VERIFYPEER => 0,
             CURLOPT_SSL_VERIFYHOST => 0,
