@@ -38,6 +38,7 @@ class Krsm extends ResourceController
                                     ->join('dosen_pengajar_kelas', 'dosen_pengajar_kelas.kelas_kuliah_id=kelas_kuliah.id', 'left')
                                     ->join('kelas', 'kelas.id=kelas_kuliah.kelas_id', 'left')
                                     ->where('temp_krsm_id', $data->id)
+                                    ->where("dosen_pengajar_kelas.mengajar", '1')
                                     ->findAll();
                                 $object = new \App\Models\TahapanModel();
                                 return $this->respond([
@@ -84,6 +85,7 @@ class Krsm extends ResourceController
                         ->join('kelas', 'kelas.id = kelas_kuliah.kelas_id', 'left')
                         ->where('id_riwayat_pendidikan', $profile->id_riwayat_pendidikan)
                         ->where('kelas_kuliah.id_semester', $semester->id_semester)
+                        ->where("dosen_pengajar_kelas.mengajar", '1')
                         ->findAll();
                     $sks_semester = 0;
                     foreach ($items as $key => $value) {
