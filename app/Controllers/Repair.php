@@ -123,6 +123,7 @@ class Repair extends BaseController
 
     public function transkrip($id_semester)
     {
+        ini_set('memory_limit', '1024M');
         $db = db_connect();
 
         try {
@@ -136,6 +137,7 @@ class Repair extends BaseController
                 ->join('kelas_kuliah', 'kelas_kuliah.id = peserta_kelas.kelas_kuliah_id', 'left')
                 ->join('nilai_kelas', 'nilai_kelas.id_nilai_kelas = peserta_kelas.id', 'left')
                 ->join('matakuliah', 'matakuliah.id = kelas_kuliah.matakuliah_id', 'left')
+                ->where('kelas_kuliah.matakuliah_id IS NOT NULL')
                 ->whereNotIn('kelas_kuliah.id_semester', [$id_semester])
                 ->get()->getResult();
 
@@ -215,7 +217,9 @@ class Repair extends BaseController
                 foreach ($matkulList as $matkulId => $nilaiSet) {
                     // sort by nilai_indeks tertinggi
                     usort($nilaiSet, function ($a, $b) {
-                        return ($b['nilai_indeks'] ?? 0) <=> ($a['nilai_indeks'] ?? 0);
+                        $aNilai = $a['nilai_indeks'] ?? 0;
+                        $bNilai = $b['nilai_indeks'] ?? 0;
+                        return $bNilai <=> $aNilai;
                     });
 
                     // ambil yang tertinggi
