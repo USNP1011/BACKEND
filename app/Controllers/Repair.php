@@ -214,7 +214,9 @@ class Repair extends BaseController
             foreach ($kandidat as $idPendidikan => $matkulList) {
                 foreach ($matkulList as $matkulId => $nilaiSet) {
                     // sort by nilai_indeks tertinggi
-                    usort($nilaiSet, fn($a, $b) => $b['nilai_indeks'] <=> $a['nilai_indeks']);
+                    usort($nilaiSet, function ($a, $b) {
+                        return ($b['nilai_indeks'] ?? 0) <=> ($a['nilai_indeks'] ?? 0);
+                    });
 
                     // ambil yang tertinggi
                     $item = $nilaiSet[0];
@@ -673,5 +675,4 @@ class Repair extends BaseController
 
         return $this->respond($data);
     }
-
 }
